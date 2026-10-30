@@ -1,3 +1,9 @@
+# Backend de Clínica Vida Salud
+
+Laravel 13, PHP 8.3 y PostgreSQL 16. Consultar [preparación local, esquema y revisión técnica](docs/esquema-postgresql.md) antes de configurar la base de datos. Las migraciones y los seeders se ejecutarán por separado cuando el equipo lo autorice.
+
+La documentación general del framework se conserva a continuación.
+
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
 <p align="center">

@@ -2,20 +2,65 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Paquetes\P1_SeguridadAdministracion\Auditoria;
+use App\Models\Paquetes\P1_SeguridadAdministracion\Rol;
+use App\Models\Paquetes\P2_PersonalMedico\Medico;
+use App\Models\Paquetes\P3_GestionPacientes\Paciente;
+use App\Models\Paquetes\P4_GestionCitas\HistorialCambioCita;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password'])]
-#[Hidden(['password', 'remember_token'])]
+#[Fillable(['nombre_usuario', 'correo', 'password_hash', 'estado', 'id_rol', 'id_paciente', 'id_medico'])]
+#[Hidden(['password_hash'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
+
+    protected $table = 'usuarios';
+
+    protected $primaryKey = 'id_usuario';
+
+    // El esquema actual no almacena tokens de «recordarme».
+    protected $rememberTokenName = '';
+
+    public $timestamps = false;
+
+    public function getAuthPasswordName(): string
+    {
+        return 'password_hash';
+    }
+
+    public function rol(): BelongsTo
+    {
+        return $this->belongsTo(Rol::class, 'id_rol', 'id_rol');
+    }
+
+    public function paciente(): BelongsTo
+    {
+        return $this->belongsTo(Paciente::class, 'id_paciente', 'id_paciente');
+    }
+
+    public function medico(): BelongsTo
+    {
+        return $this->belongsTo(Medico::class, 'id_medico', 'id_medico');
+    }
+
+    public function auditorias(): HasMany
+    {
+        return $this->hasMany(Auditoria::class, 'id_usuario', 'id_usuario');
+    }
+
+    public function historialCambiosCita(): HasMany
+    {
+        return $this->hasMany(HistorialCambioCita::class, 'id_usuario', 'id_usuario');
+    }
 
     /**
      * Get the attributes that should be cast.
@@ -25,8 +70,11 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'password_hash' => 'hashed',
+            'estado' => 'boolean',
+            'id_rol' => 'integer',
+            'id_paciente' => 'integer',
+            'id_medico' => 'integer',
         ];
     }
 }
