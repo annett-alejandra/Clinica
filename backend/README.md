@@ -1,6 +1,8 @@
 # Backend de Clínica Vida Salud
 
-Laravel 13, PHP 8.3 y PostgreSQL 16. Consultar [preparación local, esquema y revisión técnica](docs/esquema-postgresql.md) antes de configurar la base de datos. Las migraciones y los seeders se ejecutarán por separado cuando el equipo lo autorice.
+Laravel 13, PHP 8.3 y PostgreSQL 16, con interfaces PHP mediante Blade, HTML y CSS. La arquitectura MVC conserva los siete paquetes funcionales y sus 19 casos de uso.
+
+Consultar la [arquitectura MVC y vistas Blade](docs/arquitectura-mvc-blade.md) para ubicar las vistas, los recursos públicos, las rutas web, las sesiones y los formularios con CSRF. La [revisión del esquema PostgreSQL](docs/esquema-postgresql.md) documenta las once tablas y sus restricciones; esta modificación de interfaces no ejecuta migraciones ni seeders.
 
 La documentación general del framework se conserva a continuación.
 

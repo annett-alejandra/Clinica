@@ -1,161 +1,83 @@
-<div align="center">
+# Clínica Vida Salud
 
-<!-- Banner Superior Animado -->
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0:1976D2,100:00C9FF&height=200&section=header&text=Clínica%20Vida%20Salud&fontSize=60&fontColor=ffffff&animation=twinkling&fontAlignY=35&desc=Sistema%20Web%20de%20Gestión%20de%20Citas%20Médicas&descAlignY=55&descSize=20" width="100%" />
+Sistema web de gestión de citas médicas desarrollado con **Laravel 13, PHP 8.3, PostgreSQL 16 y vistas Blade**. Las interfaces se construyen en PHP, HTML y CSS; JavaScript se utiliza para mejoras progresivas.
 
-<!-- Animación de Escritura -->
-<a href="https://git.io/typing-svg">
-  <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=600&size=22&pause=1000&color=1976D2&center=true&vCenter=true&width=800&lines=Desarrollado+con+React+%2B+PHP+%2B+PostgreSQL;Arquitectura+API+REST+y+Patrón+MVC;Ingeniería+de+Requisitos+y+Modelado;UAGRM+-+FICCT+-+Grupo+22" alt="Typing SVG" />
-</a>
+La clínica busca centralizar pacientes, médicos, especialidades, horarios y reservas para evitar superposiciones y pérdidas de información. Los actores del sistema son Administrador, Recepcionista, Médico y Paciente; las citas conservan los estados Programada, Confirmada, Atendida, Cancelada e Inasistencia.
 
-<br/>
+## Información académica
 
-<!-- Escudos de Estado -->
-![Estado](https://img.shields.io/badge/Estado-En_Desarrollo-orange?style=for-the-badge&logo=statuspage&logoColor=white)
-![Metodología](https://img.shields.io/badge/Metodología-PUDS-blue?style=for-the-badge)
-![Arquitectura](https://img.shields.io/badge/Arquitectura-MVC_|_API_REST-purple?style=for-the-badge)
+| Campo | Información |
+| --- | --- |
+| Universidad | Universidad Autónoma Gabriel René Moreno (UAGRM) |
+| Facultad | Ingeniería en Ciencias de la Computación y Telecomunicaciones |
+| Materia | Ingeniería de Requisitos y Modelado |
+| Docente | MSc. Ing. Angélica Garzón Cuéllar |
+| Grupo | 22 - SC |
+| Gestión | 2/2026 |
 
-</div>
+## Arquitectura MVC
 
----
+La organización por paquetes sigue el enfoque académico de TELCOM. La aplicación se concentra en `backend/`: Laravel recibe las solicitudes web, los controladores utilizan servicios y modelos Eloquent, y las vistas Blade generan el HTML.
 
-## 📑 Información Académica
+| Capa | Ubicación |
+| --- | --- |
+| Controladores | `backend/app/Http/Controllers/Paquetes/` |
+| Modelos | `backend/app/Models/Paquetes/` y el único `backend/app/Models/User.php` |
+| Servicios | `backend/app/Services/Paquetes/` |
+| Vistas | `backend/resources/views/Paquetes/` |
+| Plantillas y componentes | `backend/resources/views/layouts/` y `components/` |
+| Rutas web | `backend/routes/web.php` |
+| CSS y JavaScript utilizados por Blade | `backend/public/css/` y `backend/public/js/` |
 
-<table align="center" width="100%">
-  <tr>
-    <td align="center"><b>🏛️ Universidad</b></td>
-    <td align="center">Universidad Autónoma Gabriel René Moreno (UAGRM)</td>
-  </tr>
-  <tr>
-    <td align="center"><b>🏫 Facultad</b></td>
-    <td align="center">Ingeniería en Ciencias de la Computación y Telecomunicaciones</td>
-  </tr>
-  <tr>
-    <td align="center"><b>📚 Materia</b></td>
-    <td align="center">Ingeniería de Requisitos y Modelado</td>
-  </tr>
-  <tr>
-    <td align="center"><b>👩‍🏫 Docente</b></td>
-    <td align="center">MSc. Ing. Angélica Garzón Cuéllar</td>
-  </tr>
-  <tr>
-    <td align="center"><b>👥 Grupo</b></td>
-    <td align="center"><b>Grupo 22 - SC</b></td>
-  </tr>
-  <tr>
-    <td align="center"><b>📅 Gestión</b></td>
-    <td align="center">2/2026</td>
-  </tr>
-</table>
+Los siete paquetes y sus 19 casos de uso conservan sus nombres y numeración:
 
----
+| Paquete | Casos de uso |
+| --- | --- |
+| P1_SeguridadAdministracion | CU01–CU04: iniciar y cerrar sesión, usuarios y roles, especialidades médicas |
+| P2_PersonalMedico | CU05–CU06: médicos y horarios de atención |
+| P3_GestionPacientes | CU07–CU09: pacientes, perfil y registro de cuenta |
+| P4_GestionCitas | CU10–CU13: disponibilidad, programación, reprogramación y cancelación |
+| P5_ControlAtencion | CU14–CU15: confirmación, asistencia, inasistencia y atención |
+| P6_ConsultasHistoriales | CU16–CU18: agenda médica, historial del paciente y mis citas |
+| P7_ReportesEstadisticas | CU19: reportes administrativos |
 
-## 🏥 Descripción del Proyecto
+Las carpetas de vistas de los casos de uso son marcadores estructurales. Esta etapa prepara el layout, los componentes y los recursos compartidos; las pantallas y operaciones de negocio se implementarán posteriormente.
 
-La **Clínica Vida Salud** es un establecimiento médico privado (caso de estudio) que actualmente gestiona sus citas de forma manual (cuadernos, llamadas y hojas de cálculo), lo que genera duplicidad de citas, pérdida de información y demoras en la atención. 
+## Tecnologías
 
-Este proyecto consiste en el desarrollo de una aplicación web moderna que centralice la información de pacientes, médicos, especialidades, horarios y reservas. El sistema permitirá **verificar la disponibilidad en tiempo real**, evitar la superposición de horarios para un mismo médico, y gestionar los estados de las citas (Programada, Confirmada, Atendida, Cancelada e Inasistencia).
+- PHP 8.3 y Laravel 13 para la aplicación y el renderizado de vistas Blade.
+- HTML y CSS para las interfaces, con JavaScript opcional.
+- PostgreSQL 16 con once tablas funcionales y sus restricciones existentes.
+- Sesiones de Laravel en archivos y formularios protegidos con CSRF en el grupo `web`.
 
----
+Se retiró la carpeta `frontend/` después de confirmar que contenía la plantilla React/Vite y directorios vacíos. La nueva base Blade sirve sus recursos públicos directamente y no requiere Node.js para visualizarse. Las herramientas iniciales de Vite del backend se conservan como opción para compilar assets en el futuro.
 
-## 👥 Actores del Sistema
+## Ejecución local
 
-<table align="center" width="100%">
-  <tr>
-    <td align="center" width="25%">
-      <img src="https://img.shields.io/badge/ADMINISTRADOR-1976D2?style=for-the-badge&logo=googlecloud&logoColor=white" /><br/><br/>
-      <b>Control Total</b><br/>
-      <small>Gestión de usuarios, médicos y especialidades.</small>
-    </td>
-    <td align="center" width="25%">
-      <img src="https://img.shields.io/badge/RECEPCIONISTA-1976D2?style=for-the-badge&logo=applepay&logoColor=white" /><br/><br/>
-      <b>Agenda y Pacientes</b><br/>
-      <small>Programación y cancelación de citas.</small>
-    </td>
-    <td align="center" width="25%">
-      <img src="https://img.shields.io/badge/MÉDICO-1976D2?style=for-the-badge&logo=health&logoColor=white" /><br/><br/>
-      <b>Consulta Médica</b><br/>
-      <small>Visualización de su agenda y registro de asistencia.</small>
-    </td>
-    <td align="center" width="25%">
-      <img src="https://img.shields.io/badge/PACIENTE-1976D2?style=for-the-badge&logo=user&logoColor=white" /><br/><br/>
-      <b>Autogestión</b><br/>
-      <small>Reserva de turnos y consulta de historial.</small>
-    </td>
-  </tr>
-</table>
+Requisitos: PHP 8.3 con `pdo_pgsql`, Composer, PostgreSQL 16 y Git.
 
----
+Para una instalación nueva, instalar las dependencias con Composer y preparar un `.env` propio a partir de `backend/.env.example`, sin sobrescribir configuraciones existentes ni publicar credenciales. La clave de aplicación se genera únicamente al preparar un entorno nuevo. Las migraciones y los seeders se gestionan por separado según el estado de cada instalación.
 
-## 🛠️ Stack Tecnológico (Arquitectura Desacoplada)
+Con el entorno existente ya preparado:
 
-<div align="center">
-  <a href="https://skillicons.dev">
-    <img src="https://skillicons.dev/icons?i=react,vite,js,html,css,php,postgres,git,github,vscode,postman&perline=6" />
-  </a>
+```bash
+cd backend
+php artisan serve
+```
 
-  <br/><br/>
-  
-  <table>
-    <tr>
-      <td align="center"><b>Frontend</b></td>
-      <td align="center"><b>Backend</b></td>
-      <td align="center"><b>Base de Datos</b></td>
-    </tr>
-    <tr>
-      <td align="center">React + Vite</td>
-      <td align="center">PHP (API REST)</td>
-      <td align="center">PostgreSQL</td>
-    </tr>
-  </table>
-</div>
+Abrir la dirección mostrada por Laravel. No es necesario ejecutar otro servidor de frontend.
 
----
+## Documentación
 
-## 🎨 Diseño UI/UX & Librerías (Fase de Definición)
+- [Árbol MVC completo, siete paquetes, 19 casos de uso y componentes Blade](backend/docs/arquitectura-mvc-blade.md).
+- [Esquema PostgreSQL y decisiones de integridad](backend/docs/esquema-postgresql.md).
+- [Documentación del backend](backend/README.md).
 
-*(El equipo se encuentra evaluando las siguientes opciones para garantizar una experiencia de usuario óptima)*
+## Comprobaciones
 
-| Elemento | Opciones Evaluadas / Propuesta |
-| :--- | :--- |
-| **Framework CSS** | `Tailwind CSS` *(Mayor libertad de diseño)* o `Material-UI` *(Componentes listos para React)* |
-| **Calendario** | `FullCalendar` *(El estándar para agendas médicas)* |
-| **Notificaciones** | `SweetAlert2` *(Para alertas de citas confirmadas/canceladas)* |
-| **Paleta de Colores** | 🟦 Azul Clínico `#1976D2` / ⬜ Blanco `#FFFFFF` / 🟩 Verde Salud `#2E7D32` / 🟥 Rojo Alerta `#E53935` |
+Las pruebas de arquitectura renderizan Blade, verifican sesiones y CSRF y comprueban los directorios de los paquetes. No ejecutan migraciones ni crean datos reales:
 
----
-
-## 📊 Progreso de los Módulos
-
-![Seguridad](https://img.shields.io/badge/🔐_Seguridad_y_Acceso-100%25-2E7D32?style=flat-square)
-![Pacientes](https://img.shields.io/badge/🧑‍🤝‍🧑_Pacientes-100%25-2E7D32?style=flat-square)
-![Médicos](https://img.shields.io/badge/👨‍⚕️_Médicos_y_Horarios-100%25-2E7D32?style=flat-square)
-![Citas](https://img.shields.io/badge/📅_Gestión_de_Citas-80%25-yellow?style=flat-square)
-![Reportes](https://img.shields.io/badge/📊_Reportes-10%25-red?style=flat-square)
-
----
-
-## 🚀 Instrucciones de Instalación y Ejecución
-
-Si deseas clonar y ejecutar este proyecto en tu entorno local, sigue estos pasos:
-
-<details>
-  <summary><b>1. Requisitos Previos (Haz clic para expandir)</b></summary>
-  <br/>
-  Asegúrate de tener instalado:
-  <ul>
-    <li><a href="https://nodejs.org/">Node.js</a> (v18 o superior) y npm.</li>
-    <li><a href="https://www.apachefriends.org/es/index.html">XAMPP</a> o Laragon (para el servidor PHP).</li>
-    <li><a href="https://www.postgresql.org/">PostgreSQL</a> (v14 o superior).</li>
-    <li><a href="https://git-scm.com/">Git</a> para el control de versiones.</li>
-  </ul>
-</details>
-
-<details>
-  <summary><b>2. Clonar el Repositorio</b></summary>
-  <br/>
-  
-  ```bash
-  # Abre tu terminal y ejecuta:
-  git clone https://github.com/tu-usuario/nombre-del-repositorio.git
-  cd nombre-del-repositorio
+```bash
+cd backend
+php vendor/phpunit/phpunit/phpunit --do-not-cache-result
+```
