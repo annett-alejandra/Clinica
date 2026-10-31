@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { EspecialidadModel } from '../../../models/Paquetes/P1_SeguridadAdministracion/EspecialidadModel';
+import { EspecialidadModel } from '../../../../models/Paquetes/P1_SeguridadAdministracion/EspecialidadModel';
 
 export function useEspecialidadController() {
   const [especialidades, setEspecialidades] = useState([]);

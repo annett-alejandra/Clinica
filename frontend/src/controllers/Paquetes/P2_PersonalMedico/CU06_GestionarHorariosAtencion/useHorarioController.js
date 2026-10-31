@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { HorarioModel } from '../../../models/Paquetes/P2_PersonalMedico/HorarioModel';
-import { MedicoModel } from '../../../models/Paquetes/P2_PersonalMedico/MedicoModel';
+import { HorarioModel } from '../../../../models/Paquetes/P2_PersonalMedico/HorarioModel';
+import { MedicoModel } from '../../../../models/Paquetes/P2_PersonalMedico/MedicoModel';
 
 export function useHorarioController() {
   const [horarios, setHorarios] = useState([]);

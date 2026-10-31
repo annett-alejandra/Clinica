@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AuthModel } from '../../../models/Paquetes/P1_SeguridadAdministracion/AuthModel';
+import { AuthModel } from '../../../../models/Paquetes/P1_SeguridadAdministracion/AuthModel';
 
 export function useAuthController(onLoginSuccess, onLogoutSuccess) {
   const [loading, setLoading] = useState(false);

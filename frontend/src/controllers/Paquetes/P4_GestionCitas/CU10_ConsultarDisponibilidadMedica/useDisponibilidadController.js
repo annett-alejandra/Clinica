@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import { DisponibilidadModel } from '../../../models/Paquetes/P4_GestionCitas/DisponibilidadModel';
-import { EspecialidadModel } from '../../../models/Paquetes/P1_SeguridadAdministracion/EspecialidadModel';
-import { MedicoModel } from '../../../models/Paquetes/P2_PersonalMedico/MedicoModel';
+import { DisponibilidadModel } from '../../../../models/Paquetes/P4_GestionCitas/DisponibilidadModel';
+import { EspecialidadModel } from '../../../../models/Paquetes/P1_SeguridadAdministracion/EspecialidadModel';
+import { MedicoModel } from '../../../../models/Paquetes/P2_PersonalMedico/MedicoModel';
 
 export function useDisponibilidadController() {
   const [especialidades, setEspecialidades] = useState([]);

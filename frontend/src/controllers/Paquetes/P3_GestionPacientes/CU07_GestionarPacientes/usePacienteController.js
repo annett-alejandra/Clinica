@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { PacienteModel } from '../../../models/Paquetes/P3_GestionPacientes/PacienteModel';
+import { PacienteModel } from '../../../../models/Paquetes/P3_GestionPacientes/PacienteModel';
 
 export function usePacienteController() {
   const [pacientes, setPacientes] = useState([]);

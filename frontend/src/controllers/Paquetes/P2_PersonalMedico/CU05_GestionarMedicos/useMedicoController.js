@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { MedicoModel } from '../../../models/Paquetes/P2_PersonalMedico/MedicoModel';
-import { EspecialidadModel } from '../../../models/Paquetes/P1_SeguridadAdministracion/EspecialidadModel';
+import { MedicoModel } from '../../../../models/Paquetes/P2_PersonalMedico/MedicoModel';
+import { EspecialidadModel } from '../../../../models/Paquetes/P1_SeguridadAdministracion/EspecialidadModel';
 
 export function useMedicoController() {
   const [medicos, setMedicos] = useState([]);

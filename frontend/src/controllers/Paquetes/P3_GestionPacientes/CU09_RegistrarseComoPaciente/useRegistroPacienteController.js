@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { PacienteModel } from '../../../models/Paquetes/P3_GestionPacientes/PacienteModel';
+import { PacienteModel } from '../../../../models/Paquetes/P3_GestionPacientes/PacienteModel';
 
 export function useRegistroPacienteController(onRegistroExitoso) {
   const [loading, setLoading] = useState(false);

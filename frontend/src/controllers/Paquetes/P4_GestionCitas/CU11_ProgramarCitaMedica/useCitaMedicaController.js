@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { CitaMedicaModel } from '../../../models/Paquetes/P4_GestionCitas/CitaMedicaModel';
-import { PacienteModel } from '../../../models/Paquetes/P3_GestionPacientes/PacienteModel';
-import { MedicoModel } from '../../../models/Paquetes/P2_PersonalMedico/MedicoModel';
-import { EspecialidadModel } from '../../../models/Paquetes/P1_SeguridadAdministracion/EspecialidadModel';
+import { CitaMedicaModel } from '../../../../models/Paquetes/P4_GestionCitas/CitaMedicaModel';
+import { PacienteModel } from '../../../../models/Paquetes/P3_GestionPacientes/PacienteModel';
+import { MedicoModel } from '../../../../models/Paquetes/P2_PersonalMedico/MedicoModel';
+import { EspecialidadModel } from '../../../../models/Paquetes/P1_SeguridadAdministracion/EspecialidadModel';
 
 export function useCitaMedicaController() {
   const [citas, setCitas] = useState([]);

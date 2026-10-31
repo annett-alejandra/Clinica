@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { UsuarioModel } from '../../../models/Paquetes/P1_SeguridadAdministracion/UsuarioModel';
+import { UsuarioModel } from '../../../../models/Paquetes/P1_SeguridadAdministracion/UsuarioModel';
 
 export function useUsuarioController() {
   const [usuarios, setUsuarios] = useState([]);
