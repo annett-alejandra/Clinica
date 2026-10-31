@@ -1,0 +1,46 @@
+services:
+  app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: clinica_app
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/var/www/html
+      - ./backend/docker-entrypoint.sh:/usr/local/bin/docker-entrypoint.sh
+    environment:
+      APP_ENV: local
+      APP_DEBUG: "true"
+      DB_CONNECTION: pgsql
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_DATABASE: clinica_vida_salud
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:16-alpine
+    container_name: clinica_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: clinica_vida_salud
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - clinica_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d clinica_vida_salud"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  clinica_pgdata:
+    driver: local
