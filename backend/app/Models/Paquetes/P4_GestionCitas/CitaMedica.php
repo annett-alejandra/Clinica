@@ -72,6 +72,11 @@ class CitaMedica extends Model
         return $this->belongsTo(EstadoCita::class, 'id_estado_cita', 'id_estado_cita');
     }
 
+    public function estadoCita(): BelongsTo
+    {
+        return $this->estado();
+    }
+
     public function historialCambios(): HasMany
     {
         return $this->hasMany(HistorialCambioCita::class, 'id_cita', 'id_cita');
