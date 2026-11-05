@@ -76,7 +76,7 @@
 <!-- =========================================================================
      00. APERTURA E INTRO INMERSIVA (HERO SECTION OPTIMIZADA)
      ========================================================================= -->
-<section class="relative min-h-[90vh] lg:min-h-screen flex flex-col justify-between pt-20 md:pt-24 pb-8 md:pb-12 border-b border-slate-200">
+<section class="relative min-h-[85vh] lg:min-h-[calc(100vh-4.75rem)] flex flex-col justify-between pt-6 md:pt-10 pb-8 md:pb-12 border-b border-slate-200">
     <!-- Difusor de Iluminación Ligero (GPU Friendly) -->
     <div class="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
         <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[350px] bg-sky-200/20 rounded-full blur-[60px]"></div>

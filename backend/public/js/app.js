@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const isExpanded = menuToggleBtn.getAttribute('aria-expanded') === 'true';
             menuToggleBtn.setAttribute('aria-expanded', !isExpanded);
             mobileMenu.classList.toggle('hidden');
+            mobileMenu.classList.toggle('is-open');
         });
 
         // Cerrar menú al hacer clic en un enlace
@@ -20,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
             link.addEventListener('click', () => {
                 menuToggleBtn.setAttribute('aria-expanded', 'false');
                 mobileMenu.classList.add('hidden');
+                mobileMenu.classList.remove('is-open');
             });
         });
     }

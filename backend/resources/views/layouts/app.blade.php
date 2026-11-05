@@ -11,6 +11,27 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
+    <!-- Tailwind CSS (CDN oficial ultraligero para utilidades Blade y diseño responsivo) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0284C7',
+                        'primary-hover': '#0369A1',
+                        secondary: '#0D9488',
+                    },
+                    fontFamily: {
+                        display: ['Cormorant Garamond', 'Georgia', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
     <!-- Estilos Globales y Tokens Clínicos (Cero Lag) -->
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     
@@ -28,7 +49,7 @@
 
     <a class="skip-link" href="#contenido">Ir al contenido</a>
 
-    <!-- Header Flotante Editorial y Totalmente Responsivo -->
+    <!-- Header Flotante / Sticky Editorial y Totalmente Responsivo -->
     <header class="site-header">
         <div class="container site-header-inner">
             <a class="brand" href="{{ route('inicio') }}" aria-label="Inicio Clínica Vida Salud">
@@ -36,55 +57,117 @@
                 <span class="brand-dot" aria-hidden="true"></span>
             </a>
 
-            <!-- Navegación por Módulos y Casos de Uso Laravel Blade -->
-            <nav class="hidden lg:flex items-center" aria-label="Navegación clínica">
-                <ul class="nav-links">
-                    <li>
-                        <a href="{{ url('/citas') }}" class="nav-item">
-                            <span class="nav-num">CU11</span>Citas
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ url('/agenda-medica') }}" class="nav-item">
-                            <span class="nav-num">CU16</span>Agenda
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ url('/control-atencion') }}" class="nav-item">
-                            <span class="nav-num">CU14</span>Control
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ url('/atencion-medica') }}" class="nav-item">
-                            <span class="nav-num">CU15</span>Consultas
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ url('/historial-paciente') }}" class="nav-item">
-                            <span class="nav-num">CU17</span>Historial
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ url('/mis-citas') }}" class="nav-item">
-                            <span class="nav-num">CU18</span>Mis Citas
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ url('/perfil-paciente') }}" class="nav-item">
-                            <span class="nav-num">CU08</span>Perfil
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ url('/reportes-administrativos') }}" class="nav-item">
-                            <span class="nav-num">CU19</span>Reportes
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ url('/usuarios') }}" class="nav-item">
-                            <span class="nav-num">CU03</span>Usuarios
-                        </a>
-                    </li>
-                </ul>
+            <!-- Navegación Principal y Módulos Clínicos Organizados -->
+            <nav class="hidden lg:flex items-center gap-6" aria-label="Navegación principal">
+                <a href="{{ route('inicio') }}" class="nav-item">Inicio</a>
+                <a href="{{ url('/#capitulo-01') }}" class="nav-item">El Complejo</a>
+                <a href="{{ url('/#capitulo-02') }}" class="nav-item">Unidades & Suites</a>
+                <a href="{{ url('/#capitulo-03') }}" class="nav-item">Especialidades</a>
+
+                <!-- Desplegable Elegante de Casos de Uso / Módulos Clínicos -->
+                <div class="nav-dropdown" x-data="{ open: false }">
+                    <button 
+                        type="button" 
+                        class="nav-item nav-dropdown-trigger flex items-center gap-1.5 focus:outline-none"
+                        @click="open = !open" 
+                        @click.outside="open = false"
+                        aria-expanded="false"
+                    >
+                        <span>Módulos Clínicos</span>
+                        <svg class="w-3.5 h-3.5 text-slate-400 transition-transform duration-200" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+
+                    <div 
+                        x-show="open" 
+                        x-cloak 
+                        x-transition:enter="transition ease-out duration-150"
+                        x-transition:enter-start="opacity-0 translate-y-2"
+                        x-transition:enter-end="opacity-100 translate-y-0"
+                        x-transition:leave="transition ease-in duration-100"
+                        x-transition:leave-start="opacity-100 translate-y-0"
+                        x-transition:leave-end="opacity-0 translate-y-2"
+                        class="nav-dropdown-menu"
+                    >
+                        <div class="dropdown-grid">
+                            <!-- Columna 1: Consultas y Atención Médica -->
+                            <div class="dropdown-col">
+                                <span class="dropdown-heading">Atención Médica</span>
+                                <a href="{{ url('/citas') }}" class="dropdown-link">
+                                    <span class="cu-badge">CU11</span>
+                                    <div>
+                                        <div class="dropdown-title">Citas Médicas</div>
+                                        <div class="dropdown-desc">Reserva y programación de consultas</div>
+                                    </div>
+                                </a>
+                                <a href="{{ url('/agenda-medica') }}" class="dropdown-link">
+                                    <span class="cu-badge">CU16</span>
+                                    <div>
+                                        <div class="dropdown-title">Agenda Médica</div>
+                                        <div class="dropdown-desc">Horarios y disponibilidad facultativa</div>
+                                    </div>
+                                </a>
+                                <a href="{{ url('/control-atencion') }}" class="dropdown-link">
+                                    <span class="cu-badge">CU14</span>
+                                    <div>
+                                        <div class="dropdown-title">Control de Atención</div>
+                                        <div class="dropdown-desc">Monitoreo de flujo y sala de espera</div>
+                                    </div>
+                                </a>
+                                <a href="{{ url('/atencion-medica') }}" class="dropdown-link">
+                                    <span class="cu-badge">CU15</span>
+                                    <div>
+                                        <div class="dropdown-title">Consultas Clínicas</div>
+                                        <div class="dropdown-desc">Evolución, diagnóstico y prescripción</div>
+                                    </div>
+                                </a>
+                                <a href="{{ url('/historial-paciente') }}" class="dropdown-link">
+                                    <span class="cu-badge">CU17</span>
+                                    <div>
+                                        <div class="dropdown-title">Historial Clínico</div>
+                                        <div class="dropdown-desc">Expediente integral del paciente</div>
+                                    </div>
+                                </a>
+                            </div>
+
+                            <!-- Columna 2: Portal Paciente y Administración -->
+                            <div class="dropdown-col">
+                                <span class="dropdown-heading">Portal Paciente</span>
+                                <a href="{{ url('/mis-citas') }}" class="dropdown-link">
+                                    <span class="cu-badge">CU18</span>
+                                    <div>
+                                        <div class="dropdown-title">Mis Citas</div>
+                                        <div class="dropdown-desc">Gestión autónoma de citas médicas</div>
+                                    </div>
+                                </a>
+                                <a href="{{ url('/perfil-paciente') }}" class="dropdown-link">
+                                    <span class="cu-badge">CU08</span>
+                                    <div>
+                                        <div class="dropdown-title">Perfil Paciente</div>
+                                        <div class="dropdown-desc">Filiación y datos personales</div>
+                                    </div>
+                                </a>
+
+                                <span class="dropdown-heading mt-4">Administración</span>
+                                <a href="{{ url('/reportes-administrativos') }}" class="dropdown-link">
+                                    <span class="cu-badge">CU19</span>
+                                    <div>
+                                        <div class="dropdown-title">Reportes</div>
+                                        <div class="dropdown-desc">Métricas operativas y estadísticas</div>
+                                    </div>
+                                </a>
+                                <a href="{{ url('/usuarios') }}" class="dropdown-link">
+                                    <span class="cu-badge">CU03</span>
+                                    <div>
+                                        <div class="dropdown-title">Usuarios & Roles</div>
+                                        <div class="dropdown-desc">Control de accesos y seguridad</div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </nav>
 
             <!-- Acciones Rápidas y Accesibilidad -->
@@ -101,7 +184,7 @@
                 </button>
 
                 <!-- CTA Principal: Coordinación y Citas -->
-                <a href="#admisiones" class="btn-primary">
+                <a href="{{ url('/citas') }}" class="btn-primary">
                     <span class="hidden sm:inline">Agendar Cita</span>
                     <span class="sm:hidden">Cita</span>
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -124,28 +207,60 @@
             </div>
         </div>
 
-        <!-- Menú Móvil Desplegable -->
-        <div id="mobile-menu" class="hidden lg:hidden border-t border-slate-200 bg-white/95 backdrop-blur-md px-6 py-4 shadow-luxury">
-            <nav class="flex flex-col gap-3" aria-label="Menú móvil">
-                <a href="#capitulo-01" class="py-2 text-sm font-medium text-slate-700 hover:text-primary flex items-center justify-between border-b border-slate-100">
+        <!-- Menú Móvil Desplegable (Estrictamente Oculto por Defecto en Desktop y Móvil hasta Abrir) -->
+        <div id="mobile-menu" class="hidden lg:hidden border-t border-slate-200 bg-white/95 backdrop-blur-md px-6 py-5 shadow-luxury">
+            <nav class="flex flex-col gap-2" aria-label="Menú móvil">
+                <span class="text-[11px] font-mono uppercase tracking-widest text-slate-400 font-semibold mb-1">Navegación General</span>
+                <a href="{{ route('inicio') }}" class="py-2 text-sm font-medium text-slate-700 hover:text-primary flex items-center justify-between border-b border-slate-100">
+                    <span>Inicio</span>
+                    <span class="text-xs text-slate-400">→</span>
+                </a>
+                <a href="{{ url('/#capitulo-01') }}" class="py-2 text-sm font-medium text-slate-700 hover:text-primary flex items-center justify-between border-b border-slate-100">
                     <span>01 El Complejo Hospitalario</span>
                     <span class="text-xs text-slate-400">→</span>
                 </a>
-                <a href="#capitulo-02" class="py-2 text-sm font-medium text-slate-700 hover:text-primary flex items-center justify-between border-b border-slate-100">
+                <a href="{{ url('/#capitulo-02') }}" class="py-2 text-sm font-medium text-slate-700 hover:text-primary flex items-center justify-between border-b border-slate-100">
                     <span>02 Unidades Clínicas & Suites</span>
                     <span class="text-xs text-slate-400">→</span>
                 </a>
-                <a href="#capitulo-03" class="py-2 text-sm font-medium text-slate-700 hover:text-primary flex items-center justify-between border-b border-slate-100">
+                <a href="{{ url('/#capitulo-03') }}" class="py-2 text-sm font-medium text-slate-700 hover:text-primary flex items-center justify-between border-b border-slate-100">
                     <span>03 Vocación Médica & Protocolos</span>
                     <span class="text-xs text-slate-400">→</span>
                 </a>
-                <a href="#capitulo-04" class="py-2 text-sm font-medium text-slate-700 hover:text-primary flex items-center justify-between border-b border-slate-100">
-                    <span>04 Explorador de Instalaciones</span>
-                    <span class="text-xs text-slate-400">→</span>
-                </a>
-                <a href="#admisiones" class="py-2 text-sm font-semibold text-primary flex items-center justify-between">
-                    <span>Admisiones y Coordinación</span>
-                    <span>→</span>
+                
+                <span class="text-[11px] font-mono uppercase tracking-widest text-slate-400 font-semibold mt-3 mb-1">Módulos Clínicos</span>
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                    <a href="{{ url('/citas') }}" class="p-2 rounded bg-slate-50 border border-slate-100 font-medium text-slate-700 hover:text-primary hover:border-sky-200">
+                        <span class="font-mono text-[10px] text-sky-600 font-bold block">CU11</span> Citas Médicas
+                    </a>
+                    <a href="{{ url('/agenda-medica') }}" class="p-2 rounded bg-slate-50 border border-slate-100 font-medium text-slate-700 hover:text-primary hover:border-sky-200">
+                        <span class="font-mono text-[10px] text-sky-600 font-bold block">CU16</span> Agenda Médica
+                    </a>
+                    <a href="{{ url('/control-atencion') }}" class="p-2 rounded bg-slate-50 border border-slate-100 font-medium text-slate-700 hover:text-primary hover:border-sky-200">
+                        <span class="font-mono text-[10px] text-sky-600 font-bold block">CU14</span> Control Atención
+                    </a>
+                    <a href="{{ url('/atencion-medica') }}" class="p-2 rounded bg-slate-50 border border-slate-100 font-medium text-slate-700 hover:text-primary hover:border-sky-200">
+                        <span class="font-mono text-[10px] text-sky-600 font-bold block">CU15</span> Consultas
+                    </a>
+                    <a href="{{ url('/historial-paciente') }}" class="p-2 rounded bg-slate-50 border border-slate-100 font-medium text-slate-700 hover:text-primary hover:border-sky-200">
+                        <span class="font-mono text-[10px] text-sky-600 font-bold block">CU17</span> Historial
+                    </a>
+                    <a href="{{ url('/mis-citas') }}" class="p-2 rounded bg-slate-50 border border-slate-100 font-medium text-slate-700 hover:text-primary hover:border-sky-200">
+                        <span class="font-mono text-[10px] text-sky-600 font-bold block">CU18</span> Mis Citas
+                    </a>
+                    <a href="{{ url('/perfil-paciente') }}" class="p-2 rounded bg-slate-50 border border-slate-100 font-medium text-slate-700 hover:text-primary hover:border-sky-200">
+                        <span class="font-mono text-[10px] text-sky-600 font-bold block">CU08</span> Mi Perfil
+                    </a>
+                    <a href="{{ url('/reportes-administrativos') }}" class="p-2 rounded bg-slate-50 border border-slate-100 font-medium text-slate-700 hover:text-primary hover:border-sky-200">
+                        <span class="font-mono text-[10px] text-sky-600 font-bold block">CU19</span> Reportes
+                    </a>
+                    <a href="{{ url('/usuarios') }}" class="p-2 rounded bg-slate-50 border border-slate-100 font-medium text-slate-700 hover:text-primary hover:border-sky-200 col-span-2">
+                        <span class="font-mono text-[10px] text-sky-600 font-bold block">CU03</span> Gestión de Usuarios
+                    </a>
+                </div>
+
+                <a href="{{ url('/citas') }}" class="mt-3 py-2.5 px-4 text-center text-xs font-semibold text-white bg-primary rounded-full shadow-sm hover:bg-primary-hover">
+                    Programar Cita Médica →
                 </a>
             </nav>
         </div>

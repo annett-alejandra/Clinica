@@ -3,7 +3,7 @@
    Optimizado para Cero Lag, Aceleración GPU y 100% Responsivo en Móvil/Tablet/PC
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+/* Tipografía cargada eficientemente en app.blade.php con preconnect */
 
 :root {
     color-scheme: light;
@@ -155,18 +155,19 @@ button, input, select, textarea {
     }
 }
 
-/* Header Flotante Editorial con Glassmorphism Rápido */
+/* Header Sticky Editorial con Glassmorphism Rápido (Cero Colisión) */
 .site-header {
-    position: fixed;
+    position: sticky;
     top: 0;
     left: 0;
     width: 100%;
     z-index: 1000;
-    background: rgba(255, 255, 255, 0.92);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
     border-bottom: 1px solid var(--color-borderfine);
-    transition: background 0.2s ease;
+    box-shadow: 0 2px 10px -2px rgba(15, 23, 42, 0.05);
+    transition: background 0.2s ease, box-shadow 0.2s ease;
 }
 
 .site-header-inner {
@@ -187,7 +188,7 @@ button, input, select, textarea {
     align-items: center;
     gap: 0.6rem;
     font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(1.25rem, 3.5vw, 1.5rem);
+    font-size: clamp(1.2rem, 3vw, 1.45rem);
     font-weight: 600;
     color: var(--color-text-primary);
     letter-spacing: 0.04em;
@@ -212,7 +213,7 @@ button, input, select, textarea {
 
 @media (min-width: 1280px) {
     .nav-links {
-        gap: 2.25rem;
+        gap: 2rem;
     }
 }
 
@@ -224,6 +225,8 @@ button, input, select, textarea {
     text-transform: uppercase;
     position: relative;
     padding-block: 0.25rem;
+    transition: color 0.15s ease;
+    cursor: pointer;
 }
 
 .nav-item:hover {
@@ -235,6 +238,100 @@ button, input, select, textarea {
     color: var(--color-text-muted);
     margin-right: 0.3rem;
     font-family: 'JetBrains Mono', monospace;
+}
+
+/* Menú Desplegable de Módulos Clínicos */
+.nav-dropdown {
+    position: relative;
+}
+
+.nav-dropdown-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    cursor: pointer;
+}
+
+.nav-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 0.75rem);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #FFFFFF;
+    border: 1px solid var(--color-borderfine);
+    border-radius: 12px;
+    box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.14), 0 0 1px 1px rgba(0, 0, 0, 0.04);
+    min-width: 490px;
+    padding: 1.25rem;
+    z-index: 1050;
+}
+
+[x-cloak] {
+    display: none !important;
+}
+
+.dropdown-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+}
+
+.dropdown-col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.dropdown-heading {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-secondary);
+    margin-bottom: 0.4rem;
+    padding-bottom: 0.25rem;
+    border-bottom: 1px solid var(--color-borderfine);
+}
+
+.dropdown-link {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    padding: 0.45rem 0.6rem;
+    border-radius: 6px;
+    transition: background 0.15s ease;
+    text-decoration: none;
+}
+
+.dropdown-link:hover {
+    background: var(--color-contrast);
+}
+
+.cu-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    background: var(--color-accent-soft);
+    padding: 0.15rem 0.35rem;
+    border-radius: 4px;
+    margin-top: 0.1rem;
+    flex-shrink: 0;
+}
+
+.dropdown-title {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    line-height: 1.2;
+}
+
+.dropdown-desc {
+    font-size: 0.6875rem;
+    color: var(--color-text-muted);
+    line-height: 1.3;
+    margin-top: 0.1rem;
 }
 
 /* Botones Editoriales */
@@ -628,31 +725,43 @@ button, input, select, textarea {
    CORRECCIÓN Y AJUSTES DE ICONOS SVG Y TIPOGRAFÍA EDITORIAL
    ========================================================================== */
 
-/* 1. Control Estricto de Iconos SVG para que nunca se desborden ni se vean gigantes */
+/* 1. Control Estricto de Iconos SVG para que NUNCA se desborden ni se vean gigantes */
 svg {
     display: inline-block;
     vertical-align: middle;
     flex-shrink: 0;
-    max-width: 100%;
-    max-height: 100%;
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+svg:not([class*="w-"]) {
+    width: 1.25rem;
+    height: 1.25rem;
 }
 
 /* Dimensiones utilitarias estándar para iconos */
+.w-2, .h-2 { width: 0.5rem !important; height: 0.5rem !important; }
+.w-2\.5, .h-2\.5 { width: 0.625rem !important; height: 0.625rem !important; }
 .w-3, .h-3 { width: 0.75rem !important; height: 0.75rem !important; }
 .w-3\.5, .h-3\.5 { width: 0.875rem !important; height: 0.875rem !important; }
 .w-4, .h-4 { width: 1rem !important; height: 1rem !important; }
+.w-4\.5, .h-4\.5 { width: 1.125rem !important; height: 1.125rem !important; }
 .w-5, .h-5 { width: 1.25rem !important; height: 1.25rem !important; }
 .w-6, .h-6 { width: 1.5rem !important; height: 1.5rem !important; }
+.w-7, .h-7 { width: 1.75rem !important; height: 1.75rem !important; }
 .w-8, .h-8 { width: 2rem !important; height: 2rem !important; }
+.w-10, .h-10 { width: 2.5rem !important; height: 2.5rem !important; }
+.w-12, .h-12 { width: 3rem !important; height: 3rem !important; }
 
 /* Botones con iconos SVG integrados */
 .btn-primary svg,
+.btn-outline svg,
 .btn-secondary svg,
 .btn-minimal svg,
 button svg,
 a svg {
-    width: 1rem;
-    height: 1rem;
+    width: 1rem !important;
+    height: 1rem !important;
     transition: transform 0.2s ease;
 }
 
@@ -661,7 +770,47 @@ a svg {
     height: 1.25rem !important;
 }
 
-/* 2. Optimización y Jerarquía de Tipografía */
+/* 2. Reglas de Visibilidad y Menú Móvil (Evita colisión permanente en Desktop) */
+.hidden {
+    display: none !important;
+}
+
+#mobile-menu {
+    display: none;
+}
+
+#mobile-menu.is-open,
+#mobile-menu:not(.hidden) {
+    display: block;
+}
+
+@media (min-width: 1024px) {
+    #mobile-menu,
+    #mobile-menu.is-open,
+    #mobile-menu:not(.hidden) {
+        display: none !important;
+    }
+    .lg\:hidden {
+        display: none !important;
+    }
+    .lg\:flex {
+        display: flex !important;
+    }
+    .lg\:block {
+        display: block !important;
+    }
+    .lg\:grid {
+        display: grid !important;
+    }
+}
+
+@media (max-width: 1023px) {
+    .hidden-mobile {
+        display: none !important;
+    }
+}
+
+/* 3. Optimización y Jerarquía de Tipografía */
 body, input, textarea, select, button {
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     letter-spacing: -0.01em;
@@ -673,20 +822,27 @@ h1, h2, h3, .font-serif {
     font-weight: 600;
 }
 
-/* Títulos balanceados */
+/* Títulos equilibrados y limpios (Cero solapamiento) */
 h1 {
-    font-size: clamp(1.85rem, 3.5vw, 2.75rem);
+    font-size: clamp(2rem, 4vw, 3.25rem);
     line-height: 1.15;
 }
 
 h2 {
-    font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+    font-size: clamp(1.5rem, 2.8vw, 2.25rem);
     line-height: 1.25;
 }
 
 h3 {
-    font-size: clamp(1.15rem, 1.8vw, 1.35rem);
+    font-size: clamp(1.2rem, 2vw, 1.65rem);
     line-height: 1.35;
+}
+
+/* Contenido Principal con Espaciado Fluido */
+.main-content {
+    min-height: calc(100vh - 4.75rem);
+    position: relative;
+    z-index: 1;
 }
 
 /* Tablas y Formularios */
