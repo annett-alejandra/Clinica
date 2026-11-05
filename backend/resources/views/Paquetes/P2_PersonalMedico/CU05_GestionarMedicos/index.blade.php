@@ -63,7 +63,8 @@
 
         <!-- Directorio Médico -->
         <div class="lg:col-span-8 bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
-            <table class="w-full text-left text-sm text-slate-700">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm text-slate-700">
                 <thead class="bg-slate-50 text-xs uppercase text-slate-500 font-semibold tracking-wider border-b border-slate-200">
                     <tr>
                         <th class="px-6 py-4">Médico</th>
@@ -104,6 +105,7 @@
                     @endforelse
                 </tbody>
             </table>
+            </div>
         </div>
     </div>
 </div>

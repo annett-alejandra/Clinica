@@ -777,11 +777,22 @@ a svg {
 
 #mobile-menu {
     display: none;
+    max-height: calc(100vh - 4.5rem);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 #mobile-menu.is-open,
 #mobile-menu:not(.hidden) {
     display: block;
+}
+
+/* Tablas y Contenedores con Scroll Seguro en Pantallas Móviles */
+.overflow-x-auto,
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
 }
 
 @media (min-width: 1024px) {
