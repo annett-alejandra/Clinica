@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useRegistroPacienteController } from '../../../../controllers/Paquetes/P3_GestionPacientes/CU09_RegistrarseComoPaciente/useRegistroPacienteController';
+import { useRegistroPacienteController } from '../../../../controllers/Paquetes/P3_GestionPacientes/CU09_RegistrarCuentaPaciente/useRegistroPacienteController';
 
 export function UI_RegistroPaciente({ onRegistroExitoso, onVolverALogin }) {
   const { loading, error, success, registrar } = useRegistroPacienteController(onRegistroExitoso);
@@ -171,4 +171,5 @@ export function UI_RegistroPaciente({ onRegistroExitoso, onVolverALogin }) {
     </div>
   );
 }
+
 
