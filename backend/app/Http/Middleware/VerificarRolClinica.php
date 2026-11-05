@@ -40,3 +40,4 @@ class VerificarRolClinica
         return $next($request);
     }
 }
+
