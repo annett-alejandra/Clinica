@@ -11,8 +11,11 @@ RUN apk add --no-cache \
     curl \
     bash
 
-# Instalar extensiones de PHP requeridas por Laravel y PostgreSQL
-RUN docker-php-ext-install pdo pdo_pgsql pgsql
+# Instalar y configurar extensiones de PHP requeridas
+RUN docker-php-ext-install pdo pdo_pgsql pgsql opcache
+
+# Configuración de rendimiento de PHP
+COPY docker/php.ini /usr/local/etc/php/conf.d/custom.ini
 
 # Instalar Composer desde la imagen oficial
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -28,4 +31,3 @@ RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
-
