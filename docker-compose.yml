@@ -19,6 +19,8 @@ services:
       DB_DATABASE: clinica_vida_salud
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
+      PHP_CLI_SERVER_WORKERS: 4
+    command: ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000", "--no-reload"]
     depends_on:
       db:
         condition: service_healthy
