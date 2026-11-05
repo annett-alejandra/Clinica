@@ -36,27 +36,52 @@
                 <span class="brand-dot" aria-hidden="true"></span>
             </a>
 
-            <!-- Navegación por Capítulos de Arquitectura Editorial (Desktop) -->
-            <nav class="hidden lg:flex items-center" aria-label="Navegación editorial">
+            <!-- Navegación por Módulos y Casos de Uso Laravel Blade -->
+            <nav class="hidden lg:flex items-center" aria-label="Navegación clínica">
                 <ul class="nav-links">
                     <li>
-                        <a href="#capitulo-01" class="nav-item">
-                            <span class="nav-num">01</span>Complejo
+                        <a href="{{ url('/citas') }}" class="nav-item">
+                            <span class="nav-num">CU11</span>Citas
                         </a>
                     </li>
                     <li>
-                        <a href="#capitulo-02" class="nav-item">
-                            <span class="nav-num">02</span>Unidades & Suites
+                        <a href="{{ url('/agenda-medica') }}" class="nav-item">
+                            <span class="nav-num">CU16</span>Agenda
                         </a>
                     </li>
                     <li>
-                        <a href="#capitulo-03" class="nav-item">
-                            <span class="nav-num">03</span>Vocación
+                        <a href="{{ url('/control-atencion') }}" class="nav-item">
+                            <span class="nav-num">CU14</span>Control
                         </a>
                     </li>
                     <li>
-                        <a href="#capitulo-04" class="nav-item">
-                            <span class="nav-num">04</span>Instalaciones
+                        <a href="{{ url('/atencion-medica') }}" class="nav-item">
+                            <span class="nav-num">CU15</span>Consultas
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url('/historial-paciente') }}" class="nav-item">
+                            <span class="nav-num">CU17</span>Historial
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url('/mis-citas') }}" class="nav-item">
+                            <span class="nav-num">CU18</span>Mis Citas
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url('/perfil-paciente') }}" class="nav-item">
+                            <span class="nav-num">CU08</span>Perfil
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url('/reportes-administrativos') }}" class="nav-item">
+                            <span class="nav-num">CU19</span>Reportes
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url('/usuarios') }}" class="nav-item">
+                            <span class="nav-num">CU03</span>Usuarios
                         </a>
                     </li>
                 </ul>
