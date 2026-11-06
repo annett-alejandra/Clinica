@@ -5,18 +5,19 @@
 @section('content')
 <div x-data="portada">
 
-    <!-- 2. HERO SECTION (Day-to-Night Automatic Scroll Crossfade) -->
-    <section id="hero" class="relative h-screen w-full overflow-hidden flex items-center justify-center">
-        <!-- Day Layer -->
-        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-1000 ease-out"
-             :style="`background-image: url('https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?auto=format&fit=crop&w=1920&q=85'); transform: scale(${1 + noche * 0.04})`">
-            <div class="absolute inset-0 bg-slate-900/45"></div>
+    <!-- 2. HERO SECTION (Fondo Arquitectónico Clínico de Alta Definición) -->
+    <section id="hero" class="relative min-h-screen w-full overflow-hidden flex items-center justify-center bg-slate-900">
+        <!-- Imagen Principal de Fondo (Hero) -->
+        <div class="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-out"
+             style="background-image: url('https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1920&q=85');">
+            <div class="absolute inset-0 bg-gradient-to-b from-slate-950/70 via-slate-900/60 to-slate-950/85"></div>
         </div>
 
-        <!-- Night Layer (Crossfades smoothly with scroll) -->
-        <div class="absolute inset-0 bg-cover bg-center transition-opacity duration-300 pointer-events-none"
-             :style="`background-image: url('https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1920&q=85'); opacity: ${noche}`">
-            <div class="absolute inset-0 bg-slate-950/65"></div>
+        <!-- Night Layer (Transición suave al hacer scroll) -->
+        <div class="absolute inset-0 bg-cover bg-center transition-opacity duration-700 pointer-events-none"
+             style="background-image: url('https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?auto=format&fit=crop&w=1920&q=85');"
+             :style="`opacity: ${noche}`">
+            <div class="absolute inset-0 bg-slate-950/70"></div>
         </div>
 
         <!-- Hero Content -->
@@ -144,7 +145,7 @@
             </div>
 
             <!-- Main Carousel Frame -->
-            <div class="relative rounded-2xl overflow-hidden bg-slate-900 shadow-xl border border-slate-200/80 aspect-[16/10] md:aspect-[16/9]">
+            <div class="relative rounded-2xl overflow-hidden bg-slate-900 shadow-2xl border border-slate-200/80 aspect-[16/10] md:aspect-[16/9] min-h-[420px]">
 
                 <!-- Day Image -->
                 <img :src="actual.imageDay"
@@ -155,7 +156,7 @@
                 <img :src="actual.imageNight"
                      :alt="actual.title + ' - Guardia Nocturna'"
                      class="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 pointer-events-none"
-                     :style="`opacity: ${Math.min(0.85, noche * 0.85)}`" />
+                     :style="`opacity: ${Math.min(0.85, (noche || 0) * 0.85)}`" />
 
                 <!-- Gradient Scrim for Text Readability -->
                 <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/35 to-transparent"></div>

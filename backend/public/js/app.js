@@ -125,33 +125,48 @@ document.addEventListener('alpine:init', () => {
 
     // Portada: transición suave de fachada de día a noche según el scroll.
     Alpine.data('portada', () => ({
-        y: 0,
+        scrollY: 0,
+        init() {
+            this.scrollY = window.scrollY;
+            window.addEventListener('scroll', () => {
+                this.scrollY = window.scrollY;
+            }, { passive: true });
+        },
         get noche() {
-            return Math.min(Math.max((this.y - 120) / 580, 0), 1);
+            return Math.min(Math.max((this.scrollY - 80) / 450, 0), 1);
         },
     }));
 
     // Recorrido por las instalaciones (carrusel + ficha técnica).
     Alpine.data('recorrido', (areas) => ({
-        areas,
-        actual: 0,
-        ficha: false,
-        get area() {
-            return this.areas[this.actual];
+        areas: areas || [],
+        indice: 0,
+        fichaAbierta: false,
+        get actual() {
+            return (this.areas && this.areas.length > 0) ? this.areas[this.indice] : {
+                id: '01',
+                tag: '01 / QUIRÓFANOS INTELIGENTES',
+                title: 'Cirugía Robótica y Pabellones de Alta Complejidad',
+                subtitle: 'Pabellón Quirúrgico Integrado Da Vinci Xi',
+                description: 'Instalaciones quirúrgicas de flujo laminar grado 100 con integración digital.',
+                imageDay: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1920&q=80',
+                imageNight: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=1920&q=80',
+                specs: { capacity: '12 Pabellones Híbridos', equipment: 'Robot Da Vinci Xi', certifications: 'JCI', status: 'Activo 24/7', statusType: 'stable' }
+            };
         },
         siguiente() {
-            this.actual = (this.actual + 1) % this.areas.length;
+            if (this.areas.length > 0) {
+                this.indice = (this.indice + 1) % this.areas.length;
+            }
         },
         anterior() {
-            this.actual = (this.actual - 1 + this.areas.length) % this.areas.length;
+            if (this.areas.length > 0) {
+                this.indice = (this.indice - 1 + this.areas.length) % this.areas.length;
+            }
         },
         ir(i) {
-            this.actual = i;
+            this.indice = i;
         },
-        imagen(noche) {
-            return noche > 0.45 ? this.area.imageNight : this.area.imageDay;
-        },
-        num: dosDigitos,
     }));
 
     // Reserva de citas: consulta disponibilidad real (CU10) y envía CU11.
