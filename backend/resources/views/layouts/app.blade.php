@@ -24,8 +24,8 @@
         }
     </script>
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
     <script defer src="{{ asset('js/app.js') }}"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
 </head>
 @php
     $enPortada = request()->routeIs('inicio');

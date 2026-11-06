@@ -145,18 +145,24 @@
             </div>
 
             <!-- Main Carousel Frame -->
-            <div class="relative rounded-2xl overflow-hidden bg-slate-900 shadow-2xl border border-slate-200/80 aspect-[16/10] md:aspect-[16/9] min-h-[420px]">
+            <div class="relative rounded-2xl overflow-hidden bg-slate-900 shadow-2xl border border-slate-200/80 aspect-[16/10] md:aspect-[16/9] min-h-[440px]">
 
-                <!-- Day Image -->
-                <img :src="actual.imageDay"
-                     :alt="actual.title"
-                     class="w-full h-full object-cover transition-all duration-700" />
-
-                <!-- Night Image Overlay (scroll reactive) -->
-                <img :src="actual.imageNight"
-                     :alt="actual.title + ' - Guardia Nocturna'"
-                     class="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 pointer-events-none"
-                     :style="`opacity: ${Math.min(0.85, (noche || 0) * 0.85)}`" />
+                <!-- 8 Imágenes pre-renderizadas: se activan instantáneamente según el índice sin esperar descargas asíncronas -->
+                @foreach ($areas as $index => $item)
+                    <div x-show="indice === {{ $index }}"
+                         x-transition:enter="transition ease-out duration-500"
+                         x-transition:enter-start="opacity-0 scale-95"
+                         x-transition:enter-end="opacity-100 scale-100"
+                         class="absolute inset-0 w-full h-full">
+                        <img src="{{ $item['imageDay'] }}"
+                             alt="{{ $item['title'] }}"
+                             class="w-full h-full object-cover" />
+                        <img src="{{ $item['imageNight'] }}"
+                             alt="{{ $item['title'] }} - Guardia Nocturna"
+                             class="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 pointer-events-none"
+                             :style="`opacity: ${Math.min(0.85, (noche || 0) * 0.85)}`" />
+                    </div>
+                @endforeach
 
                 <!-- Gradient Scrim for Text Readability -->
                 <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/35 to-transparent"></div>
