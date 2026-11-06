@@ -96,13 +96,25 @@
             </div>
 
             <div class="lg:col-span-6 space-y-6 text-slate-600 text-base leading-relaxed">
+                <!-- Imagen Destacada del Complejo Hospitalario -->
+                <div class="relative rounded-2xl overflow-hidden shadow-xl border border-slate-200/90 aspect-[16/10] group">
+                    <img src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1200&q=85"
+                         alt="Instalaciones de Vanguardia Clínica Vida Salud"
+                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent"></div>
+                    <div class="absolute bottom-4 left-4 right-4 flex items-center justify-between text-white text-xs">
+                        <span class="font-semibold bg-[#0284C7]/90 px-3 py-1 rounded-lg backdrop-blur-sm">Arquitectura Hospitalaria Sostenible</span>
+                        <span class="text-slate-200 text-[11px]">Santa Cruz, Bolivia</span>
+                    </div>
+                </div>
+
                 <p class="text-[#0F172A] text-lg font-medium leading-relaxed">
                     Diseñado bajo estándares internacionales de arquitectura hospitalaria saludable, el complejo combina tecnología diagnóstica de última generación con espacios luminosos y jardines terapéuticos que aceleran la recuperación del paciente.
                 </p>
                 <p>
                     Cada nivel ha sido planificado con circulaciones diferenciadas para pacientes ambulatorios, hospitalización privada y flujos críticos de urgencia, garantizando privacidad, bioseguridad absoluta y eficiencia médica en cada intervención.
                 </p>
-                <div class="pt-4 flex items-center space-x-4 text-xs font-semibold text-[#0284C7]">
+                <div class="pt-2 flex items-center space-x-4 text-xs font-semibold text-[#0284C7]">
                     <x-icon name="shield-check" class="w-5 h-5 shrink-0" />
                     <span>Consorcio Médico de Alta Complejidad — Certificación Internacional ISO 9001 &amp; JCI</span>
                 </div>
