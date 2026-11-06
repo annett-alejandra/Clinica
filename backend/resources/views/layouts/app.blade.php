@@ -81,134 +81,110 @@
             </div>
         @endif
 
-        <!-- Right Side: Modules CU Dropdown, Role Switcher, Agendar Cita & Portal Toggle -->
+        <!-- Right Side: Si no ha iniciado sesión solo ve "Iniciar Sesión" y "Agendar Cita". Si ya inició sesión, ve sus módulos y perfil. -->
         <div class="flex items-center space-x-2.5 sm:space-x-3">
 
-            <!-- Módulos CU (19 Casos de Uso) -->
-            <div class="relative" @click.outside="showCuMenu = false">
-                <button type="button"
-                        @click="showCuMenu = !showCuMenu; showRoleSelector = false"
-                        class="flex items-center space-x-2 bg-slate-100 hover:bg-slate-200/80 text-slate-700 px-3 py-2 rounded-lg text-xs font-semibold transition-all border border-slate-200/80">
-                    <x-icon name="layout-grid" class="w-3.5 h-3.5 text-[#0284C7]" />
-                    <span class="hidden md:inline">Módulos (CU01–19)</span>
-                    <x-icon name="chevron-down" class="w-3.5 h-3.5 text-slate-400" />
-                </button>
+            @if ($usuarioActual)
+                <!-- Módulos CU (Casos de Uso permitidos para su rol) -->
+                <div class="relative" @click.outside="showCuMenu = false">
+                    <button type="button"
+                            @click="showCuMenu = !showCuMenu; showRoleSelector = false"
+                            class="flex items-center space-x-2 bg-slate-100 hover:bg-slate-200/80 text-slate-700 px-3 py-2 rounded-lg text-xs font-semibold transition-all border border-slate-200/80">
+                        <x-icon name="layout-grid" class="w-3.5 h-3.5 text-[#0284C7]" />
+                        <span class="hidden md:inline">Módulos</span>
+                        <x-icon name="chevron-down" class="w-3.5 h-3.5 text-slate-400" />
+                    </button>
 
-                <div x-show="showCuMenu" x-cloak
-                     x-transition.opacity.duration.150ms
-                     class="absolute right-0 mt-2 w-80 max-h-[75vh] overflow-y-auto bg-white rounded-2xl shadow-2xl border border-slate-200 p-3 z-50">
-                    <div class="px-2 py-1.5 border-b border-slate-100 mb-2 flex items-center justify-between">
-                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">19 Casos de Uso del Sistema</span>
-                        <span class="text-[10px] font-bold text-[#0284C7] bg-sky-50 px-2 py-0.5 rounded-full">{{ $rolActual }}</span>
-                    </div>
-                    @foreach (collect(config('clinica.modulos'))->groupBy('grupo') as $grupo => $items)
-                        <div class="mb-2.5 last:mb-0">
-                            <p class="px-2 text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">{{ $grupo }}</p>
-                            <div class="space-y-0.5">
-                                @foreach ($items as $item)
-                                    <a href="{{ url($item['url'] ?? $item['ruta'] ?? '#') }}"
-                                       class="flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-700 hover:bg-sky-50 hover:text-[#0284C7] transition-colors">
-                                        <span>{{ $item['titulo'] }}</span>
-                                        <span class="text-[10px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">{{ $item['cu'] }}</span>
-                                    </a>
-                                @endforeach
-                            </div>
+                    <div x-show="showCuMenu" x-cloak
+                         x-transition.opacity.duration.150ms
+                         class="absolute right-0 mt-2 w-80 max-h-[75vh] overflow-y-auto bg-white rounded-2xl shadow-2xl border border-slate-200 p-3 z-50">
+                        <div class="px-2 py-1.5 border-b border-slate-100 mb-2 flex items-center justify-between">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Casos de Uso Disponibles</span>
+                            <span class="text-[10px] font-bold text-[#0284C7] bg-sky-50 px-2 py-0.5 rounded-full">{{ $rolActual }}</span>
                         </div>
-                    @endforeach
-                    <div class="border-t border-slate-100 mt-2 pt-2 flex items-center justify-between px-2">
-                        <a href="{{ route('login') }}" class="text-xs font-semibold text-[#0284C7] hover:underline">CU01 Iniciar Sesión</a>
-                        <a href="{{ url('/registro-paciente') }}" class="text-xs font-semibold text-emerald-600 hover:underline">CU09 Registro Paciente</a>
+                        @foreach ($modulosMenu as $grupo => $items)
+                            <div class="mb-2.5 last:mb-0">
+                                <p class="px-2 text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">{{ $grupo }}</p>
+                                <div class="space-y-0.5">
+                                    @foreach ($items as $item)
+                                        <a href="{{ url($item['url'] ?? $item['ruta'] ?? '#') }}"
+                                           class="flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-700 hover:bg-sky-50 hover:text-[#0284C7] transition-colors">
+                                            <span>{{ $item['titulo'] }}</span>
+                                            <span class="text-[10px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">{{ $item['cu'] }}</span>
+                                        </a>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endforeach
                     </div>
                 </div>
-            </div>
 
-            <!-- Selector de Perfil / Rol Operativo -->
-            <div class="relative" @click.outside="showRoleSelector = false">
-                <button type="button"
-                        @click="showRoleSelector = !showRoleSelector; showCuMenu = false"
-                        class="flex items-center space-x-2 bg-slate-100 hover:bg-slate-200/80 text-slate-700 px-3 py-2 rounded-lg text-xs font-semibold transition-all border border-slate-200/80">
-                    <x-icon name="user-check" class="w-3.5 h-3.5 text-[#0284C7]" />
-                    <span class="hidden sm:inline">
-                        @if ($usuarioActual)
+                <!-- Perfil del Usuario Autenticado -->
+                <div class="relative" @click.outside="showRoleSelector = false">
+                    <button type="button"
+                            @click="showRoleSelector = !showRoleSelector; showCuMenu = false"
+                            class="flex items-center space-x-2 bg-slate-100 hover:bg-slate-200/80 text-slate-700 px-3 py-2 rounded-lg text-xs font-semibold transition-all border border-slate-200/80">
+                        <x-icon name="user-check" class="w-3.5 h-3.5 text-[#0284C7]" />
+                        <span class="hidden sm:inline">
                             {{ $usuarioActual->nombreVisible() }} ({{ $usuarioActual->nombreRol() }})
-                        @else
-                            {{ $rolEtiqueta }}
-                        @endif
-                    </span>
-                    <x-icon name="chevron-down" class="w-3.5 h-3.5 text-slate-400" />
-                </button>
+                        </span>
+                        <x-icon name="chevron-down" class="w-3.5 h-3.5 text-slate-400" />
+                    </button>
 
-                <!-- Dropdown Menu -->
-                <div x-show="showRoleSelector" x-cloak
-                     x-transition.opacity.duration.150ms
-                     class="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-slate-200 py-2 z-50">
-                    <div class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100">
-                        Cambiar Vista de Perfil (Portal)
-                    </div>
-                    <a href="{{ route('portal', ['rol' => 'medico']) }}"
-                       class="w-full text-left px-4 py-2.5 text-xs font-medium flex items-center space-x-2.5 hover:bg-slate-50 transition-colors {{ $rolKey === 'medico' ? 'text-[#0284C7] bg-sky-50/60 font-bold' : 'text-slate-700' }}">
-                        <x-icon name="stethoscope" class="w-4 h-4 text-[#0284C7]" />
-                        <span>Médico Especialista (CU15/16)</span>
-                    </a>
-                    <a href="{{ route('portal', ['rol' => 'enfermeria']) }}"
-                       class="w-full text-left px-4 py-2.5 text-xs font-medium flex items-center space-x-2.5 hover:bg-slate-50 transition-colors {{ $rolKey === 'enfermeria' ? 'text-[#0284C7] bg-sky-50/60 font-bold' : 'text-slate-700' }}">
-                        <x-icon name="activity" class="w-4 h-4 text-emerald-600" />
-                        <span>Enfermería y Recepción (CU14)</span>
-                    </a>
-                    <a href="{{ route('portal', ['rol' => 'paciente']) }}"
-                       class="w-full text-left px-4 py-2.5 text-xs font-medium flex items-center space-x-2.5 hover:bg-slate-50 transition-colors {{ $rolKey === 'paciente' ? 'text-[#0284C7] bg-sky-50/60 font-bold' : 'text-slate-700' }}">
-                        <x-icon name="users" class="w-4 h-4 text-indigo-600" />
-                        <span>Paciente / Familia (CU08/11/18)</span>
-                    </a>
-                    <a href="{{ route('portal', ['rol' => 'administrador']) }}"
-                       class="w-full text-left px-4 py-2.5 text-xs font-medium flex items-center space-x-2.5 hover:bg-slate-50 transition-colors {{ $rolKey === 'administrador' ? 'text-[#0284C7] bg-sky-50/60 font-bold' : 'text-slate-700' }}">
-                        <x-icon name="shield-check" class="w-4 h-4 text-amber-600" />
-                        <span>Dirección / Admin (CU03/04/19)</span>
-                    </a>
-
-                    <div class="border-t border-slate-100 mt-1 pt-1.5 px-3 flex items-center justify-between">
-                        @if ($usuarioActual)
-                            <form method="POST" action="{{ url('/logout') }}" class="w-full">
+                    <div x-show="showRoleSelector" x-cloak
+                         x-transition.opacity.duration.150ms
+                         class="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-slate-200 py-2 z-50">
+                        <div class="px-4 py-2 border-b border-slate-100">
+                            <p class="text-xs font-bold text-slate-800">{{ $usuarioActual->nombreVisible() }}</p>
+                            <p class="text-[11px] text-slate-400 truncate">{{ $usuarioActual->correo }}</p>
+                            <span class="mt-1 inline-block px-2 py-0.5 text-[10px] font-bold rounded-md bg-sky-50 text-[#0284C7]">
+                                Rol: {{ $usuarioActual->nombreRol() }}
+                            </span>
+                        </div>
+                        <a href="{{ route('portal') }}" class="block px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 font-medium">
+                            Ir a mi Consola Operativa
+                        </a>
+                        <div class="border-t border-slate-100 mt-1 pt-1 px-3">
+                            <form method="POST" action="{{ url('/logout') }}">
                                 @csrf
                                 <button type="submit" class="w-full text-left py-1.5 text-xs font-semibold text-red-600 hover:text-red-700 flex items-center space-x-2">
                                     <x-icon name="log-out" class="w-3.5 h-3.5" />
                                     <span>Cerrar sesión (CU02)</span>
                                 </button>
                             </form>
-                        @else
-                            <a href="{{ route('login') }}" class="py-1.5 text-xs font-semibold text-[#0284C7] hover:underline flex items-center space-x-1.5">
-                                <x-icon name="log-in" class="w-3.5 h-3.5" />
-                                <span>Autenticación Oficial (CU01)</span>
-                            </a>
-                        @endif
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Botón Agendar Cita Rápida (Abre Modal Global CU10 + CU11) -->
-            <button type="button"
-                    @click="$dispatch('abrir-reserva')"
-                    class="hidden sm:flex items-center space-x-1.5 bg-sky-50 hover:bg-sky-100 text-[#0284C7] border border-sky-200 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all">
-                <x-icon name="calendar" class="w-3.5 h-3.5" />
-                <span>Agendar Cita</span>
-            </button>
-
-            <!-- Botón Principal: Login vs Entrar al Portal vs Volver a la Web -->
-            @if ($enPortada)
-                @if ($usuarioActual)
+                @if ($enPortada)
                     <a href="{{ route('portal') }}"
                        class="flex items-center space-x-2 bg-[#0284C7] hover:bg-[#0369A1] text-white px-4 py-2.5 rounded-xl text-xs font-semibold transition-all shadow-md shadow-[#0284C7]/20">
                         <x-icon name="layout-grid" class="w-3.5 h-3.5" />
-                        <span>Mi Portal Clínico</span>
+                        <span>Entrar al Portal</span>
                     </a>
                 @else
-                    <a href="{{ route('login') }}"
-                       class="flex items-center space-x-2 bg-[#0284C7] hover:bg-[#0369A1] text-white px-4 py-2.5 rounded-xl text-xs font-semibold transition-all shadow-md shadow-[#0284C7]/20">
-                        <x-icon name="log-in" class="w-3.5 h-3.5" />
-                        <span>Iniciar Sesión (CU01)</span>
+                    <a href="{{ route('inicio') }}"
+                       class="flex items-center space-x-2 bg-slate-800 hover:bg-slate-900 text-white px-4 py-2.5 rounded-xl text-xs font-semibold transition-all shadow-sm">
+                        <x-icon name="arrow-left" class="w-3.5 h-3.5" />
+                        <span>Volver a la Web</span>
                     </a>
                 @endif
             @else
+                <!-- Visitante público que navega la web institucional -->
+                <button type="button"
+                        @click="$dispatch('abrir-reserva')"
+                        class="hidden sm:flex items-center space-x-1.5 bg-sky-50 hover:bg-sky-100 text-[#0284C7] border border-sky-200 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all">
+                    <x-icon name="calendar" class="w-3.5 h-3.5" />
+                    <span>Agendar Cita</span>
+                </button>
+
+                <a href="{{ route('login') }}"
+                   class="flex items-center space-x-2 bg-[#0284C7] hover:bg-[#0369A1] text-white px-5 py-2.5 rounded-xl text-xs font-semibold transition-all shadow-md shadow-[#0284C7]/20">
+                    <x-icon name="log-in" class="w-3.5 h-3.5" />
+                    <span>Iniciar Sesión</span>
+                </a>
+            @endif
+        </div>
                 <a href="{{ route('inicio') }}"
                    class="flex items-center space-x-2 bg-slate-800 hover:bg-slate-900 text-white px-4 py-2.5 rounded-xl text-xs font-semibold transition-all shadow-sm">
                     <x-icon name="arrow-left" class="w-3.5 h-3.5" />

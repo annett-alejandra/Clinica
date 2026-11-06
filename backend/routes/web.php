@@ -40,8 +40,8 @@ use Illuminate\Support\Facades\Route;
 // Inicio Institucional
 Route::get('/', InicioController::class)->name('inicio');
 
-// Portal clínico interactivo por rol
-Route::get('/portal', PortalController::class)->name('portal');
+// Portal clínico interactivo por rol (requiere autenticación obligatoria)
+Route::get('/portal', PortalController::class)->middleware('auth')->name('portal');
 
 // Cambio rápido de perfil / rol en el portal o barra superior
 Route::post('/cambiar-rol', function (Request $request, PortalService $portal) {

@@ -26,12 +26,16 @@ class VerificarRolClinica
             $rolUsuario = $request->header('X-User-Role') ?? 'Administrador';
         }
 
-        if ($rolUsuario === null && $request->hasSession()) {
-            $rolUsuario = $request->session()->get('rol_activo', 'Administrador');
-        }
-
         if ($rolUsuario === null) {
-            $rolUsuario = 'Administrador';
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Debes iniciar sesión para realizar esta operación.',
+                ], 401);
+            }
+
+            return redirect()->guest(route('login'))
+                ->with('error', 'Debes iniciar sesión con tu cuenta oficial para ingresar.');
         }
 
         // En rutas API exigimos coincidencia estricta con los roles permitidos
