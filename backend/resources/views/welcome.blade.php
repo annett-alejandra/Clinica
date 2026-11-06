@@ -42,13 +42,14 @@
             <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <a href="#projeto"
                    class="w-full sm:w-auto px-8 py-4 bg-[#0284C7] text-white font-semibold text-xs uppercase tracking-widest rounded-xl hover:bg-[#0369A1] transition-all duration-300 shadow-lg shadow-[#0284C7]/30">
-                    Conocer el Proyecto
+                    Conocer el Complejo
                 </a>
-                <a href="{{ route('portal') }}"
-                   class="w-full sm:w-auto px-8 py-4 bg-white/15 backdrop-blur-md border border-white/30 text-white font-semibold text-xs uppercase tracking-widest rounded-xl hover:bg-white/25 transition-all duration-300 flex items-center justify-center space-x-2">
-                    <x-icon name="activity" class="w-4 h-4 text-[#38BDF8]" />
-                    <span>Acceso a Sistemas Médicos</span>
-                </a>
+                <button type="button"
+                        @click="$dispatch('abrir-reserva')"
+                        class="w-full sm:w-auto px-8 py-4 bg-white/15 backdrop-blur-md border border-white/30 text-white font-semibold text-xs uppercase tracking-widest rounded-xl hover:bg-white/25 transition-all duration-300 flex items-center justify-center space-x-2">
+                    <x-icon name="calendar" class="w-4 h-4 text-[#38BDF8]" />
+                    <span>Agendar Cita en Línea</span>
+                </button>
             </div>
         </div>
 
@@ -415,27 +416,28 @@
             </div>
         @endif
 
-        <!-- Callout Banner to Clinical Software Portal -->
+        <!-- Callout Banner hacia Acceso Institucional -->
         <div class="mt-12 rounded-2xl bg-gradient-to-r from-[#0F172A] to-[#1E293B] p-8 md:p-10 text-white flex flex-col lg:flex-row items-center justify-between gap-8 shadow-xl">
             <div class="max-w-2xl">
                 <span class="text-[#38BDF8] text-xs font-bold uppercase tracking-widest block mb-2">
-                    PORTAL DE GESTIÓN CLÍNICA INTEGRADA
+                    ACCESO AL SISTEMA HOSPITALARIO
                 </span>
                 <h4 class="font-serif text-2xl md:text-3xl mb-2">
-                    Acceso directo para Médicos, Personal y Pacientes
+                    Portal Clínico &amp; Servicios en Línea
                 </h4>
                 <p class="text-slate-300 text-sm leading-relaxed">
-                    Consulte disponibilidad de camas UCI, seguimiento de pacientes en tiempo real, resultados de laboratorio e historial clínico electrónico según su perfil de acceso (19 Casos de Uso).
+                    Si eres paciente, médico o personal asistencial de Clínica Vida Salud, ingresa con tus credenciales institucionales para gestionar consultas, turnos y registros clínicos.
                 </p>
             </div>
             <div class="flex flex-wrap gap-3 shrink-0">
-                <a href="{{ route('portal') }}"
-                   class="px-6 py-3.5 bg-[#0284C7] hover:bg-[#0369A1] text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-lg">
-                    Abrir Portal Clínico
+                <a href="{{ route('login') }}"
+                   class="px-6 py-3.5 bg-[#0284C7] hover:bg-[#0369A1] text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-lg flex items-center space-x-2">
+                    <x-icon name="log-in" class="w-4 h-4" />
+                    <span>Iniciar Sesión (CU01)</span>
                 </a>
-                <a href="{{ url('/disponibilidad') }}"
+                <a href="{{ url('/registro-paciente') }}"
                    class="px-6 py-3.5 bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-xl text-xs font-bold uppercase tracking-wider transition-all">
-                    Consultar Disponibilidad (CU10)
+                    Registrarse como Paciente
                 </a>
             </div>
         </div>
