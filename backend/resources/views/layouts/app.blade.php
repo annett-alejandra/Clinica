@@ -185,13 +185,6 @@
                 </a>
             @endif
         </div>
-                <a href="{{ route('inicio') }}"
-                   class="flex items-center space-x-2 bg-slate-800 hover:bg-slate-900 text-white px-4 py-2.5 rounded-xl text-xs font-semibold transition-all shadow-sm">
-                    <x-icon name="arrow-left" class="w-3.5 h-3.5" />
-                    <span>Volver a la Web</span>
-                </a>
-            @endif
-        </div>
     </nav>
 
     <!-- Espaciador para la barra fija cuando no estamos en la portada -->
