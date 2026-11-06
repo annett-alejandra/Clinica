@@ -343,7 +343,7 @@
             </button>
         </div>
 
-        <!-- 3 Centros de Alta Complejidad del Diseño de Referencia -->
+        <!-- 3 Centros de Alta Complejidad con Imágenes Clínicas -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             @php
                 $centrosDestacados = [
@@ -352,37 +352,49 @@
                         'desc' => 'Angioplastia primaria 24/7, electrofisiología cardíaca y cirugía cardiovascular mínimamente invasiva.',
                         'doctors' => '18 Especialistas',
                         'wait' => 'Atención inmediata',
+                        'image' => 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=800&q=80',
                     ],
                     [
                         'title' => 'Neurocirugía & Stroke Center',
                         'desc' => 'Neuronavegación óptica, trombectomía mecánica de urgencia y monitoreo neurofisiológico intraoperatorio.',
                         'doctors' => '14 Especialistas',
                         'wait' => 'Protocolo ACV Activo',
+                        'image' => 'https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=800&q=80',
                     ],
                     [
                         'title' => 'Oncología & Radioterapia',
                         'desc' => 'Comité oncológico multidisciplinario, inmunoterapia personalizada y acelerador lineal de alta precisión.',
                         'doctors' => '22 Especialistas',
                         'wait' => 'Agenda preferente',
+                        'image' => 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&w=800&q=80',
                     ],
                 ];
             @endphp
             @foreach ($centrosDestacados as $centro)
-                <div class="bg-white rounded-2xl p-7 border border-slate-200/90 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
-                    <div>
-                        <div class="w-11 h-11 rounded-xl bg-sky-50 text-[#0284C7] flex items-center justify-center mb-5">
-                            <x-icon name="stethoscope" class="w-5 h-5" />
+                <div class="bg-white rounded-2xl overflow-hidden border border-slate-200/90 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col justify-between group">
+                    <div class="relative h-44 overflow-hidden bg-slate-100">
+                        <img src="{{ $centro['image'] }}" alt="{{ $centro['title'] }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/20 to-transparent"></div>
+                        <div class="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-lg text-[10px] font-bold text-slate-800">
+                            {{ $centro['doctors'] }}
                         </div>
-                        <h4 class="font-bold text-lg text-[#0F172A] mb-2">{{ $centro['title'] }}</h4>
-                        <p class="text-slate-600 text-sm leading-relaxed mb-6">{{ $centro['desc'] }}</p>
+                        <div class="absolute bottom-3 left-4 right-4">
+                            <span class="text-white text-xs font-semibold px-2 py-0.5 rounded bg-[#0284C7]/90 inline-block">Centro de Excelencia</span>
+                        </div>
                     </div>
-                    <div class="pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
-                        <span class="font-semibold text-slate-700">{{ $centro['doctors'] }}</span>
-                        <button type="button"
-                                @click="$dispatch('abrir-reserva')"
-                                class="text-emerald-600 font-medium bg-emerald-50 hover:bg-emerald-100 px-2.5 py-1 rounded-full transition-colors">
-                            {{ $centro['wait'] }} →
-                        </button>
+                    <div class="p-6 flex-1 flex flex-col justify-between">
+                        <div>
+                            <h4 class="font-bold text-lg text-[#0F172A] mb-2">{{ $centro['title'] }}</h4>
+                            <p class="text-slate-600 text-sm leading-relaxed mb-6">{{ $centro['desc'] }}</p>
+                        </div>
+                        <div class="pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
+                            <span class="font-semibold text-slate-700">Guardia activa</span>
+                            <button type="button"
+                                    @click="$dispatch('abrir-reserva')"
+                                    class="text-[#0284C7] font-semibold bg-sky-50 hover:bg-[#0284C7] hover:text-white px-3 py-1.5 rounded-lg transition-colors">
+                                {{ $centro['wait'] }} →
+                            </button>
+                        </div>
                     </div>
                 </div>
             @endforeach
