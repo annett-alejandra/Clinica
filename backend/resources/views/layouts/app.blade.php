@@ -193,13 +193,21 @@
                 <span>Agendar Cita</span>
             </button>
 
-            <!-- Botón Principal: Entrar al Portal vs Volver a la Web -->
+            <!-- Botón Principal: Login vs Entrar al Portal vs Volver a la Web -->
             @if ($enPortada)
-                <a href="{{ route('portal') }}"
-                   class="flex items-center space-x-2 bg-[#0284C7] hover:bg-[#0369A1] text-white px-4 py-2.5 rounded-xl text-xs font-semibold transition-all shadow-md shadow-[#0284C7]/20">
-                    <x-icon name="log-in" class="w-3.5 h-3.5" />
-                    <span>Entrar al Portal</span>
-                </a>
+                @if ($usuarioActual)
+                    <a href="{{ route('portal') }}"
+                       class="flex items-center space-x-2 bg-[#0284C7] hover:bg-[#0369A1] text-white px-4 py-2.5 rounded-xl text-xs font-semibold transition-all shadow-md shadow-[#0284C7]/20">
+                        <x-icon name="layout-grid" class="w-3.5 h-3.5" />
+                        <span>Mi Portal Clínico</span>
+                    </a>
+                @else
+                    <a href="{{ route('login') }}"
+                       class="flex items-center space-x-2 bg-[#0284C7] hover:bg-[#0369A1] text-white px-4 py-2.5 rounded-xl text-xs font-semibold transition-all shadow-md shadow-[#0284C7]/20">
+                        <x-icon name="log-in" class="w-3.5 h-3.5" />
+                        <span>Iniciar Sesión (CU01)</span>
+                    </a>
+                @endif
             @else
                 <a href="{{ route('inicio') }}"
                    class="flex items-center space-x-2 bg-slate-800 hover:bg-slate-900 text-white px-4 py-2.5 rounded-xl text-xs font-semibold transition-all shadow-sm">

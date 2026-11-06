@@ -3,69 +3,110 @@
 @section('title', 'Iniciar Sesión (CU01) — Clínica Vida Salud')
 
 @section('content')
-<div class="py-12 px-4 max-w-xl mx-auto">
+<div class="py-12 px-4 max-w-xl mx-auto"
+     x-data="{
+         credencial: '{{ old('credencial', 'admin@clinica.com') }}',
+         password: '{{ old('password', 'clinica123') }}',
+         rolSeleccionado: 'Administrador',
+         cargar(usuario, pass, rol) {
+             this.credencial = usuario;
+             this.password = pass;
+             this.rolSeleccionado = rol;
+         }
+     }">
     <div class="text-center mb-8">
-        <span class="text-xs font-bold uppercase tracking-widest text-[#0284C7]">PAQUETE 01 · CU01 SEGURIDAD CLÍNICA</span>
-        <h1 class="text-3xl md:text-4xl font-serif text-[#0F172A] mt-1">Acceso al Sistema Hospitalario</h1>
-        <p class="text-sm text-slate-500 mt-1">Ingresa tus credenciales institucionales o selecciona un perfil operativo del portal.</p>
+        <span class="text-xs font-bold uppercase tracking-widest text-[#0284C7]">PAQUETE 01 · CU01 SEGURIDAD Y ACCESO CLÍNICO</span>
+        <h1 class="text-3xl md:text-4xl font-serif text-[#0F172A] mt-1">Iniciar Sesión en el Sistema</h1>
+        <p class="text-sm text-slate-500 mt-1">Ingresa con tus credenciales según tu rol oficial (Administrador, Médico, Recepcionista o Paciente).</p>
     </div>
 
+    <!-- Selector de Credenciales Rápidas para Demo / Evaluación -->
+    <div class="mb-6 bg-slate-50 border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-sm">
+        <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-600">
+                1-Click: Cargar Cuenta Oficial de Prueba
+            </span>
+            <span class="text-[11px] font-bold text-[#0284C7] bg-sky-50 px-2 py-0.5 rounded-full" x-text="'Rol: ' + rolSeleccionado"></span>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <button type="button"
+                    @click="cargar('admin@clinica.com', 'clinica123', 'Administrador')"
+                    :class="rolSeleccionado === 'Administrador' ? 'border-[#0284C7] bg-white text-[#0284C7] shadow-sm' : 'border-slate-200 bg-white text-slate-700'"
+                    class="p-2.5 rounded-xl border text-left transition-all hover:border-[#0284C7]">
+                <span class="text-[10px] font-bold uppercase text-amber-600 block">Admin</span>
+                <span class="text-xs font-semibold block truncate">admin</span>
+            </button>
+
+            <button type="button"
+                    @click="cargar('roberto.valenzuela@clinica.com', 'clinica123', 'Médico')"
+                    :class="rolSeleccionado === 'Médico' ? 'border-[#0284C7] bg-white text-[#0284C7] shadow-sm' : 'border-slate-200 bg-white text-slate-700'"
+                    class="p-2.5 rounded-xl border text-left transition-all hover:border-[#0284C7]">
+                <span class="text-[10px] font-bold uppercase text-[#0284C7] block">Médico</span>
+                <span class="text-xs font-semibold block truncate">dr_valenzuela</span>
+            </button>
+
+            <button type="button"
+                    @click="cargar('recepcion@clinica.com', 'clinica123', 'Recepcionista')"
+                    :class="rolSeleccionado === 'Recepcionista' ? 'border-[#0284C7] bg-white text-[#0284C7] shadow-sm' : 'border-slate-200 bg-white text-slate-700'"
+                    class="p-2.5 rounded-xl border text-left transition-all hover:border-[#0284C7]">
+                <span class="text-[10px] font-bold uppercase text-emerald-600 block">Recepción</span>
+                <span class="text-xs font-semibold block truncate">recepcion</span>
+            </button>
+
+            <button type="button"
+                    @click="cargar('fernando.justiniano@mail.com', 'clinica123', 'Paciente')"
+                    :class="rolSeleccionado === 'Paciente' ? 'border-[#0284C7] bg-white text-[#0284C7] shadow-sm' : 'border-slate-200 bg-white text-slate-700'"
+                    class="p-2.5 rounded-xl border text-left transition-all hover:border-[#0284C7]">
+                <span class="text-[10px] font-bold uppercase text-indigo-600 block">Paciente</span>
+                <span class="text-xs font-semibold block truncate">paciente_fer</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Formulario Oficial de Autenticación CU01 -->
     <div class="bg-white p-6 md:p-8 rounded-2xl border border-slate-200/90 shadow-sm">
         <form action="{{ url('/login') }}" method="POST" class="space-y-5">
             @csrf
             <div>
-                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Usuario o Correo Electrónico *</label>
-                <input type="text" name="credencial" value="{{ old('credencial') }}"
-                       class="w-full text-sm border-slate-200 rounded-xl px-3.5 py-2.5 bg-slate-50 border focus:bg-white focus:border-[#0284C7] focus:outline-none"
-                       placeholder="correo@clinicavidasalud.bo o usuario" required autofocus>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                    Usuario o Correo Electrónico *
+                </label>
+                <div class="relative">
+                    <input type="text"
+                           name="credencial"
+                           x-model="credencial"
+                           class="w-full text-sm border-slate-200 rounded-xl px-3.5 py-2.5 bg-slate-50 border focus:bg-white focus:border-[#0284C7] focus:outline-none"
+                           placeholder="admin@clinica.com o usuario" required autofocus>
+                </div>
             </div>
 
             <div>
-                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Contraseña *</label>
-                <input type="password" name="password"
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                    Contraseña *
+                </label>
+                <input type="password"
+                       name="password"
+                       x-model="password"
                        class="w-full text-sm border-slate-200 rounded-xl px-3.5 py-2.5 bg-slate-50 border focus:bg-white focus:border-[#0284C7] focus:outline-none"
                        placeholder="••••••••" required>
             </div>
 
-            <button type="submit" class="w-full bg-[#0284C7] hover:bg-[#0369A1] text-white font-semibold py-3 rounded-xl shadow-md shadow-[#0284C7]/20 transition-all text-sm">
-                Iniciar Sesión Oficial (CU01)
+            <div class="flex items-center justify-between text-xs">
+                <span class="text-slate-500">Contraseña demo: <strong class="text-slate-700">clinica123</strong></span>
+                <a href="{{ url('/registro-paciente') }}" class="font-semibold text-[#0284C7] hover:underline">
+                    ¿Nuevo paciente? Registrarse (CU09)
+                </a>
+            </div>
+
+            <button type="submit" class="w-full bg-[#0284C7] hover:bg-[#0369A1] text-white font-semibold py-3.5 rounded-xl shadow-md shadow-[#0284C7]/20 transition-all text-sm flex items-center justify-center space-x-2">
+                <x-icon name="log-in" class="w-4 h-4" />
+                <span>Ingresar al Sistema Clínico (CU01)</span>
             </button>
         </form>
 
-        <!-- Acceso directo por rol al Portal Clínico -->
-        <div class="mt-6 pt-6 border-t border-slate-200/80">
-            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-3 text-center">
-                O accede directamente a la consola por perfil:
-            </span>
-            <div class="grid grid-cols-2 gap-2.5">
-                <a href="{{ route('portal', ['rol' => 'medico']) }}"
-                   class="flex items-center space-x-2 p-2.5 rounded-xl border border-slate-200 hover:border-[#0284C7] hover:bg-sky-50/50 text-xs font-semibold text-slate-700 transition-all">
-                    <x-icon name="stethoscope" class="w-4 h-4 text-[#0284C7]" />
-                    <span>Médico Especialista</span>
-                </a>
-                <a href="{{ route('portal', ['rol' => 'enfermeria']) }}"
-                   class="flex items-center space-x-2 p-2.5 rounded-xl border border-slate-200 hover:border-[#0284C7] hover:bg-sky-50/50 text-xs font-semibold text-slate-700 transition-all">
-                    <x-icon name="activity" class="w-4 h-4 text-emerald-600" />
-                    <span>Enfermería / Recepción</span>
-                </a>
-                <a href="{{ route('portal', ['rol' => 'paciente']) }}"
-                   class="flex items-center space-x-2 p-2.5 rounded-xl border border-slate-200 hover:border-[#0284C7] hover:bg-sky-50/50 text-xs font-semibold text-slate-700 transition-all">
-                    <x-icon name="users" class="w-4 h-4 text-indigo-600" />
-                    <span>Portal Paciente</span>
-                </a>
-                <a href="{{ route('portal', ['rol' => 'administrador']) }}"
-                   class="flex items-center space-x-2 p-2.5 rounded-xl border border-slate-200 hover:border-[#0284C7] hover:bg-sky-50/50 text-xs font-semibold text-slate-700 transition-all">
-                    <x-icon name="shield-check" class="w-4 h-4 text-amber-600" />
-                    <span>Dirección / Admin</span>
-                </a>
-            </div>
-        </div>
-
-        <div class="mt-6 pt-5 border-t border-slate-100 text-center text-xs text-slate-500">
-            ¿Eres paciente nuevo?
-            <a href="{{ url('/registro-paciente') }}" class="font-semibold text-[#0284C7] hover:underline">
-                Regístrate aquí en línea (CU09)
-            </a>
+        <div class="mt-6 pt-5 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+            <span>Autenticación segura con Hash Bcrypt</span>
+            <a href="{{ route('inicio') }}" class="text-slate-600 hover:text-slate-900 font-medium">← Volver a la portada</a>
         </div>
     </div>
 </div>

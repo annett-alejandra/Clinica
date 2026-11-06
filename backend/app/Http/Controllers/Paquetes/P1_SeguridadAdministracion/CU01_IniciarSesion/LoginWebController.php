@@ -34,9 +34,10 @@ class LoginWebController extends Controller
 
         Auth::loginUsingId($resultado['usuario']['id_usuario']);
         $request->session()->regenerate();
+        $request->session()->put('rol_activo', $resultado['usuario']['rol'] ?? $resultado['usuario']['perfil'] ?? 'Administrador');
 
         return redirect()->intended(route('portal'))
-            ->with('status', 'Bienvenido(a), ' . $resultado['usuario']['perfil'] . '.');
+            ->with('status', 'Bienvenido(a), ' . $resultado['usuario']['perfil'] . ' (' . ($resultado['usuario']['rol'] ?? '') . ').');
     }
 }
 
