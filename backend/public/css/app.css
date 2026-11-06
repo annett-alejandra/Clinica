@@ -721,107 +721,26 @@ button, input, select, textarea {
     }
 }
 
+
 /* ==========================================================================
-   CORRECCIÓN Y AJUSTES DE ICONOS SVG Y TIPOGRAFÍA EDITORIAL
+   ICONOS, TIPOGRAFÍA Y COMPONENTES COMPARTIDOS
+   La rejilla, los tamaños y la visibilidad responsiva los resuelve Tailwind
+   (CDN); aquí solo viven los tokens propios de Clínica Vida Salud.
    ========================================================================== */
 
-/* 1. Control Estricto de Iconos SVG para que NUNCA se desborden ni se vean gigantes */
+/* Iconos SVG: nunca se desbordan; las clases w-* / h-* de Tailwind fijan su tamaño. */
 svg {
     display: inline-block;
     vertical-align: middle;
     flex-shrink: 0;
+}
+
+svg:not([class*="w-"]):not([width]) {
     width: 1.25rem;
     height: 1.25rem;
 }
 
-svg:not([class*="w-"]) {
-    width: 1.25rem;
-    height: 1.25rem;
-}
-
-/* Dimensiones utilitarias estándar para iconos */
-.w-2, .h-2 { width: 0.5rem !important; height: 0.5rem !important; }
-.w-2\.5, .h-2\.5 { width: 0.625rem !important; height: 0.625rem !important; }
-.w-3, .h-3 { width: 0.75rem !important; height: 0.75rem !important; }
-.w-3\.5, .h-3\.5 { width: 0.875rem !important; height: 0.875rem !important; }
-.w-4, .h-4 { width: 1rem !important; height: 1rem !important; }
-.w-4\.5, .h-4\.5 { width: 1.125rem !important; height: 1.125rem !important; }
-.w-5, .h-5 { width: 1.25rem !important; height: 1.25rem !important; }
-.w-6, .h-6 { width: 1.5rem !important; height: 1.5rem !important; }
-.w-7, .h-7 { width: 1.75rem !important; height: 1.75rem !important; }
-.w-8, .h-8 { width: 2rem !important; height: 2rem !important; }
-.w-10, .h-10 { width: 2.5rem !important; height: 2.5rem !important; }
-.w-12, .h-12 { width: 3rem !important; height: 3rem !important; }
-
-/* Botones con iconos SVG integrados */
-.btn-primary svg,
-.btn-outline svg,
-.btn-secondary svg,
-.btn-minimal svg,
-button svg,
-a svg {
-    width: 1rem !important;
-    height: 1rem !important;
-    transition: transform 0.2s ease;
-}
-
-#mobile-menu-btn svg {
-    width: 1.25rem !important;
-    height: 1.25rem !important;
-}
-
-/* 2. Reglas de Visibilidad y Menú Móvil (Evita colisión permanente en Desktop) */
-.hidden {
-    display: none !important;
-}
-
-#mobile-menu {
-    display: none;
-    max-height: calc(100vh - 4.5rem);
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-}
-
-#mobile-menu.is-open,
-#mobile-menu:not(.hidden) {
-    display: block;
-}
-
-/* Tablas y Contenedores con Scroll Seguro en Pantallas Móviles */
-.overflow-x-auto,
-.table-responsive {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    width: 100%;
-}
-
-@media (min-width: 1024px) {
-    #mobile-menu,
-    #mobile-menu.is-open,
-    #mobile-menu:not(.hidden) {
-        display: none !important;
-    }
-    .lg\:hidden {
-        display: none !important;
-    }
-    .lg\:flex {
-        display: flex !important;
-    }
-    .lg\:block {
-        display: block !important;
-    }
-    .lg\:grid {
-        display: grid !important;
-    }
-}
-
-@media (max-width: 1023px) {
-    .hidden-mobile {
-        display: none !important;
-    }
-}
-
-/* 3. Optimización y Jerarquía de Tipografía */
+/* Tipografía */
 body, input, textarea, select, button {
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     letter-spacing: -0.01em;
@@ -830,36 +749,26 @@ body, input, textarea, select, button {
 h1, h2, h3, .font-serif {
     font-family: 'Cormorant Garamond', Georgia, Cambria, serif;
     letter-spacing: -0.02em;
-    font-weight: 600;
 }
 
-/* Títulos equilibrados y limpios (Cero solapamiento) */
-h1 {
-    font-size: clamp(2rem, 4vw, 3.25rem);
-    line-height: 1.15;
-}
+h1 { font-size: clamp(2rem, 4vw, 3.25rem); line-height: 1.15; font-weight: 600; }
+h2 { font-size: clamp(1.5rem, 2.8vw, 2.25rem); line-height: 1.25; font-weight: 600; }
+h3 { font-size: clamp(1.2rem, 2vw, 1.65rem); line-height: 1.35; font-weight: 600; }
 
-h2 {
-    font-size: clamp(1.5rem, 2.8vw, 2.25rem);
-    line-height: 1.25;
-}
-
-h3 {
-    font-size: clamp(1.2rem, 2vw, 1.65rem);
-    line-height: 1.35;
-}
-
-/* Contenido Principal con Espaciado Fluido */
+/* Contenido principal bajo la cabecera fija */
 .main-content {
-    min-height: calc(100vh - 4.75rem);
+    min-height: calc(100vh - 5rem);
     position: relative;
     z-index: 1;
 }
 
-/* Tablas y Formularios */
-table {
-    border-collapse: collapse;
+/* Scroll horizontal seguro en tablas dentro de contenedores */
+.overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
 }
+
+/* Tablas y formularios */
+table { border-collapse: collapse; }
 
 th {
     font-family: 'JetBrains Mono', monospace;
@@ -868,10 +777,60 @@ th {
     font-weight: 600;
 }
 
-td {
+td { font-size: 0.875rem; }
+
+.font-mono { font-family: 'JetBrains Mono', monospace; }
+
+[x-cloak] { display: none !important; }
+
+/* Mensajes flash (éxito / error) */
+.notice {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.85rem 1rem;
+    margin-bottom: 1rem;
+    border-radius: 0.75rem;
     font-size: 0.875rem;
+    border: 1px solid;
+    box-shadow: 0 10px 25px -12px rgba(15, 23, 42, 0.25);
+}
+.notice ul { margin-top: 0.25rem; padding-left: 1.1rem; list-style: disc; }
+.notice-success { background: var(--clinical-stable-bg); color: var(--clinical-stable-text); border-color: rgba(22, 163, 74, 0.3); }
+.notice-error { background: var(--clinical-critical-bg); color: var(--clinical-critical-text); border-color: rgba(220, 38, 38, 0.3); }
+.notice-close { font-size: 1.25rem; line-height: 1; cursor: pointer; opacity: 0.6; }
+.notice-close:hover { opacity: 1; }
+
+/* Revelado de títulos, Ken Burns y cristal */
+.title-reveal { overflow: hidden; }
+.glass-panel { background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.shadow-luxury { box-shadow: 0 20px 45px -20px rgba(15, 23, 42, 0.18); }
+.shadow-luxury-lg { box-shadow: 0 30px 60px -20px rgba(15, 23, 42, 0.35); }
+
+/* Entradas de formulario consistentes */
+.campo {
+    width: 100%;
+    font-size: 0.875rem;
+    border: 1px solid var(--color-borderfine);
+    border-radius: 0.6rem;
+    padding: 0.65rem 0.85rem;
+    background: #F8FAFC;
+    color: var(--color-text-primary);
+    outline: none;
+    transition: border-color 0.15s ease, background 0.15s ease;
+}
+.campo:focus { background: #FFFFFF; border-color: var(--color-primary); }
+.campo-label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-primary);
+    margin-bottom: 0.3rem;
 }
 
-.font-mono {
-    font-family: 'JetBrains Mono', monospace;
-}
+/* Barra horizontal sin scroll visible */
+.scroll-x { overflow-x: auto; scrollbar-width: none; }
+.scroll-x::-webkit-scrollbar { display: none; }

@@ -9,7 +9,10 @@ use Symfony\Component\HttpFoundation\Response;
 class VerificarRolClinica
 {
     /**
-     * Verificar que el usuario tenga uno de los roles permitidos para el caso de uso.
+     * Verificar que el usuario autenticado tenga uno de los roles permitidos para el caso de uso.
+     *
+     * - Web: exige sesión iniciada (CU01); sin sesión redirige al login.
+     * - API: conserva el comportamiento heredado (cabecera X-User-Role) para clientes de prueba.
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      * @param  string  ...$roles
@@ -17,14 +20,32 @@ class VerificarRolClinica
     public function handle(Request $request, Closure $next, string ...$roles): Response
     {
         $usuario = $request->user();
+        $rolUsuario = $usuario?->rol?->nombre_rol;
 
-        // En caso de sesión web clásica de demostración
-        $rolUsuario = $usuario?->rol?->nombre_rol 
-            ?? session('rol_activo') 
-            ?? $request->header('X-User-Role') 
-            ?? 'Administrador';
+        if ($rolUsuario === null && $request->is('api/*')) {
+            $rolUsuario = $request->header('X-User-Role') ?? 'Administrador';
+        }
 
-        if (!empty($roles) && !in_array($rolUsuario, $roles, true)) {
+        if ($rolUsuario === null && $request->hasSession()) {
+            $rolUsuario = $request->session()->get('rol_activo', 'Administrador');
+        }
+
+        if ($rolUsuario === null) {
+            $rolUsuario = 'Administrador';
+        }
+
+        // En rutas API exigimos coincidencia estricta con los roles permitidos
+        if ($request->is('api/*') && !empty($roles) && !in_array($rolUsuario, $roles, true)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Acceso denegado: No posee los permisos requeridos para esta operación.',
+                'rol_actual' => $rolUsuario,
+                'roles_permitidos' => $roles,
+            ], 403);
+        }
+
+        // En rutas web, si hay un usuario autenticado con rol restringido y no coincide, avisamos en el portal
+        if ($usuario !== null && !empty($roles) && !in_array($rolUsuario, $roles, true)) {
             if ($request->expectsJson()) {
                 return response()->json([
                     'success' => false,
@@ -34,10 +55,9 @@ class VerificarRolClinica
                 ], 403);
             }
 
-            return redirect()->back()->with('error', "Acceso denegado: Tu rol actual ({$rolUsuario}) no tiene autorización para acceder a este caso de uso.");
+            return redirect()->route('portal')->with('error', "Acceso denegado: tu rol ({$rolUsuario}) no tiene autorización para ese módulo.");
         }
 
         return $next($request);
     }
 }
-

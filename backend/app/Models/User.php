@@ -42,6 +42,25 @@ class User extends Authenticatable
         return $this->belongsTo(Rol::class, 'id_rol', 'id_rol');
     }
 
+    /** Nombre del rol asignado (Administrador, Recepcionista, Médico o Paciente). */
+    public function nombreRol(): ?string
+    {
+        return $this->rol?->nombre_rol;
+    }
+
+    public function tieneRol(string ...$roles): bool
+    {
+        return in_array($this->nombreRol(), $roles, true);
+    }
+
+    /** Nombre visible del perfil clínico asociado, o el nombre de usuario como respaldo. */
+    public function nombreVisible(): string
+    {
+        return $this->medico?->nombre_completo
+            ?? $this->paciente?->nombre_completo
+            ?? $this->nombre_usuario;
+    }
+
     public function paciente(): BelongsTo
     {
         return $this->belongsTo(Paciente::class, 'id_paciente', 'id_paciente');

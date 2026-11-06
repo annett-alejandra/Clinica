@@ -1,7 +1,9 @@
 <?php
 
-use App\Http\Controllers\Paquetes\P1_SeguridadAdministracion\CU01_IniciarSesion\AuthController;
-use App\Http\Controllers\Paquetes\P1_SeguridadAdministracion\CU02_CerrarSesion\LogoutController;
+use App\Http\Controllers\InicioController;
+use App\Http\Controllers\PortalController;
+use App\Http\Controllers\Paquetes\P1_SeguridadAdministracion\CU01_IniciarSesion\LoginWebController;
+use App\Http\Controllers\Paquetes\P1_SeguridadAdministracion\CU02_CerrarSesion\LogoutWebController;
 use App\Http\Controllers\Paquetes\P1_SeguridadAdministracion\CU03_GestionarUsuariosRoles\UsuariosController;
 use App\Http\Controllers\Paquetes\P1_SeguridadAdministracion\CU04_GestionarEspecialidadesMedicas\EspecialidadController;
 use App\Http\Controllers\Paquetes\P2_PersonalMedico\CU05_GestionarMedicos\MedicosController;
@@ -25,6 +27,7 @@ use App\Models\Paquetes\P2_PersonalMedico\Medico;
 use App\Models\Paquetes\P3_GestionPacientes\Paciente;
 use App\Models\Paquetes\P4_GestionCitas\CitaMedica;
 use App\Models\User;
+use App\Services\PortalService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -35,13 +38,33 @@ use Illuminate\Support\Facades\Route;
 */
 
 // Inicio Institucional
-Route::view('/', 'welcome')->name('inicio');
+Route::get('/', InicioController::class)->name('inicio');
+
+// Portal clínico interactivo por rol
+Route::get('/portal', PortalController::class)->name('portal');
+
+// Cambio rápido de perfil / rol en el portal o barra superior
+Route::post('/cambiar-rol', function (Request $request, PortalService $portal) {
+    $rol = $portal->normalizarRol($request->input('rol'));
+    $request->session()->put('rol_activo', $rol);
+
+    return redirect()->route('portal', ['rol' => match ($rol) {
+        'Médico' => 'medico',
+        'Recepcionista' => 'enfermeria',
+        'Paciente' => 'paciente',
+        default => 'administrador',
+    }])->with('status', "Perfil operativo activo: {$rol}");
+})->name('cambiar-rol');
 
 // CU01 & CU02: Iniciar y Cerrar Sesión
-Route::get('/login', fn() => view('Paquetes.P1_SeguridadAdministracion.CU01_IniciarSesion.index'))->name('login');
-Route::post('/login', [AuthController::class, 'login']);
+Route::get('/login', function () {
+    return auth()->check()
+        ? redirect()->route('portal')
+        : view('Paquetes.P1_SeguridadAdministracion.CU01_IniciarSesion.index');
+})->name('login');
+Route::post('/login', LoginWebController::class)->middleware('throttle:10,1');
 Route::get('/logout', fn() => view('Paquetes.P1_SeguridadAdministracion.CU02_CerrarSesion.index'))->name('logout');
-Route::post('/logout', LogoutController::class);
+Route::post('/logout', LogoutWebController::class);
 
 // CU03: Gestión de Usuarios y Roles (Admin)
 Route::get('/usuarios', function () {
@@ -83,8 +106,11 @@ Route::post('/pacientes', [PacientesController::class, 'store'])->middleware('ro
 
 // CU08: Gestionar Perfil del Paciente (Paciente)
 Route::get('/perfil-paciente', function (Request $request) {
-    $idPaciente = $request->query('id_paciente', 1);
-    $paciente = Paciente::find($idPaciente);
+    $usuario = $request->user();
+    $idPaciente = $usuario?->tieneRol('Paciente')
+        ? (int) $usuario->id_paciente
+        : (int) $request->query('id_paciente', 1);
+    $paciente = Paciente::find($idPaciente) ?? Paciente::where('estado', true)->first();
     return view('Paquetes.P3_GestionPacientes.CU08_GestionarPerfilPaciente.index', compact('paciente'));
 })->middleware('rol:Paciente,Administrador');
 Route::put('/perfil-paciente', [PerfilPacienteController::class, 'update'])->middleware('rol:Paciente,Administrador');
@@ -101,22 +127,37 @@ Route::get('/disponibilidad', function (Request $request) {
 
     if ($request->filled('id_medico') && $request->filled('fecha')) {
         $service = app(\App\Services\Paquetes\P4_GestionCitas\DisponibilidadService::class);
-        $turnos = $service->obtenerTurnosDisponibles(
-            idMedico: (int) $request->id_medico,
-            fecha: $request->fecha,
-            idEspecialidad: $request->id_especialidad ? (int) $request->id_especialidad : null
-        );
+        $idMedico = (int) $request->id_medico;
+        $idEspecialidad = $request->filled('id_especialidad')
+            ? (int) $request->id_especialidad
+            : (int) Medico::find($idMedico)?->especialidades()->value('especialidades.id_especialidad');
+
+        try {
+            $oferta = $service->consultar($idEspecialidad, $idMedico, $request->fecha);
+            $turnos = collect($oferta)->flatMap(fn (array $o) => $o['cupos'])->values()->all();
+        } catch (\Throwable $e) {
+            session()->now('error', $e instanceof \InvalidArgumentException
+                ? $e->getMessage()
+                : 'No fue posible consultar la disponibilidad. Verifica la especialidad, el médico y la fecha.');
+        }
     }
 
     return view('Paquetes.P4_GestionCitas.CU10_ConsultarDisponibilidadMedica.index', compact('especialidades', 'medicos', 'turnos'));
 });
 
 // CU11: Programar Cita Médica (Admin, Recepción, Paciente)
-Route::get('/citas', function () {
-    $pacientes = Paciente::where('estado', true)->get();
+Route::get('/citas', function (Request $request) {
+    $usuario = $request->user();
+    $esPaciente = $usuario?->tieneRol('Paciente') ?? false;
+    $idPaciente = (int) ($usuario?->id_paciente ?? 0);
+
+    $pacientes = Paciente::where('estado', true)
+        ->when($esPaciente && $idPaciente > 0, fn ($q) => $q->where('id_paciente', $idPaciente))
+        ->get();
     $especialidades = Especialidad::where('estado', true)->get();
     $medicos = Medico::where('estado', true)->get();
     $citas = CitaMedica::with(['paciente', 'medico', 'especialidad', 'estado'])
+        ->when($esPaciente && $idPaciente > 0, fn ($q) => $q->where('id_paciente', $idPaciente))
         ->orderBy('fecha_cita', 'desc')
         ->orderBy('hora_cita', 'desc')
         ->take(15)
@@ -154,7 +195,10 @@ Route::patch('/control-atencion/citas/{id}/inasistencia', [ControlAsistenciaCont
 
 // CU15: Registrar Cita Atendida (Médico)
 Route::get('/atencion-medica', function (Request $request) {
-    $idMedico = $request->query('id_medico', 1);
+    $usuario = $request->user();
+    $idMedico = $usuario?->tieneRol('Médico') && $usuario->id_medico
+        ? (int) $usuario->id_medico
+        : (int) ($request->query('id_medico') ?: Medico::where('estado', true)->value('id_medico') ?: 1);
     $citas = CitaMedica::with(['paciente', 'medico', 'especialidad', 'estado'])
         ->where('id_medico', $idMedico)
         ->orderBy('fecha_cita', 'desc')
@@ -211,7 +255,10 @@ Route::get('/historial-paciente', function (Request $request) {
 
 // CU18: Consultar Mis Citas (Paciente)
 Route::get('/mis-citas', function (Request $request) {
-    $idPaciente = $request->query('id_paciente', 1);
+    $usuario = $request->user();
+    $idPaciente = $usuario?->tieneRol('Paciente') && $usuario->id_paciente
+        ? (int) $usuario->id_paciente
+        : (int) ($request->query('id_paciente') ?: Paciente::where('estado', true)->value('id_paciente') ?: 1);
     $paciente = Paciente::find($idPaciente);
 
     $proximas = CitaMedica::with(['medico', 'especialidad', 'estado'])

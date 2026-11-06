@@ -57,6 +57,12 @@ class CitaMedicaController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
+        // Un paciente solo puede reservar para sí mismo, sin importar lo enviado en el formulario.
+        $usuario = $request->user();
+        if ($usuario?->tieneRol('Paciente')) {
+            $request->merge(['id_paciente' => $usuario->id_paciente]);
+        }
+
         $validated = $request->validate([
             'id_paciente' => 'required|integer|exists:pacientes,id_paciente',
             'id_medico' => 'required|integer|exists:medicos,id_medico',

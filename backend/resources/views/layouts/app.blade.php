@@ -4,276 +4,359 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Clínica Vida Salud — Excelencia Médica & Hospitalidad Terapéutica')</title>
-    
-    <!-- Tipografías de Alta Gama (Google Fonts) -->
+    <title>@yield('title', 'Clínica Vida Salud — Complejo Hospitalario & Cirugía de Alta Complejidad')</title>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Tailwind CSS (CDN oficial ultraligero para utilidades Blade y diseño responsivo) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: {
-                        primary: '#0284C7',
-                        'primary-hover': '#0369A1',
-                        secondary: '#0D9488',
-                    },
                     fontFamily: {
-                        display: ['Cormorant Garamond', 'Georgia', 'serif'],
-                        sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'monospace'],
+                        sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+                        serif: ['"Fraunces"', 'Georgia', 'serif'],
                     }
                 }
             }
         }
     </script>
-
-    <!-- Estilos Globales y Tokens Clínicos (Cero Lag) -->
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
-    
-    <!-- Alpine.js para Interactividad Reactiva Ligera -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
-
-    @stack('styles')
-    
-    <!-- Motor de Animación e Interacciones -->
-    <script src="{{ asset('js/app.js') }}" defer></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+    <script defer src="{{ asset('js/app.js') }}"></script>
 </head>
-<body class="selection:bg-sky-100 selection:text-sky-900 antialiased">
-    <!-- Capa de Fondo Fijo Acelerada por GPU (60fps garantizados) -->
-    <div class="bg-ambient-glow" aria-hidden="true"></div>
+@php
+    $enPortada = request()->routeIs('inicio');
+    $enPortal = request()->routeIs('portal');
+    $rolKey = match ($rolActual ?? 'Médico') {
+        'Médico' => 'medico',
+        'Recepcionista' => 'enfermeria',
+        'Paciente' => 'paciente',
+        default => 'administrador',
+    };
+    $rolEtiqueta = match ($rolKey) {
+        'medico' => 'Dr. Matías Lagos (Médico)',
+        'enfermeria' => 'Enf. Carla Soto (Gestión)',
+        'paciente' => 'Portal Paciente',
+        default => 'Dirección General (Admin)',
+    };
+@endphp
+<body class="min-h-screen bg-[#F8FAFC] text-[#1E293B] font-sans selection:bg-[#0284C7] selection:text-white overflow-x-hidden antialiased"
+      x-data="{ showRoleSelector: false, showCuMenu: false, mobileMenu: false }">
 
-    <a class="skip-link" href="#contenido">Ir al contenido</a>
+    <!-- 1. GLOBAL NAVBAR (Landing & Software Portal Switcher) -->
+    <nav class="fixed top-0 left-0 w-full z-50 px-4 sm:px-6 md:px-12 py-3.5 flex justify-between items-center transition-all duration-300 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-sm">
+        <!-- Brand Logo -->
+        <a href="{{ route('inicio') }}" class="flex items-center space-x-3 cursor-pointer group shrink-0">
+            <div class="w-10 h-10 rounded-xl bg-[#0284C7] flex items-center justify-center text-white shadow-md shadow-[#0284C7]/20 group-hover:bg-[#0369A1] transition-colors">
+                <x-icon name="compass" class="w-5 h-5" />
+            </div>
+            <div>
+                <span class="font-bold tracking-tight text-sm md:text-base block leading-none text-[#0F172A]">
+                    CLÍNICA VIDA SALUD
+                </span>
+                <span class="text-[10px] uppercase tracking-widest text-[#0284C7] font-semibold block mt-0.5">
+                    Complejo Hospitalario · JCI
+                </span>
+            </div>
+        </a>
 
-    <!-- Header Flotante / Sticky Editorial y Totalmente Responsivo -->
-    <header class="site-header">
-        <div class="container site-header-inner">
-            <a class="brand" href="{{ route('inicio') }}" aria-label="Inicio Clínica Vida Salud">
-                <span>Clínica Vida Salud</span>
-                <span class="brand-dot" aria-hidden="true"></span>
-            </a>
+        <!-- Center Navigation Links (Landing vs Portal/CU) -->
+        @if ($enPortada)
+            <div class="hidden xl:flex space-x-7 text-xs uppercase tracking-wider font-semibold text-slate-600 items-center">
+                <a href="#hero" class="hover:text-[#0284C7] transition-colors">Inicio</a>
+                <a href="#projeto" class="hover:text-[#0284C7] transition-colors">El Proyecto</a>
+                <a href="#ambientes" class="hover:text-[#0284C7] transition-colors">Instalaciones 360°</a>
+                <a href="#especialidades" class="hover:text-[#0284C7] transition-colors">Especialidades</a>
+                <a href="{{ url('/disponibilidad') }}" class="hover:text-[#0284C7] transition-colors">Disponibilidad (CU10)</a>
+            </div>
+        @else
+            <div class="hidden lg:flex items-center space-x-3 bg-slate-100 px-3.5 py-1.5 rounded-xl border border-slate-200/70">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="text-xs font-semibold text-slate-700">Sistema Clínico en Tiempo Real</span>
+                <span class="text-slate-300">|</span>
+                <span class="text-xs text-[#0284C7] font-bold">Conexión Cifrada SSL 256-bit</span>
+            </div>
+        @endif
 
-            <!-- Navegación Principal y Módulos Clínicos Organizados -->
-            <nav class="hidden lg:flex items-center gap-6" aria-label="Navegación principal">
-                <a href="{{ route('inicio') }}" class="nav-item">Inicio</a>
-                <a href="{{ url('/#capitulo-01') }}" class="nav-item">El Complejo</a>
-                <a href="{{ url('/#capitulo-02') }}" class="nav-item">Unidades & Suites</a>
-                <a href="{{ url('/#capitulo-03') }}" class="nav-item">Especialidades</a>
+        <!-- Right Side: Modules CU Dropdown, Role Switcher, Agendar Cita & Portal Toggle -->
+        <div class="flex items-center space-x-2.5 sm:space-x-3">
 
-                <!-- Desplegable Elegante de Casos de Uso / Módulos Clínicos -->
-                <div class="nav-dropdown" x-data="{ open: false }">
-                    <button 
-                        type="button" 
-                        class="nav-item nav-dropdown-trigger flex items-center gap-1.5 focus:outline-none"
-                        @click="open = !open" 
-                        @click.outside="open = false"
-                        aria-expanded="false"
-                    >
-                        <span>Módulos Clínicos</span>
-                        <svg class="w-3.5 h-3.5 text-slate-400 transition-transform duration-200" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                        </svg>
-                    </button>
+            <!-- Módulos CU (19 Casos de Uso) -->
+            <div class="relative" @click.outside="showCuMenu = false">
+                <button type="button"
+                        @click="showCuMenu = !showCuMenu; showRoleSelector = false"
+                        class="flex items-center space-x-2 bg-slate-100 hover:bg-slate-200/80 text-slate-700 px-3 py-2 rounded-lg text-xs font-semibold transition-all border border-slate-200/80">
+                    <x-icon name="layout-grid" class="w-3.5 h-3.5 text-[#0284C7]" />
+                    <span class="hidden md:inline">Módulos (CU01–19)</span>
+                    <x-icon name="chevron-down" class="w-3.5 h-3.5 text-slate-400" />
+                </button>
 
-                    <div 
-                        x-show="open" 
-                        x-cloak 
-                        x-transition:enter="transition ease-out duration-150"
-                        x-transition:enter-start="opacity-0 translate-y-2"
-                        x-transition:enter-end="opacity-100 translate-y-0"
-                        x-transition:leave="transition ease-in duration-100"
-                        x-transition:leave-start="opacity-100 translate-y-0"
-                        x-transition:leave-end="opacity-0 translate-y-2"
-                        class="nav-dropdown-menu"
-                    >
-                        <div class="dropdown-grid">
-                            <!-- Columna 1: Consultas y Atención Médica -->
-                            <div class="dropdown-col">
-                                <span class="dropdown-heading">Atención Médica</span>
-                                <a href="{{ url('/citas') }}" class="dropdown-link">
-                                    <span class="cu-badge">CU11</span>
-                                    <div>
-                                        <div class="dropdown-title">Citas Médicas</div>
-                                        <div class="dropdown-desc">Reserva y programación de consultas</div>
-                                    </div>
-                                </a>
-                                <a href="{{ url('/agenda-medica') }}" class="dropdown-link">
-                                    <span class="cu-badge">CU16</span>
-                                    <div>
-                                        <div class="dropdown-title">Agenda Médica</div>
-                                        <div class="dropdown-desc">Horarios y disponibilidad facultativa</div>
-                                    </div>
-                                </a>
-                                <a href="{{ url('/control-atencion') }}" class="dropdown-link">
-                                    <span class="cu-badge">CU14</span>
-                                    <div>
-                                        <div class="dropdown-title">Control de Atención</div>
-                                        <div class="dropdown-desc">Monitoreo de flujo y sala de espera</div>
-                                    </div>
-                                </a>
-                                <a href="{{ url('/atencion-medica') }}" class="dropdown-link">
-                                    <span class="cu-badge">CU15</span>
-                                    <div>
-                                        <div class="dropdown-title">Consultas Clínicas</div>
-                                        <div class="dropdown-desc">Evolución, diagnóstico y prescripción</div>
-                                    </div>
-                                </a>
-                                <a href="{{ url('/historial-paciente') }}" class="dropdown-link">
-                                    <span class="cu-badge">CU17</span>
-                                    <div>
-                                        <div class="dropdown-title">Historial Clínico</div>
-                                        <div class="dropdown-desc">Expediente integral del paciente</div>
-                                    </div>
-                                </a>
-                            </div>
-
-                            <!-- Columna 2: Portal Paciente y Administración -->
-                            <div class="dropdown-col">
-                                <span class="dropdown-heading">Portal Paciente</span>
-                                <a href="{{ url('/mis-citas') }}" class="dropdown-link">
-                                    <span class="cu-badge">CU18</span>
-                                    <div>
-                                        <div class="dropdown-title">Mis Citas</div>
-                                        <div class="dropdown-desc">Gestión autónoma de citas médicas</div>
-                                    </div>
-                                </a>
-                                <a href="{{ url('/perfil-paciente') }}" class="dropdown-link">
-                                    <span class="cu-badge">CU08</span>
-                                    <div>
-                                        <div class="dropdown-title">Perfil Paciente</div>
-                                        <div class="dropdown-desc">Filiación y datos personales</div>
-                                    </div>
-                                </a>
-
-                                <span class="dropdown-heading mt-4">Administración</span>
-                                <a href="{{ url('/reportes-administrativos') }}" class="dropdown-link">
-                                    <span class="cu-badge">CU19</span>
-                                    <div>
-                                        <div class="dropdown-title">Reportes</div>
-                                        <div class="dropdown-desc">Métricas operativas y estadísticas</div>
-                                    </div>
-                                </a>
-                                <a href="{{ url('/usuarios') }}" class="dropdown-link">
-                                    <span class="cu-badge">CU03</span>
-                                    <div>
-                                        <div class="dropdown-title">Usuarios & Roles</div>
-                                        <div class="dropdown-desc">Control de accesos y seguridad</div>
-                                    </div>
-                                </a>
+                <div x-show="showCuMenu" x-cloak
+                     x-transition.opacity.duration.150ms
+                     class="absolute right-0 mt-2 w-80 max-h-[75vh] overflow-y-auto bg-white rounded-2xl shadow-2xl border border-slate-200 p-3 z-50">
+                    <div class="px-2 py-1.5 border-b border-slate-100 mb-2 flex items-center justify-between">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">19 Casos de Uso del Sistema</span>
+                        <span class="text-[10px] font-bold text-[#0284C7] bg-sky-50 px-2 py-0.5 rounded-full">{{ $rolActual }}</span>
+                    </div>
+                    @foreach (collect(config('clinica.modulos'))->groupBy('grupo') as $grupo => $items)
+                        <div class="mb-2.5 last:mb-0">
+                            <p class="px-2 text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">{{ $grupo }}</p>
+                            <div class="space-y-0.5">
+                                @foreach ($items as $item)
+                                    <a href="{{ url($item['ruta']) }}"
+                                       class="flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-700 hover:bg-sky-50 hover:text-[#0284C7] transition-colors">
+                                        <span>{{ $item['titulo'] }}</span>
+                                        <span class="text-[10px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">{{ $item['cu'] }}</span>
+                                    </a>
+                                @endforeach
                             </div>
                         </div>
+                    @endforeach
+                    <div class="border-t border-slate-100 mt-2 pt-2 flex items-center justify-between px-2">
+                        <a href="{{ route('login') }}" class="text-xs font-semibold text-[#0284C7] hover:underline">CU01 Iniciar Sesión</a>
+                        <a href="{{ url('/registro-paciente') }}" class="text-xs font-semibold text-emerald-600 hover:underline">CU09 Registro Paciente</a>
                     </div>
                 </div>
-            </nav>
+            </div>
 
-            <!-- Acciones Rápidas y Accesibilidad -->
-            <div class="flex items-center gap-2 sm:gap-3">
-                <!-- Control para Pausar / Reducir Animaciones -->
-                <button 
-                    id="toggle-motion-btn"
-                    type="button" 
-                    class="btn-minimal text-xs hidden md:inline-flex"
-                    aria-pressed="false"
-                    title="Alternar animaciones y transiciones visuales"
-                >
-                    <span>Ⅱ</span> Pausar Animaciones
+            <!-- Selector de Perfil / Rol Operativo -->
+            <div class="relative" @click.outside="showRoleSelector = false">
+                <button type="button"
+                        @click="showRoleSelector = !showRoleSelector; showCuMenu = false"
+                        class="flex items-center space-x-2 bg-slate-100 hover:bg-slate-200/80 text-slate-700 px-3 py-2 rounded-lg text-xs font-semibold transition-all border border-slate-200/80">
+                    <x-icon name="user-check" class="w-3.5 h-3.5 text-[#0284C7]" />
+                    <span class="hidden sm:inline">
+                        @if ($usuarioActual)
+                            {{ $usuarioActual->nombreVisible() }} ({{ $usuarioActual->nombreRol() }})
+                        @else
+                            {{ $rolEtiqueta }}
+                        @endif
+                    </span>
+                    <x-icon name="chevron-down" class="w-3.5 h-3.5 text-slate-400" />
                 </button>
 
-                <!-- CTA Principal: Coordinación y Citas -->
-                <a href="{{ url('/citas') }}" class="btn-primary">
-                    <span class="hidden sm:inline">Agendar Cita</span>
-                    <span class="sm:hidden">Cita</span>
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-                    </svg>
+                <!-- Dropdown Menu -->
+                <div x-show="showRoleSelector" x-cloak
+                     x-transition.opacity.duration.150ms
+                     class="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-slate-200 py-2 z-50">
+                    <div class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100">
+                        Cambiar Vista de Perfil (Portal)
+                    </div>
+                    <a href="{{ route('portal', ['rol' => 'medico']) }}"
+                       class="w-full text-left px-4 py-2.5 text-xs font-medium flex items-center space-x-2.5 hover:bg-slate-50 transition-colors {{ $rolKey === 'medico' ? 'text-[#0284C7] bg-sky-50/60 font-bold' : 'text-slate-700' }}">
+                        <x-icon name="stethoscope" class="w-4 h-4 text-[#0284C7]" />
+                        <span>Médico Especialista (CU15/16)</span>
+                    </a>
+                    <a href="{{ route('portal', ['rol' => 'enfermeria']) }}"
+                       class="w-full text-left px-4 py-2.5 text-xs font-medium flex items-center space-x-2.5 hover:bg-slate-50 transition-colors {{ $rolKey === 'enfermeria' ? 'text-[#0284C7] bg-sky-50/60 font-bold' : 'text-slate-700' }}">
+                        <x-icon name="activity" class="w-4 h-4 text-emerald-600" />
+                        <span>Enfermería y Recepción (CU14)</span>
+                    </a>
+                    <a href="{{ route('portal', ['rol' => 'paciente']) }}"
+                       class="w-full text-left px-4 py-2.5 text-xs font-medium flex items-center space-x-2.5 hover:bg-slate-50 transition-colors {{ $rolKey === 'paciente' ? 'text-[#0284C7] bg-sky-50/60 font-bold' : 'text-slate-700' }}">
+                        <x-icon name="users" class="w-4 h-4 text-indigo-600" />
+                        <span>Paciente / Familia (CU08/11/18)</span>
+                    </a>
+                    <a href="{{ route('portal', ['rol' => 'administrador']) }}"
+                       class="w-full text-left px-4 py-2.5 text-xs font-medium flex items-center space-x-2.5 hover:bg-slate-50 transition-colors {{ $rolKey === 'administrador' ? 'text-[#0284C7] bg-sky-50/60 font-bold' : 'text-slate-700' }}">
+                        <x-icon name="shield-check" class="w-4 h-4 text-amber-600" />
+                        <span>Dirección / Admin (CU03/04/19)</span>
+                    </a>
+
+                    <div class="border-t border-slate-100 mt-1 pt-1.5 px-3 flex items-center justify-between">
+                        @if ($usuarioActual)
+                            <form method="POST" action="{{ url('/logout') }}" class="w-full">
+                                @csrf
+                                <button type="submit" class="w-full text-left py-1.5 text-xs font-semibold text-red-600 hover:text-red-700 flex items-center space-x-2">
+                                    <x-icon name="log-out" class="w-3.5 h-3.5" />
+                                    <span>Cerrar sesión (CU02)</span>
+                                </button>
+                            </form>
+                        @else
+                            <a href="{{ route('login') }}" class="py-1.5 text-xs font-semibold text-[#0284C7] hover:underline flex items-center space-x-1.5">
+                                <x-icon name="log-in" class="w-3.5 h-3.5" />
+                                <span>Autenticación Oficial (CU01)</span>
+                            </a>
+                        @endif
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botón Agendar Cita Rápida (Abre Modal Global CU10 + CU11) -->
+            <button type="button"
+                    @click="$dispatch('abrir-reserva')"
+                    class="hidden sm:flex items-center space-x-1.5 bg-sky-50 hover:bg-sky-100 text-[#0284C7] border border-sky-200 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all">
+                <x-icon name="calendar" class="w-3.5 h-3.5" />
+                <span>Agendar Cita</span>
+            </button>
+
+            <!-- Botón Principal: Entrar al Portal vs Volver a la Web -->
+            @if ($enPortada)
+                <a href="{{ route('portal') }}"
+                   class="flex items-center space-x-2 bg-[#0284C7] hover:bg-[#0369A1] text-white px-4 py-2.5 rounded-xl text-xs font-semibold transition-all shadow-md shadow-[#0284C7]/20">
+                    <x-icon name="log-in" class="w-3.5 h-3.5" />
+                    <span>Entrar al Portal</span>
                 </a>
+            @else
+                <a href="{{ route('inicio') }}"
+                   class="flex items-center space-x-2 bg-slate-800 hover:bg-slate-900 text-white px-4 py-2.5 rounded-xl text-xs font-semibold transition-all shadow-sm">
+                    <x-icon name="arrow-left" class="w-3.5 h-3.5" />
+                    <span>Volver a la Web</span>
+                </a>
+            @endif
+        </div>
+    </nav>
 
-                <!-- Botón Hamburguesa Móvil -->
-                <button 
-                    id="mobile-menu-btn"
-                    type="button"
-                    class="lg:hidden w-9 h-9 rounded-full border border-slate-200 flex items-center justify-center text-slate-700 hover:bg-slate-100 transition-colors"
-                    aria-label="Abrir menú de navegación"
-                    aria-expanded="false"
-                >
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                    </svg>
-                </button>
+    <!-- Espaciador para la barra fija cuando no estamos en la portada -->
+    @unless ($enPortada)
+        <div class="pt-20">
+            <x-alerts />
+        </div>
+    @else
+        <div class="fixed top-20 left-0 right-0 z-40 px-4 pointer-events-none">
+            <div class="pointer-events-auto">
+                <x-alerts />
             </div>
         </div>
-
-        <!-- Menú Móvil Desplegable (Estrictamente Oculto por Defecto en Desktop y Móvil hasta Abrir) -->
-        <div id="mobile-menu" class="hidden lg:hidden border-t border-slate-200 bg-white/95 backdrop-blur-md px-6 py-5 shadow-luxury">
-            <nav class="flex flex-col gap-2" aria-label="Menú móvil">
-                <span class="text-[11px] font-mono uppercase tracking-widest text-slate-400 font-semibold mb-1">Navegación General</span>
-                <a href="{{ route('inicio') }}" class="py-2 text-sm font-medium text-slate-700 hover:text-primary flex items-center justify-between border-b border-slate-100">
-                    <span>Inicio</span>
-                    <span class="text-xs text-slate-400">→</span>
-                </a>
-                <a href="{{ url('/#capitulo-01') }}" class="py-2 text-sm font-medium text-slate-700 hover:text-primary flex items-center justify-between border-b border-slate-100">
-                    <span>01 El Complejo Hospitalario</span>
-                    <span class="text-xs text-slate-400">→</span>
-                </a>
-                <a href="{{ url('/#capitulo-02') }}" class="py-2 text-sm font-medium text-slate-700 hover:text-primary flex items-center justify-between border-b border-slate-100">
-                    <span>02 Unidades Clínicas & Suites</span>
-                    <span class="text-xs text-slate-400">→</span>
-                </a>
-                <a href="{{ url('/#capitulo-03') }}" class="py-2 text-sm font-medium text-slate-700 hover:text-primary flex items-center justify-between border-b border-slate-100">
-                    <span>03 Vocación Médica & Protocolos</span>
-                    <span class="text-xs text-slate-400">→</span>
-                </a>
-                
-                <span class="text-[11px] font-mono uppercase tracking-widest text-slate-400 font-semibold mt-3 mb-1">Módulos Clínicos</span>
-                <div class="grid grid-cols-2 gap-2 text-xs">
-                    <a href="{{ url('/citas') }}" class="p-2 rounded bg-slate-50 border border-slate-100 font-medium text-slate-700 hover:text-primary hover:border-sky-200">
-                        <span class="font-mono text-[10px] text-sky-600 font-bold block">CU11</span> Citas Médicas
-                    </a>
-                    <a href="{{ url('/agenda-medica') }}" class="p-2 rounded bg-slate-50 border border-slate-100 font-medium text-slate-700 hover:text-primary hover:border-sky-200">
-                        <span class="font-mono text-[10px] text-sky-600 font-bold block">CU16</span> Agenda Médica
-                    </a>
-                    <a href="{{ url('/control-atencion') }}" class="p-2 rounded bg-slate-50 border border-slate-100 font-medium text-slate-700 hover:text-primary hover:border-sky-200">
-                        <span class="font-mono text-[10px] text-sky-600 font-bold block">CU14</span> Control Atención
-                    </a>
-                    <a href="{{ url('/atencion-medica') }}" class="p-2 rounded bg-slate-50 border border-slate-100 font-medium text-slate-700 hover:text-primary hover:border-sky-200">
-                        <span class="font-mono text-[10px] text-sky-600 font-bold block">CU15</span> Consultas
-                    </a>
-                    <a href="{{ url('/historial-paciente') }}" class="p-2 rounded bg-slate-50 border border-slate-100 font-medium text-slate-700 hover:text-primary hover:border-sky-200">
-                        <span class="font-mono text-[10px] text-sky-600 font-bold block">CU17</span> Historial
-                    </a>
-                    <a href="{{ url('/mis-citas') }}" class="p-2 rounded bg-slate-50 border border-slate-100 font-medium text-slate-700 hover:text-primary hover:border-sky-200">
-                        <span class="font-mono text-[10px] text-sky-600 font-bold block">CU18</span> Mis Citas
-                    </a>
-                    <a href="{{ url('/perfil-paciente') }}" class="p-2 rounded bg-slate-50 border border-slate-100 font-medium text-slate-700 hover:text-primary hover:border-sky-200">
-                        <span class="font-mono text-[10px] text-sky-600 font-bold block">CU08</span> Mi Perfil
-                    </a>
-                    <a href="{{ url('/reportes-administrativos') }}" class="p-2 rounded bg-slate-50 border border-slate-100 font-medium text-slate-700 hover:text-primary hover:border-sky-200">
-                        <span class="font-mono text-[10px] text-sky-600 font-bold block">CU19</span> Reportes
-                    </a>
-                    <a href="{{ url('/usuarios') }}" class="p-2 rounded bg-slate-50 border border-slate-100 font-medium text-slate-700 hover:text-primary hover:border-sky-200 col-span-2">
-                        <span class="font-mono text-[10px] text-sky-600 font-bold block">CU03</span> Gestión de Usuarios
-                    </a>
-                </div>
-
-                <a href="{{ url('/citas') }}" class="mt-3 py-2.5 px-4 text-center text-xs font-semibold text-white bg-primary rounded-full shadow-sm hover:bg-primary-hover">
-                    Programar Cita Médica →
-                </a>
-            </nav>
-        </div>
-    </header>
+    @endunless
 
     <!-- Contenido Principal -->
-    <main id="contenido" class="main-content focus:outline-none" tabindex="-1">
-        @include('components.alerts')
+    <main>
         @yield('content')
     </main>
 
-    <!-- Modal Global de Inspección de Instalaciones -->
-    <x-gallery-modal />
+    <!-- MODAL GLOBAL DE AGENDAMIENTO DE CITAS (Conectado a CU10 Disponibilidad + CU11 Programar Cita) -->
+    <div x-data="reserva({ urlDisponibilidad: '{{ url('/api/disponibilidad') }}' })"
+         @abrir-reserva.window="abrir($event.detail || {})"
+         x-show="abierto"
+         x-cloak
+         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm">
+        <div class="bg-white border border-slate-200 max-w-lg w-full rounded-2xl p-6 md:p-8 relative shadow-2xl max-h-[90vh] overflow-y-auto"
+             @click.outside="cerrar()">
+            <button type="button"
+                    @click="cerrar()"
+                    class="absolute top-5 right-5 text-slate-400 hover:text-slate-700 p-2 rounded-full hover:bg-slate-100 transition-colors">
+                <x-icon name="x" class="w-5 h-5" />
+            </button>
+
+            <div class="flex items-center space-x-3 mb-5">
+                <div class="w-11 h-11 rounded-xl bg-sky-50 text-[#0284C7] flex items-center justify-center border border-sky-100">
+                    <x-icon name="calendar" class="w-5 h-5" />
+                </div>
+                <div>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-[#0284C7] block">CU10 & CU11 · Reserva en Tiempo Real</span>
+                    <h4 class="font-bold text-lg text-[#0F172A]">Agendar Hora Médica</h4>
+                </div>
+            </div>
+
+            <form method="POST" action="{{ url('/citas') }}" class="space-y-4">
+                @csrf
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Paciente Titular</label>
+                    <select name="id_paciente" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#0284C7] bg-white">
+                        @forelse ($pacientesReserva as $pac)
+                            <option value="{{ $pac->id_paciente }}" @selected($usuarioActual?->id_paciente == $pac->id_paciente)>
+                                {{ $pac->nombres }} {{ $pac->apellidos }} — CI: {{ $pac->ci }}
+                            </option>
+                        @empty
+                            <option value="1">Paciente Titular Clínica Vida Salud</option>
+                        @endforelse
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Especialidad Médica</label>
+                        <select name="id_especialidad" x-model="idEspecialidad" @change="consultar()" required
+                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-700 focus:outline-none focus:border-[#0284C7] bg-white">
+                            <option value="">Seleccione especialidad...</option>
+                            @foreach ($especialidadesReserva as $esp)
+                                <option value="{{ $esp->id_especialidad }}">{{ $esp->nombre_especialidad }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Fecha Preferente</label>
+                        <input type="date" name="fecha_cita" x-model="fecha" @change="consultar()" required
+                               min="{{ now()->toDateString() }}"
+                               class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-700 focus:outline-none focus:border-[#0284C7]" />
+                    </div>
+                </div>
+
+                <!-- Resultados dinámicos de CU10 (/api/disponibilidad) o selección manual de médico/hora -->
+                <template x-if="cargando">
+                    <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-500 flex items-center space-x-2">
+                        <span class="w-2 h-2 rounded-full bg-[#0284C7] animate-ping"></span>
+                        <span>Consultando agendas y bloques horarios disponibles (CU10)...</span>
+                    </div>
+                </template>
+
+                <template x-if="!cargando && oferta.length > 0">
+                    <div class="space-y-2.5 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                        <p class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Seleccione Médico y Horario Disponible:</p>
+                        <template x-for="item in oferta" :key="item.id_medico">
+                            <div class="bg-white p-3 rounded-lg border border-slate-200">
+                                <p class="text-xs font-bold text-slate-800" x-text="item.nombre_completo"></p>
+                                <p class="text-[11px] text-slate-400 mb-2" x-text="'Consultorio: ' + (item.consultorio || 'Pabellón Central')"></p>
+                                <div class="flex flex-wrap gap-1.5">
+                                    <template x-for="cupo in item.cupos" :key="item.id_medico + '-' + cupo">
+                                        <button type="button"
+                                                @click="elegirCupo(item, cupo)"
+                                                :class="idMedico == item.id_medico && hora === cupo
+                                                    ? 'bg-[#0284C7] text-white border-[#0284C7]'
+                                                    : 'bg-slate-50 text-slate-700 border-slate-200 hover:border-[#0284C7]'"
+                                                class="px-2.5 py-1 rounded-md text-xs font-semibold border transition-colors"
+                                                x-text="cupo.substring(0, 5)">
+                                        </button>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Médico Especialista</label>
+                        <select name="id_medico" x-model="idMedico" required
+                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-700 focus:outline-none focus:border-[#0284C7] bg-white">
+                            <option value="">Seleccione especialista...</option>
+                            @foreach ($medicosReserva as $med)
+                                <option value="{{ $med->id_medico }}">Dr(a). {{ $med->nombres }} {{ $med->apellidos }} ({{ $med->consultorio ?? 'Consultorio' }})</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Hora (Bloque 30 min)</label>
+                        <input type="time" name="hora_cita" x-model="hora" step="1800" required
+                               value="09:00"
+                               class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-700 focus:outline-none focus:border-[#0284C7]" />
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Motivo Clínico de Consulta</label>
+                    <input type="text" name="motivo_consulta" required minlength="5"
+                           placeholder="Ej. Evaluación cardiológica preventiva / Control especialista"
+                           class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#0284C7]" />
+                </div>
+
+                <div class="pt-2 flex flex-col sm:flex-row gap-2.5">
+                    <button type="submit"
+                            class="flex-1 bg-[#0284C7] hover:bg-[#0369A1] text-white font-semibold py-3 rounded-xl shadow-lg shadow-[#0284C7]/25 transition-all text-sm">
+                        Confirmar Reserva de Cita (CU11)
+                    </button>
+                    <a href="{{ url('/citas') }}"
+                       class="px-4 py-3 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 font-semibold text-xs flex items-center justify-center">
+                        Ir a Módulo Completo
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
 
     @stack('scripts')
 </body>

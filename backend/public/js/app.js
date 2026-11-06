@@ -110,3 +110,152 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+
+/**
+ * Componentes Alpine de la interfaz (se registran antes de que Alpine arranque).
+ */
+document.addEventListener('alpine:init', () => {
+    const dosDigitos = (n) => String(n).padStart(2, '0');
+
+    // Fecha local (YYYY-MM-DD) sin desfase por zona horaria.
+    const hoyLocal = () => {
+        const d = new Date();
+        return `${d.getFullYear()}-${dosDigitos(d.getMonth() + 1)}-${dosDigitos(d.getDate())}`;
+    };
+
+    // Portada: transición suave de fachada de día a noche según el scroll.
+    Alpine.data('portada', () => ({
+        y: 0,
+        get noche() {
+            return Math.min(Math.max((this.y - 120) / 580, 0), 1);
+        },
+    }));
+
+    // Recorrido por las instalaciones (carrusel + ficha técnica).
+    Alpine.data('recorrido', (areas) => ({
+        areas,
+        actual: 0,
+        ficha: false,
+        get area() {
+            return this.areas[this.actual];
+        },
+        siguiente() {
+            this.actual = (this.actual + 1) % this.areas.length;
+        },
+        anterior() {
+            this.actual = (this.actual - 1 + this.areas.length) % this.areas.length;
+        },
+        ir(i) {
+            this.actual = i;
+        },
+        imagen(noche) {
+            return noche > 0.45 ? this.area.imageNight : this.area.imageDay;
+        },
+        num: dosDigitos,
+    }));
+
+    // Reserva de citas: consulta disponibilidad real (CU10) y envía CU11.
+    Alpine.data('reserva', (cfg) => ({
+        abierto: false,
+        especialidad: '',
+        fecha: '',
+        hoy: hoyLocal(),
+        cargando: false,
+        buscado: false,
+        oferta: [],
+        error: '',
+        medico: null,
+        hora: '',
+        duracion: 30,
+        motivo: '',
+
+        abrir(idEspecialidad = null) {
+            this.reiniciarSeleccion();
+            if (idEspecialidad) {
+                this.especialidad = String(idEspecialidad);
+            }
+            this.abierto = true;
+            document.body.style.overflow = 'hidden';
+        },
+
+        cerrar() {
+            this.abierto = false;
+            document.body.style.overflow = '';
+        },
+
+        reiniciarSeleccion() {
+            this.medico = null;
+            this.hora = '';
+            this.duracion = 30;
+        },
+
+        async buscar() {
+            this.error = '';
+            this.buscado = false;
+            this.oferta = [];
+            this.reiniciarSeleccion();
+
+            if (!this.especialidad || !this.fecha) {
+                this.error = 'Selecciona una especialidad y una fecha.';
+                return;
+            }
+
+            this.cargando = true;
+            try {
+                const params = new URLSearchParams({ id_especialidad: this.especialidad, fecha: this.fecha });
+                const respuesta = await fetch(`${cfg.urlDisponibilidad}?${params}`, {
+                    headers: { Accept: 'application/json' },
+                });
+                const json = await respuesta.json();
+
+                if (!respuesta.ok) {
+                    const primero = json.errors ? Object.values(json.errors).flat()[0] : null;
+                    this.error = primero || json.message || 'No fue posible consultar la disponibilidad.';
+                } else {
+                    this.oferta = json.data || [];
+                }
+                this.buscado = true;
+            } catch (e) {
+                this.error = 'No hay conexión con el servidor. Inténtalo nuevamente.';
+            } finally {
+                this.cargando = false;
+            }
+        },
+
+        elegir(bloque, cupo) {
+            this.medico = bloque.medico;
+            this.hora = cupo.hora_inicio;
+            this.duracion = cupo.duracion_minutos;
+        },
+
+        esElegido(bloque, cupo) {
+            return this.medico && this.medico.id_medico === bloque.medico.id_medico && this.hora === cupo.hora_inicio;
+        },
+    }));
+
+    // Portal: filtro y búsqueda del listado de citas sin recargar la página.
+    Alpine.data('listadoCitas', () => ({
+        busqueda: '',
+        estado: 'todos',
+        visible(texto, estado) {
+            const coincideTexto = texto.toLowerCase().includes(this.busqueda.trim().toLowerCase());
+            const coincideEstado = this.estado === 'todos' || String(estado) === this.estado;
+            return coincideTexto && coincideEstado;
+        },
+    }));
+
+    // Portal médico: modal para registrar la atención de una cita (CU15).
+    Alpine.data('atencion', (urlBase) => ({
+        abierto: false,
+        cita: null,
+        accion: '',
+        abrir(cita) {
+            this.cita = cita;
+            this.accion = `${urlBase}/${cita.id}/atender`;
+            this.abierto = true;
+        },
+        cerrar() {
+            this.abierto = false;
+        },
+    }));
+});

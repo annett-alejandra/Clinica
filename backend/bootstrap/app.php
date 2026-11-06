@@ -15,6 +15,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'rol' => \App\Http\Middleware\VerificarRolClinica::class,
         ]);
+
+        // Traduce las respuestas JSON de los casos de uso a mensajes flash en la web.
+        $middleware->web(append: [
+            \App\Http\Middleware\RespuestaWebAmigable::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
