@@ -106,7 +106,7 @@
                             <p class="px-2 text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">{{ $grupo }}</p>
                             <div class="space-y-0.5">
                                 @foreach ($items as $item)
-                                    <a href="{{ url($item['ruta']) }}"
+                                    <a href="{{ url($item['url'] ?? $item['ruta'] ?? '#') }}"
                                        class="flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-700 hover:bg-sky-50 hover:text-[#0284C7] transition-colors">
                                         <span>{{ $item['titulo'] }}</span>
                                         <span class="text-[10px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">{{ $item['cu'] }}</span>

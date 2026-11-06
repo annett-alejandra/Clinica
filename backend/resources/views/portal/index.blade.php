@@ -753,11 +753,11 @@
                             <h4 class="text-xs font-bold uppercase tracking-wider text-[#0284C7] mb-3">{{ $grupo }}</h4>
                             <div class="space-y-2">
                                 @foreach ($items as $item)
-                                    <a href="{{ url($item['ruta']) }}"
+                                    <a href="{{ url($item['url'] ?? $item['ruta'] ?? '#') }}"
                                        class="flex items-center justify-between p-2.5 rounded-lg bg-white border border-slate-200/80 hover:border-[#0284C7] transition-all group">
                                         <div>
                                             <span class="text-xs font-bold text-[#0F172A] group-hover:text-[#0284C7] block">{{ $item['titulo'] }}</span>
-                                            <span class="text-[11px] text-slate-500">{{ $item['resumen'] }}</span>
+                                            <span class="text-[11px] text-slate-500">{{ $item['desc'] ?? $item['resumen'] ?? '' }}</span>
                                         </div>
                                         <span class="text-[10px] font-bold text-[#0284C7] bg-sky-50 px-2 py-0.5 rounded shrink-0 ml-2">
                                             {{ $item['cu'] }}
