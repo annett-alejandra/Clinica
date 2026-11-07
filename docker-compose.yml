@@ -9,7 +9,11 @@ services:
       - "8000:8000"
     volumes:
       - ./backend:/var/www/html
+      - clinica_vendor:/var/www/html/vendor
+      - clinica_storage:/var/www/html/storage
+      - clinica_cache:/var/www/html/bootstrap/cache
       - ./backend/docker-entrypoint.sh:/usr/local/bin/docker-entrypoint.sh
+      - ./backend/docker/php.ini:/usr/local/etc/php/conf.d/custom.ini
     environment:
       APP_ENV: local
       APP_DEBUG: "true"
@@ -19,8 +23,8 @@ services:
       DB_DATABASE: clinica_vida_salud
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
-      PHP_CLI_SERVER_WORKERS: 4
-    command: ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000", "--no-reload"]
+      PHP_CLI_SERVER_WORKERS: 6
+    command: ["php", "-S", "0.0.0.0:8000", "-t", "public"]
     depends_on:
       db:
         condition: service_healthy
@@ -45,4 +49,10 @@ services:
 
 volumes:
   clinica_pgdata:
+    driver: local
+  clinica_vendor:
+    driver: local
+  clinica_storage:
+    driver: local
+  clinica_cache:
     driver: local

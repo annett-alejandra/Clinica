@@ -1,6 +1,10 @@
 #!/bin/sh
 set -e
 
+# Asegurar directorios de almacenamiento, caché de Laravel y OPcache en disco nativo Linux
+mkdir -p /tmp/opcache storage/framework/cache/data storage/framework/sessions storage/framework/views storage/logs bootstrap/cache
+chmod -R 777 /tmp/opcache storage bootstrap/cache
+
 # Crear .env a partir de .env.example si no existe
 if [ ! -f .env ]; then
     echo "Configurando archivo .env para el entorno Docker..."
@@ -10,9 +14,9 @@ if [ ! -f .env ]; then
     sed -i 's/DB_PASSWORD=/DB_PASSWORD=postgres/' .env
 fi
 
-# Instalar dependencias de Composer si falta vendor/autoload.php
+# Instalar dependencias de Composer en volumen nativo Linux si falta vendor/autoload.php
 if [ ! -f vendor/autoload.php ]; then
-    echo "Instalando paquetes de Composer (PHP 8.3 / Laravel 13)..."
+    echo "Instalando paquetes de Composer en volumen nativo Linux de alta velocidad..."
     composer install --no-interaction --prefer-dist --optimize-autoloader
 fi
 
@@ -22,9 +26,10 @@ if ! grep -q "^APP_KEY=base64:" .env; then
     php artisan key:generate --force
 fi
 
-# Asegurar directorios de almacenamiento y permisos
-mkdir -p storage/framework/cache/data storage/framework/sessions storage/framework/views storage/logs bootstrap/cache
-chmod -R 777 storage bootstrap/cache
+# Pre-compilar configuración, rutas y vistas Blade en volúmenes nativos Linux
+php artisan config:cache || true
+php artisan route:cache || true
+php artisan view:cache || true
 
 # Iniciar el servidor
 exec "$@"
