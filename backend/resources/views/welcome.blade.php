@@ -153,14 +153,16 @@
                          x-transition:enter="transition ease-out duration-500"
                          x-transition:enter-start="opacity-0 scale-95"
                          x-transition:enter-end="opacity-100 scale-100"
-                         class="absolute inset-0 w-full h-full">
+                         class="absolute inset-0 w-full h-full bg-slate-900">
                         <img src="{{ $item['imageDay'] }}"
                              alt="{{ $item['title'] }}"
-                             class="w-full h-full object-cover" />
+                             class="w-full h-full object-cover"
+                             onerror="this.classList.add('opacity-0');" />
                         <img src="{{ $item['imageNight'] }}"
                              alt="{{ $item['title'] }} - Guardia Nocturna"
                              class="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 pointer-events-none"
-                             :style="`opacity: ${Math.min(0.85, (noche || 0) * 0.85)}`" />
+                             :style="`opacity: ${Math.min(0.85, (noche || 0) * 0.85)}`"
+                             onerror="this.classList.add('opacity-0');" />
                     </div>
                 @endforeach
 
