@@ -31,14 +31,14 @@ COPY . /var/www
 # 6. Instalar dependencias de Composer sin scripts previos
 RUN composer install --no-dev --no-scripts --optimize-autoloader --no-interaction --prefer-dist
 
-# 7. Asegurar directorios de almacenamiento y permisos para Nginx/PHP-FPM
+# 7. Asegurar directorios de almacenamiento y permisos iniciales
 RUN mkdir -p /var/www/storage/framework/cache/data \
              /var/www/storage/framework/sessions \
              /var/www/storage/framework/views \
              /var/www/storage/logs \
              /var/www/bootstrap/cache \
     && chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
-    && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
+    && chmod -R 777 /var/www/storage /var/www/bootstrap/cache
 
 # 8. Configurar Nginx para servir /var/www/public
 RUN mkdir -p /etc/nginx/http.d && printf 'server {\n\
@@ -57,20 +57,30 @@ RUN mkdir -p /etc/nginx/http.d && printf 'server {\n\
     }\n\
 }\n' > /etc/nginx/http.d/default.conf
 
-# 9. Script de arranque para Render (soporte de $PORT dinámico, package:discover, cachés y migraciones)
+# 9. Script de arranque resiliente para Render:
+#    - Puerto dinámico ($PORT)
+#    - Genera APP_KEY si falta
+#    - Prepara caché, migraciones y re-asigna permisos a www-data antes de iniciar php-fpm
 RUN printf '#!/bin/sh\n\
 set -e\n\
 if [ -n "$PORT" ]; then\n\
     sed -i "s/listen 80;/listen $PORT;/g" /etc/nginx/http.d/default.conf\n\
 fi\n\
-if [ ! -f .env ] && [ -f .env.example ]; then\n\
-    cp .env.example .env\n\
+if [ ! -f .env ]; then\n\
+    if [ -f .env.example ]; then cp .env.example .env; else touch .env; fi\n\
+fi\n\
+if [ -z "$APP_KEY" ] && ! grep -q "^APP_KEY=base64:" .env; then\n\
+    php artisan key:generate --force || true\n\
 fi\n\
 php artisan package:discover --ansi || true\n\
-php artisan config:cache || true\n\
-php artisan route:cache || true\n\
+php artisan config:clear || true\n\
+php artisan route:clear || true\n\
+php artisan view:clear || true\n\
 php artisan view:cache || true\n\
 php artisan migrate --force || true\n\
+touch /var/www/storage/logs/laravel.log\n\
+chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache\n\
+chmod -R 777 /var/www/storage /var/www/bootstrap/cache\n\
 php-fpm -D\n\
 exec nginx -g "daemon off;"\n' > /start.sh \
     && chmod +x /start.sh
