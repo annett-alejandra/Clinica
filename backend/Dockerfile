@@ -17,7 +17,11 @@ RUN apk add --no-cache \
 # 3. Instalar extensiones de PHP requeridas por Laravel y PostgreSQL
 RUN docker-php-ext-install pdo pdo_pgsql pgsql mbstring bcmath gd zip opcache
 
-# 4. Obtener Composer oficial
+# 4. Configurar PHP-FPM para conservar las variables de entorno de Render (DB_HOST, APP_KEY, etc.)
+RUN sed -i 's/;clear_env = no/clear_env = no/' /usr/local/etc/php-fpm.d/www.conf \
+    && echo "clear_env = no" >> /usr/local/etc/php-fpm.d/zz-docker.conf
+
+# 5. Obtener Composer oficial
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 # Permitir que Composer corra como superusuario en contenedor
@@ -74,7 +78,9 @@ if [ -z "$APP_KEY" ] && ! grep -q "^APP_KEY=base64:" .env; then\n\
 fi\n\
 php artisan package:discover --ansi || true\n\
 php artisan config:clear || true\n\
+php artisan config:cache || true\n\
 php artisan route:clear || true\n\
+php artisan route:cache || true\n\
 php artisan view:clear || true\n\
 php artisan view:cache || true\n\
 php artisan migrate --force || true\n\
