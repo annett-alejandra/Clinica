@@ -25,16 +25,13 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 
 WORKDIR /var/www
 
-# 5. Copiar composer.json y composer.lock primero para aprovechar la caché de Docker
-COPY composer.json composer.lock* /var/www/
+# 5. Copiar el código del backend al contenedor
+COPY backend/ /var/www
 
-# 6. Instalar dependencias con --no-scripts para evitar que artisan intente correr sin el código completo
+# 6. Instalar dependencias de Composer sin scripts previos
 RUN composer install --no-dev --no-scripts --optimize-autoloader --no-interaction --prefer-dist
 
-# 7. Copiar el resto del código del repositorio
-COPY . /var/www
-
-# 8. Asegurar directorios de almacenamiento y permisos para Nginx/PHP-FPM
+# 7. Asegurar directorios de almacenamiento y permisos para Nginx/PHP-FPM
 RUN mkdir -p /var/www/storage/framework/cache/data \
              /var/www/storage/framework/sessions \
              /var/www/storage/framework/views \
@@ -43,7 +40,7 @@ RUN mkdir -p /var/www/storage/framework/cache/data \
     && chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
     && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
-# 9. Configurar Nginx para servir /var/www/public
+# 8. Configurar Nginx para servir /var/www/public
 RUN mkdir -p /etc/nginx/http.d && printf 'server {\n\
     listen 80;\n\
     index index.php index.html;\n\
@@ -60,7 +57,7 @@ RUN mkdir -p /etc/nginx/http.d && printf 'server {\n\
     }\n\
 }\n' > /etc/nginx/http.d/default.conf
 
-# 10. Script de arranque para Render (soporte de $PORT dinámico, package:discover, cachés y migraciones)
+# 9. Script de arranque para Render (soporte de $PORT dinámico, package:discover, cachés y migraciones)
 RUN printf '#!/bin/sh\n\
 set -e\n\
 if [ -n "$PORT" ]; then\n\
@@ -78,7 +75,7 @@ php-fpm -D\n\
 exec nginx -g "daemon off;"\n' > /start.sh \
     && chmod +x /start.sh
 
-# 11. Exponer el puerto estándar
+# 10. Exponer el puerto estándar
 EXPOSE 80
 
 CMD ["/start.sh"]
