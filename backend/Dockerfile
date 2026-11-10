@@ -71,7 +71,13 @@ if [ -n "$PORT" ]; then\n\
     sed -i "s/listen 80;/listen $PORT;/g" /etc/nginx/http.d/default.conf\n\
 fi\n\
 if [ ! -f .env ]; then\n\
-    if [ -f .env.example ]; then cp .env.example .env; else touch .env; fi\n\
+    if [ -n "$DB_HOST" ] || [ -n "$DB_URL" ] || [ -n "$DATABASE_URL" ]; then\n\
+        printf "APP_ENV=production\nAPP_DEBUG=false\nAPP_KEY=\nDB_CONNECTION=pgsql\nSESSION_DRIVER=file\nCACHE_STORE=file\n" > .env\n\
+    elif [ -f .env.example ]; then\n\
+        cp .env.example .env\n\
+    else\n\
+        printf "APP_KEY=\n" > .env\n\
+    fi\n\
 fi\n\
 if [ -z "$APP_KEY" ] && ! grep -q "^APP_KEY=base64:" .env; then\n\
     php artisan key:generate --force || true\n\
