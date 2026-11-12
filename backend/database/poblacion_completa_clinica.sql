@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict yqm0n17KE3XB7W2iHpX0wCn2DBoG2igVbjgWt3Fi6CH4aYvmEb2MfETXQbjY1ry
+\restrict HHoQhff6drOwci3tyEzaNwMzbbLc8WCFdbDEos0xFhM68FKooBub6scyE6fiWxN
 
 -- Dumped from database version 18.6 (Debian 18.6-1.pgdg12+2)
 -- Dumped by pg_dump version 18.1
@@ -1018,6 +1018,158 @@ COPY public.auditoria (id_auditoria, id_usuario, accion, tabla_afectada, id_regi
 262	1	INSERT_CITA	cita_medica	141	{"origen": "POBLACION_CLINICA"}	2026-12-14 08:00:00
 263	1	INSERT_CITA	cita_medica	142	{"origen": "POBLACION_CLINICA"}	2026-12-15 15:00:00
 264	1	INSERT_CITA	cita_medica	143	{"origen": "POBLACION_CLINICA"}	2026-12-15 09:30:00
+265	1	INSERT_CITA	cita_medica	144	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-23 10:00:00
+266	1	INSERT_CITA	cita_medica	145	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-22 16:30:00
+267	1	INSERT_CITA	cita_medica	146	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-07 17:30:00
+268	1	INSERT_CITA	cita_medica	147	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-22 09:00:00
+269	1	INSERT_CITA	cita_medica	148	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-27 10:00:00
+270	1	INSERT_CITA	cita_medica	149	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-29 17:30:00
+271	1	INSERT_CITA	cita_medica	150	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-24 14:00:00
+272	1	INSERT_CITA	cita_medica	151	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-24 17:30:00
+273	1	INSERT_CITA	cita_medica	152	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-11-11 11:00:00
+274	1	INSERT_CITA	cita_medica	153	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-28 16:00:00
+275	1	INSERT_CITA	cita_medica	154	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-18 08:00:00
+276	1	INSERT_CITA	cita_medica	155	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-28 10:30:00
+277	1	INSERT_CITA	cita_medica	156	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-07 17:30:00
+278	1	INSERT_CITA	cita_medica	157	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-22 15:30:00
+279	1	INSERT_CITA	cita_medica	158	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-07 10:00:00
+280	1	INSERT_CITA	cita_medica	159	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-23 15:30:00
+281	1	INSERT_CITA	cita_medica	160	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-25 14:30:00
+282	1	INSERT_CITA	cita_medica	161	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-22 09:00:00
+283	1	INSERT_CITA	cita_medica	162	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-23 10:30:00
+284	1	INSERT_CITA	cita_medica	163	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-11-12 08:30:00
+285	1	INSERT_CITA	cita_medica	164	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-23 14:00:00
+286	1	INSERT_CITA	cita_medica	165	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-11-04 11:00:00
+287	1	INSERT_CITA	cita_medica	166	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-23 14:00:00
+288	1	INSERT_CITA	cita_medica	167	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-09 16:30:00
+289	1	INSERT_CITA	cita_medica	168	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-16 09:30:00
+290	1	INSERT_CITA	cita_medica	169	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-21 15:30:00
+291	1	INSERT_CITA	cita_medica	170	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-11-11 08:00:00
+292	1	INSERT_CITA	cita_medica	171	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-09 08:00:00
+293	1	INSERT_CITA	cita_medica	172	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-28 14:00:00
+294	1	INSERT_CITA	cita_medica	173	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-17 17:00:00
+295	1	INSERT_CITA	cita_medica	174	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-11-05 14:30:00
+296	1	INSERT_CITA	cita_medica	175	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-28 16:00:00
+297	1	INSERT_CITA	cita_medica	176	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-08 10:00:00
+298	1	INSERT_CITA	cita_medica	177	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-07 15:00:00
+299	1	INSERT_CITA	cita_medica	178	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-25 16:30:00
+300	1	INSERT_CITA	cita_medica	179	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-29 10:00:00
+301	1	INSERT_CITA	cita_medica	180	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-21 17:30:00
+302	1	INSERT_CITA	cita_medica	181	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-29 16:30:00
+303	1	INSERT_CITA	cita_medica	182	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-09 08:00:00
+304	1	INSERT_CITA	cita_medica	183	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-09 16:00:00
+305	1	INSERT_CITA	cita_medica	184	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-02 10:30:00
+306	1	INSERT_CITA	cita_medica	185	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-15 11:00:00
+307	1	INSERT_CITA	cita_medica	186	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-16 11:00:00
+308	1	INSERT_CITA	cita_medica	187	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-28 09:30:00
+309	1	INSERT_CITA	cita_medica	188	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-07 15:00:00
+310	1	INSERT_CITA	cita_medica	189	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-22 09:00:00
+311	1	INSERT_CITA	cita_medica	190	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-22 15:30:00
+312	1	INSERT_CITA	cita_medica	191	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-11-04 10:30:00
+313	1	INSERT_CITA	cita_medica	192	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-30 16:30:00
+314	1	INSERT_CITA	cita_medica	193	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-21 16:00:00
+315	1	INSERT_CITA	cita_medica	194	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-28 09:00:00
+316	1	INSERT_CITA	cita_medica	195	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-29 10:30:00
+317	1	INSERT_CITA	cita_medica	196	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-25 14:00:00
+318	1	INSERT_CITA	cita_medica	197	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-29 11:00:00
+319	1	INSERT_CITA	cita_medica	198	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-22 16:00:00
+320	1	INSERT_CITA	cita_medica	199	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-29 14:30:00
+321	1	INSERT_CITA	cita_medica	200	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-18 15:30:00
+322	1	INSERT_CITA	cita_medica	201	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-11-11 09:00:00
+323	1	INSERT_CITA	cita_medica	202	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-23 16:00:00
+324	1	INSERT_CITA	cita_medica	203	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-13 10:00:00
+325	1	INSERT_CITA	cita_medica	204	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-19 17:30:00
+326	1	INSERT_CITA	cita_medica	205	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-06 17:30:00
+327	1	INSERT_CITA	cita_medica	206	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-23 09:30:00
+328	1	INSERT_CITA	cita_medica	207	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-23 11:30:00
+329	1	INSERT_CITA	cita_medica	208	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-22 17:30:00
+330	1	INSERT_CITA	cita_medica	209	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-26 17:30:00
+331	1	INSERT_CITA	cita_medica	210	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-23 10:30:00
+332	1	INSERT_CITA	cita_medica	211	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-30 10:00:00
+333	1	INSERT_CITA	cita_medica	212	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-07 17:00:00
+334	1	INSERT_CITA	cita_medica	213	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-26 15:00:00
+335	1	INSERT_CITA	cita_medica	214	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-11-02 08:30:00
+336	1	INSERT_CITA	cita_medica	215	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-11-06 08:30:00
+337	1	INSERT_CITA	cita_medica	216	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-22 11:00:00
+338	1	INSERT_CITA	cita_medica	217	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-12 16:00:00
+339	1	INSERT_CITA	cita_medica	218	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-23 16:30:00
+340	1	INSERT_CITA	cita_medica	219	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-16 15:30:00
+341	1	INSERT_CITA	cita_medica	220	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-23 14:00:00
+342	1	INSERT_CITA	cita_medica	221	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-12 16:30:00
+343	1	INSERT_CITA	cita_medica	222	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-11-02 15:00:00
+344	1	INSERT_CITA	cita_medica	223	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-11-11 17:00:00
+345	1	INSERT_CITA	cita_medica	224	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-15 11:30:00
+346	1	INSERT_CITA	cita_medica	225	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-01 15:00:00
+347	1	INSERT_CITA	cita_medica	226	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-29 15:00:00
+348	1	INSERT_CITA	cita_medica	227	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-20 11:30:00
+349	1	INSERT_CITA	cita_medica	228	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-23 09:30:00
+350	1	INSERT_CITA	cita_medica	229	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-19 14:00:00
+351	1	INSERT_CITA	cita_medica	230	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-11-06 09:30:00
+352	1	INSERT_CITA	cita_medica	231	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-02 17:00:00
+353	1	INSERT_CITA	cita_medica	232	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-15 11:00:00
+354	1	INSERT_CITA	cita_medica	233	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-21 09:30:00
+355	1	INSERT_CITA	cita_medica	234	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-20 08:00:00
+356	1	INSERT_CITA	cita_medica	235	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-09 09:30:00
+357	1	INSERT_CITA	cita_medica	236	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-07 08:00:00
+358	1	INSERT_CITA	cita_medica	237	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-28 16:00:00
+359	1	INSERT_CITA	cita_medica	238	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-28 14:30:00
+360	1	INSERT_CITA	cita_medica	239	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-27 10:00:00
+361	1	INSERT_CITA	cita_medica	240	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-09 08:30:00
+362	1	INSERT_CITA	cita_medica	241	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-16 14:30:00
+363	1	INSERT_CITA	cita_medica	242	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-15 17:00:00
+364	1	INSERT_CITA	cita_medica	243	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-23 09:30:00
+365	1	INSERT_CITA	cita_medica	244	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-24 08:00:00
+366	1	INSERT_CITA	cita_medica	245	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-02 16:30:00
+367	1	INSERT_CITA	cita_medica	246	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-17 15:00:00
+368	1	INSERT_CITA	cita_medica	247	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-07 17:00:00
+369	1	INSERT_CITA	cita_medica	248	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-16 15:30:00
+370	1	INSERT_CITA	cita_medica	249	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-07 11:30:00
+371	1	INSERT_CITA	cita_medica	250	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-11-04 09:00:00
+372	1	INSERT_CITA	cita_medica	251	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-19 14:00:00
+373	1	INSERT_CITA	cita_medica	252	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-29 17:00:00
+374	1	INSERT_CITA	cita_medica	253	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-15 16:30:00
+375	1	INSERT_CITA	cita_medica	254	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-12 08:00:00
+376	1	INSERT_CITA	cita_medica	255	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-22 17:30:00
+377	1	INSERT_CITA	cita_medica	256	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-16 17:00:00
+378	1	INSERT_CITA	cita_medica	257	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-11-03 16:00:00
+379	1	INSERT_CITA	cita_medica	258	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-09 14:30:00
+380	1	INSERT_CITA	cita_medica	259	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-01 15:00:00
+381	1	INSERT_CITA	cita_medica	260	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-22 17:00:00
+382	1	INSERT_CITA	cita_medica	261	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-30 15:30:00
+383	1	INSERT_CITA	cita_medica	262	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-19 11:30:00
+384	1	INSERT_CITA	cita_medica	263	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-19 10:00:00
+385	1	INSERT_CITA	cita_medica	264	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-22 09:30:00
+386	1	INSERT_CITA	cita_medica	265	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-30 11:00:00
+387	1	INSERT_CITA	cita_medica	266	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-30 17:30:00
+388	1	INSERT_CITA	cita_medica	267	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-23 14:00:00
+389	1	INSERT_CITA	cita_medica	268	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-20 16:00:00
+390	1	INSERT_CITA	cita_medica	269	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-11-05 15:00:00
+391	1	INSERT_CITA	cita_medica	270	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-23 14:30:00
+392	1	INSERT_CITA	cita_medica	271	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-20 14:30:00
+393	1	INSERT_CITA	cita_medica	272	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-28 08:30:00
+394	1	INSERT_CITA	cita_medica	273	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-19 11:30:00
+395	1	INSERT_CITA	cita_medica	274	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-24 16:00:00
+396	1	INSERT_CITA	cita_medica	275	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-15 11:00:00
+397	1	INSERT_CITA	cita_medica	276	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-11-05 15:30:00
+398	1	INSERT_CITA	cita_medica	277	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-11-10 08:30:00
+399	1	INSERT_CITA	cita_medica	278	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-11-11 15:30:00
+400	1	INSERT_CITA	cita_medica	279	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-23 17:00:00
+401	1	INSERT_CITA	cita_medica	280	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-29 17:30:00
+402	1	INSERT_CITA	cita_medica	281	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-16 08:00:00
+403	1	INSERT_CITA	cita_medica	282	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-30 14:30:00
+404	1	INSERT_CITA	cita_medica	283	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-17 14:00:00
+405	1	INSERT_CITA	cita_medica	284	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-21 15:30:00
+406	1	INSERT_CITA	cita_medica	285	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-11-03 17:30:00
+407	1	INSERT_CITA	cita_medica	286	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-09 08:30:00
+408	1	INSERT_CITA	cita_medica	287	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-26 11:30:00
+409	1	INSERT_CITA	cita_medica	288	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-29 08:00:00
+410	1	INSERT_CITA	cita_medica	289	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-22 11:30:00
+411	1	INSERT_CITA	cita_medica	290	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-01 16:00:00
+412	1	INSERT_CITA	cita_medica	291	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-19 17:30:00
+413	1	INSERT_CITA	cita_medica	292	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-22 11:00:00
+414	1	INSERT_CITA	cita_medica	293	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-09-17 08:00:00
+415	1	INSERT_CITA	cita_medica	294	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-10-19 10:00:00
+416	1	INSERT_CITA	cita_medica	295	{"modulo": "ESTADISTICAS_CLINICAS"}	2026-11-10 11:30:00
 \.
 
 
@@ -1167,6 +1319,158 @@ COPY public.cita_medica (id_cita, codigo_unico, id_paciente, id_medico, id_espec
 141	ba8a753f-7c08-47c8-80a3-0f2b8b139a36	21	11	7	1	2026-12-14	08:00:00	30	Estudio de mareos y desequilibrio.	\N	\N	\N
 142	2aa53724-5e0f-4b1f-a4df-42da681acaaa	27	16	12	1	2026-12-15	15:00:00	30	Control de agudeza visual y lentes.	\N	\N	\N
 143	e4fd7abc-d1a2-4c76-aea7-a02eeecbdabf	89	4	2	1	2026-12-15	09:30:00	30	Control de crecimiento y desarrollo.	\N	\N	\N
+144	3ad425bc-5ab3-4014-8e9b-1268b5b8d815	85	1	1	4	2026-10-23	10:00:00	30	Control de glucemia y perfil lipídico	\N	Médico convocado de urgencia a cirugía en centro hospitalario de convenio.	\N
+145	9da401b4-6777-4423-a49e-d4fc20c0a1f6	83	1	1	4	2026-09-22	16:30:00	30	Chequeo clínico general preventivo	\N	Médico convocado de urgencia a cirugía en centro hospitalario de convenio.	\N
+146	db5d05c0-d179-4c63-adeb-38f3e0d36a65	3	1	1	4	2026-10-07	17:30:00	30	Cuadro gripal persistente	\N	Cancelación preventiva solicitada por el asegurador o convenio empresarial.	\N
+147	52cc0366-7dea-460d-937d-f2228d28ee28	96	2	1	4	2026-09-22	09:00:00	30	Control de glucemia y perfil lipídico	\N	Cancelación preventiva solicitada por el asegurador o convenio empresarial.	\N
+148	2a013a79-de3d-4ebc-af3a-d6c1c3ea4f91	94	1	1	3	2026-10-27	10:00:00	30	Cuadro gripal persistente	Examen segmentario sin hallazgos patológicos agudos. Se prescriben antiinflamatorios y reposo relativo por 5 días.	\N	2026-10-27 09:47:00
+149	897b8dcf-0f24-412e-8806-4137b3a557c4	83	1	1	3	2026-10-29	17:30:00	30	Control de glucemia y perfil lipídico	Consulta concluida. Signos vitales normales: PA 120/75, FC 70 lpm. Se entrega receta y pautas preventivas. Alta médica temporal.	\N	2026-10-29 17:15:00
+150	538c4868-08e0-49d5-b5d4-6cbc10544086	92	2	1	4	2026-09-24	14:00:00	30	Evaluación de fatiga y cefaleas	\N	Paciente solicitó cambio de fecha por motivos personales.	\N
+151	ec20a880-0b49-4fac-a237-ebd601546ad0	10	1	1	3	2026-09-24	17:30:00	30	Evaluación de fatiga y cefaleas	Evolución clínica satisfactoria. Se refuerzan medidas dietéticas y actividad física. Cita de seguimiento programada.	\N	2026-09-24 17:14:00
+152	29adc9e6-c44c-4614-976a-a33d7ddfff8f	96	2	1	3	2026-11-11	11:00:00	30	Chequeo clínico general preventivo	Consulta concluida. Signos vitales normales: PA 120/75, FC 70 lpm. Se entrega receta y pautas preventivas. Alta médica temporal.	\N	2026-11-11 10:54:00
+153	573edb30-3d88-468e-8550-3de9f3905dc8	8	2	1	4	2026-10-28	16:00:00	30	Control de glucemia y perfil lipídico	\N	Paciente reportó imprevisto laboral de urgencia y no pudo asistir.	\N
+154	7a9d1ace-10e3-478d-9bf9-5427e892d709	86	2	1	4	2026-09-18	08:00:00	30	Evaluación de fatiga y cefaleas	\N	Cancelación preventiva solicitada por el asegurador o convenio empresarial.	\N
+155	6977da9d-885a-400c-a26c-53a7f098770e	113	2	1	3	2026-09-28	10:30:00	30	Control de glucemia y perfil lipídico	Examen segmentario sin hallazgos patológicos agudos. Se prescriben antiinflamatorios y reposo relativo por 5 días.	\N	2026-09-28 10:22:00
+156	a2a1e836-a953-4e16-8f8c-26bcd73793bf	114	1	1	4	2026-10-07	17:30:00	30	Evaluación de fatiga y cefaleas	\N	Imposibilidad de transporte por bloqueo y fuertes lluvias en la ciudad.	\N
+157	c9e3d7c9-f9e6-400b-83c4-43d73423c177	98	1	1	3	2026-10-22	15:30:00	30	Control de glucemia y perfil lipídico	Examen segmentario sin hallazgos patológicos agudos. Se prescriben antiinflamatorios y reposo relativo por 5 días.	\N	2026-10-22 15:16:00
+158	778dae41-5a7f-4c20-a480-823fd42f8ea2	88	1	1	3	2026-10-07	10:00:00	30	Cuadro gripal persistente	Examen segmentario sin hallazgos patológicos agudos. Se prescriben antiinflamatorios y reposo relativo por 5 días.	\N	2026-10-07 09:52:00
+159	e3700624-5be2-46b1-bd7b-d417d37c13ed	27	1	1	4	2026-09-23	15:30:00	30	Control de glucemia y perfil lipídico	\N	Médico convocado de urgencia a cirugía en centro hospitalario de convenio.	\N
+160	3b91a73e-0ec3-4b07-bc9b-ad8ea55ef6f5	32	1	1	4	2026-09-25	14:30:00	30	Cuadro gripal persistente	\N	Paciente reagendó consulta para el siguiente mes por viaje de trabajo.	\N
+161	7b564993-e445-41dd-8a55-d1ecffb18e13	104	2	1	3	2026-09-22	09:00:00	30	Control de glucemia y perfil lipídico	Evolución clínica satisfactoria. Se refuerzan medidas dietéticas y actividad física. Cita de seguimiento programada.	\N	2026-09-22 08:54:00
+162	1a86d606-03e3-44a4-83f0-9f8c5cf7e803	17	1	1	4	2026-10-23	10:30:00	30	Chequeo clínico general preventivo	\N	Cancelación preventiva solicitada por el asegurador o convenio empresarial.	\N
+163	adb33d18-e7fb-471b-b87a-69a02bd2b92e	28	1	1	3	2026-11-12	08:30:00	30	Evaluación de fatiga y cefaleas	Consulta concluida. Signos vitales normales: PA 120/75, FC 70 lpm. Se entrega receta y pautas preventivas. Alta médica temporal.	\N	2026-11-12 08:23:00
+164	e8da281d-4c56-4775-88b8-0ee2ba6d2a2d	11	1	1	4	2026-09-23	14:00:00	30	Control de glucemia y perfil lipídico	\N	Paciente reportó imprevisto laboral de urgencia y no pudo asistir.	\N
+165	fd8bd249-af98-43cc-a8fa-72d8bb40e115	76	1	1	3	2026-11-04	11:00:00	30	Cuadro gripal persistente	Paciente atendido en consultorio. Examen clínico adecuado. Tratamiento bien tolerado. Se ajustan dosis y se indican controles laboratoriales en 60 días.	\N	2026-11-04 10:55:00
+166	e6f5813c-887f-4b3d-91d1-a6a1015e6974	98	1	1	5	2026-09-23	14:00:00	30	Chequeo clínico general preventivo	\N	Paciente no se presentó en horario fijado.	\N
+167	7a7174d3-ab6a-4b74-a441-fae93a67e8ce	76	2	1	4	2026-10-09	16:30:00	30	Evaluación de fatiga y cefaleas	\N	Médico convocado de urgencia a cirugía en centro hospitalario de convenio.	\N
+168	69e71073-dde0-45fc-b1a7-bf3c94b2dff4	78	2	1	4	2026-10-16	09:30:00	30	Evaluación de fatiga y cefaleas	\N	Paciente viajó al interior por emergencia familiar.	\N
+169	cabcf8bc-dbcc-48d6-8952-c74b54eeacbb	8	2	1	3	2026-09-21	15:30:00	30	Cuadro gripal persistente	Evolución clínica satisfactoria. Se refuerzan medidas dietéticas y actividad física. Cita de seguimiento programada.	\N	2026-09-21 15:21:00
+170	a63e22f1-8265-4396-9492-6f3fc47e5a18	34	2	1	4	2026-11-11	08:00:00	30	Chequeo clínico general preventivo	\N	El paciente notificó que presentó mejoría de sus síntomas y prefirió cancelar.	\N
+171	6096a311-4815-4998-a889-cde24c2acee9	27	1	1	4	2026-10-09	08:00:00	30	Evaluación de fatiga y cefaleas	\N	Cancelada por solicitud de atención prioritaria en guardia de emergencia.	\N
+172	e911bc04-262f-414a-bb72-d73404665ece	82	2	1	5	2026-09-28	14:00:00	30	Control de glucemia y perfil lipídico	\N	Paciente no se presentó en horario fijado.	\N
+173	a2ef525d-f0d2-4cac-bd21-285fba2b2983	86	2	1	4	2026-09-17	17:00:00	30	Cuadro gripal persistente	\N	Cancelada por solicitud de atención prioritaria en guardia de emergencia.	\N
+174	13b4fbaa-cd2a-444b-869a-64501af147c0	89	2	1	3	2026-11-05	14:30:00	30	Cuadro gripal persistente	Examen segmentario sin hallazgos patológicos agudos. Se prescriben antiinflamatorios y reposo relativo por 5 días.	\N	2026-11-05 14:18:00
+175	de7f075e-d75d-4f0d-bbc9-512caf6be0d7	83	2	1	4	2026-10-28	16:00:00	30	Evaluación de fatiga y cefaleas	\N	Cruce de horarios laborales; el paciente solicitó reprogramación telefónica.	\N
+176	7ac3b587-7c38-4821-a113-5ec814e0ee47	5	1	1	4	2026-10-08	10:00:00	30	Chequeo clínico general preventivo	\N	Paciente solicitó cambio de fecha por motivos personales.	\N
+177	653484d9-2e21-4f58-b992-de0e1c3aa0aa	17	2	1	4	2026-10-07	15:00:00	30	Evaluación de fatiga y cefaleas	\N	Médico convocado de urgencia a cirugía en centro hospitalario de convenio.	\N
+178	82e55e95-9541-4902-8120-51a692ae7331	83	1	1	3	2026-09-25	16:30:00	30	Control de glucemia y perfil lipídico	Consulta concluida. Signos vitales normales: PA 120/75, FC 70 lpm. Se entrega receta y pautas preventivas. Alta médica temporal.	\N	2026-09-25 16:23:00
+179	7dfc02f0-3aab-4655-a551-74e28dbc053c	22	3	2	4	2026-10-29	10:00:00	30	Revisión del esquema de vacunación	\N	Médico convocado de urgencia a cirugía en centro hospitalario de convenio.	\N
+180	4cf68191-8179-443b-a8d1-2285a109a05e	90	3	2	4	2026-09-21	17:30:00	30	Control de talla y peso pediátrico	\N	El paciente notificó que presentó mejoría de sus síntomas y prefirió cancelar.	\N
+181	919dfaa2-e1de-4ffa-8bf0-f86ddbd50036	85	4	2	5	2026-09-29	16:30:00	30	Control del lactante menor	\N	Paciente no se presentó en horario fijado.	\N
+182	a7274dda-769e-4b58-8b5d-506933bb4d9f	91	3	2	3	2026-10-09	08:00:00	30	Evaluación respiratoria infantil	Paciente atendido en consultorio. Examen clínico adecuado. Tratamiento bien tolerado. Se ajustan dosis y se indican controles laboratoriales en 60 días.	\N	2026-10-09 07:42:00
+183	f432730c-5c33-4ae7-88f9-40035c227ffe	28	3	2	3	2026-10-09	16:00:00	30	Control de talla y peso pediátrico	Consulta concluida. Signos vitales normales: PA 120/75, FC 70 lpm. Se entrega receta y pautas preventivas. Alta médica temporal.	\N	2026-10-09 15:49:00
+184	3f28aeca-2bea-40b5-92b5-6ad611accc64	77	4	2	3	2026-10-02	10:30:00	30	Revisión del esquema de vacunación	Examen segmentario sin hallazgos patológicos agudos. Se prescriben antiinflamatorios y reposo relativo por 5 días.	\N	2026-10-02 10:23:00
+185	ca6d84ed-6e39-4356-8356-c59cfbdefaa3	87	4	2	5	2026-10-15	11:00:00	30	Evaluación respiratoria infantil	\N	Paciente no se presentó en horario fijado.	\N
+186	9be4296e-595d-4aed-a683-ae3496c4f4bc	97	4	2	4	2026-09-16	11:00:00	30	Control de talla y peso pediátrico	\N	Paciente reportó imprevisto laboral de urgencia y no pudo asistir.	\N
+187	4c8241e1-efff-4d0e-8704-91d7244029b8	109	4	2	3	2026-09-28	09:30:00	30	Control de talla y peso pediátrico	Paciente atendido en consultorio. Examen clínico adecuado. Tratamiento bien tolerado. Se ajustan dosis y se indican controles laboratoriales en 60 días.	\N	2026-09-28 09:25:00
+188	ca573e0a-2716-4e92-aa48-223aa329f233	89	3	2	4	2026-10-07	15:00:00	30	Evaluación respiratoria infantil	\N	Imposibilidad de transporte por bloqueo y fuertes lluvias en la ciudad.	\N
+189	0652ce0b-7bbe-43dd-93fe-9858ad8251ce	107	4	2	3	2026-09-22	09:00:00	30	Evaluación respiratoria infantil	Examen segmentario sin hallazgos patológicos agudos. Se prescriben antiinflamatorios y reposo relativo por 5 días.	\N	2026-09-22 08:52:00
+190	5c3c7170-06d2-4038-b117-572ac8934550	17	4	2	3	2026-10-22	15:30:00	30	Evaluación respiratoria infantil	Evolución clínica satisfactoria. Se refuerzan medidas dietéticas y actividad física. Cita de seguimiento programada.	\N	2026-10-22 15:16:00
+191	43b95f64-cf3c-482b-9074-2a9c4dd1f83b	107	4	2	5	2026-11-04	10:30:00	30	Control del lactante menor	\N	Paciente no se presentó en horario fijado.	\N
+192	0d5a080d-5391-476a-9d59-0a3e8c71c944	82	4	2	3	2026-09-30	16:30:00	30	Evaluación respiratoria infantil	Evolución clínica satisfactoria. Se refuerzan medidas dietéticas y actividad física. Cita de seguimiento programada.	\N	2026-09-30 16:12:00
+193	afe12af8-63ee-4509-b7bf-fbf59c5e1746	8	3	2	4	2026-09-21	16:00:00	30	Evaluación respiratoria infantil	\N	Cancelada por solicitud de atención prioritaria en guardia de emergencia.	\N
+194	6dcc5f1d-0016-428b-92de-949da18c6ff7	107	3	2	3	2026-09-28	09:00:00	30	Revisión del esquema de vacunación	Consulta concluida. Signos vitales normales: PA 120/75, FC 70 lpm. Se entrega receta y pautas preventivas. Alta médica temporal.	\N	2026-09-28 08:55:00
+195	ed79b785-fe30-4c03-835c-decd153f1a42	7	3	2	3	2026-09-29	10:30:00	30	Control de talla y peso pediátrico	Paciente atendido en consultorio. Examen clínico adecuado. Tratamiento bien tolerado. Se ajustan dosis y se indican controles laboratoriales en 60 días.	\N	2026-09-29 10:25:00
+196	f0d0cd8e-9af8-4a85-9170-b87fd5198c01	12	3	2	3	2026-09-25	14:00:00	30	Control del lactante menor	Paciente atendido en consultorio. Examen clínico adecuado. Tratamiento bien tolerado. Se ajustan dosis y se indican controles laboratoriales en 60 días.	\N	2026-09-25 13:54:00
+197	38e264ad-148d-4dd5-9c9c-3009603a6fcc	14	3	2	3	2026-10-29	11:00:00	30	Control de talla y peso pediátrico	Examen segmentario sin hallazgos patológicos agudos. Se prescriben antiinflamatorios y reposo relativo por 5 días.	\N	2026-10-29 10:48:00
+198	3e428187-8938-4484-ae61-dce8542dad4c	11	3	2	3	2026-09-22	16:00:00	30	Control del lactante menor	Consulta concluida. Signos vitales normales: PA 120/75, FC 70 lpm. Se entrega receta y pautas preventivas. Alta médica temporal.	\N	2026-09-22 15:53:00
+199	71df0b08-c7ec-4f6e-b209-e14f1604bd5d	20	4	2	3	2026-10-29	14:30:00	30	Evaluación respiratoria infantil	Evolución clínica satisfactoria. Se refuerzan medidas dietéticas y actividad física. Cita de seguimiento programada.	\N	2026-10-29 14:16:00
+200	1e343191-2a97-4ab7-8d7e-e6c465bc302c	76	4	2	3	2026-09-18	15:30:00	30	Control del lactante menor	Evolución clínica satisfactoria. Se refuerzan medidas dietéticas y actividad física. Cita de seguimiento programada.	\N	2026-09-18 15:12:00
+201	5c3443ed-62de-4673-89a6-97a28f9a121c	2	4	2	4	2026-11-11	09:00:00	30	Control del lactante menor	\N	Imposibilidad de transporte por bloqueo y fuertes lluvias en la ciudad.	\N
+202	f5a84af2-c9a0-45ca-8666-54640cc9029f	89	4	2	3	2026-09-23	16:00:00	30	Control de talla y peso pediátrico	Paciente atendido en consultorio. Examen clínico adecuado. Tratamiento bien tolerado. Se ajustan dosis y se indican controles laboratoriales en 60 días.	\N	2026-09-23 15:53:00
+203	315f3fdc-d16a-4119-941a-ba2d8633e37b	14	4	2	3	2026-10-13	10:00:00	30	Control de talla y peso pediátrico	Evolución clínica satisfactoria. Se refuerzan medidas dietéticas y actividad física. Cita de seguimiento programada.	\N	2026-10-13 09:53:00
+204	bfb7c4b6-95e4-4e00-a525-34de4553a019	3	3	2	5	2026-10-19	17:30:00	30	Control del lactante menor	\N	Paciente no se presentó en horario fijado.	\N
+205	8fe8f9d5-e75a-4d1f-9088-6cc84bb4722f	5	3	2	4	2026-10-06	17:30:00	30	Revisión del esquema de vacunación	\N	Cancelación preventiva solicitada por el asegurador o convenio empresarial.	\N
+206	f73de364-76b0-4731-8240-7ea3578711c6	18	3	2	3	2026-09-23	09:30:00	30	Evaluación respiratoria infantil	Examen segmentario sin hallazgos patológicos agudos. Se prescriben antiinflamatorios y reposo relativo por 5 días.	\N	2026-09-23 09:18:00
+207	84ff169d-4a04-41bf-afa3-ce32a7948ebf	107	3	2	4	2026-10-23	11:30:00	30	Control de talla y peso pediátrico	\N	El paciente notificó que presentó mejoría de sus síntomas y prefirió cancelar.	\N
+208	e180c08d-811f-47a7-89da-b3e1b3083291	13	4	2	3	2026-10-22	17:30:00	30	Control de talla y peso pediátrico	Examen segmentario sin hallazgos patológicos agudos. Se prescriben antiinflamatorios y reposo relativo por 5 días.	\N	2026-10-22 17:24:00
+209	ce45363f-01f4-4d6e-8596-2b849091fea7	29	5	3	3	2026-10-26	17:30:00	30	Ecocardiografía de control	Examen segmentario sin hallazgos patológicos agudos. Se prescriben antiinflamatorios y reposo relativo por 5 días.	\N	2026-10-26 17:21:00
+210	fad4dd6c-a490-4399-ba67-51f04cd7029f	17	5	3	3	2026-10-23	10:30:00	30	Evaluación preoperatoria cardiológica	Examen segmentario sin hallazgos patológicos agudos. Se prescriben antiinflamatorios y reposo relativo por 5 días.	\N	2026-10-23 10:20:00
+211	c46227c6-43fa-458a-8d84-1d7f0fced184	21	5	3	3	2026-10-30	10:00:00	30	Evaluación preoperatoria cardiológica	Examen segmentario sin hallazgos patológicos agudos. Se prescriben antiinflamatorios y reposo relativo por 5 días.	\N	2026-10-30 09:44:00
+212	d3186f63-1d9a-48b6-ac0e-2e82d863925f	18	5	3	4	2026-10-07	17:00:00	30	Control de presión arterial e hipertensión	\N	Cancelación preventiva solicitada por el asegurador o convenio empresarial.	\N
+213	f9ca8164-90a6-4ffd-97f1-d0deea0abc59	88	5	3	3	2026-10-26	15:00:00	30	Monitoreo post infarto agudo	Evolución clínica satisfactoria. Se refuerzan medidas dietéticas y actividad física. Cita de seguimiento programada.	\N	2026-10-26 14:50:00
+214	21593e27-5cbf-4ac0-ba53-56d431a6e037	85	5	3	4	2026-11-02	08:30:00	30	Control de presión arterial e hipertensión	\N	Cancelación preventiva solicitada por el asegurador o convenio empresarial.	\N
+215	6205471c-300b-4c15-a4e5-6b29f2dc0a90	97	5	3	3	2026-11-06	08:30:00	30	Evaluación preoperatoria cardiológica	Evolución clínica satisfactoria. Se refuerzan medidas dietéticas y actividad física. Cita de seguimiento programada.	\N	2026-11-06 08:15:00
+216	041f4257-e548-448a-899b-1438f228c8fe	14	5	3	3	2026-10-22	11:00:00	30	Monitoreo post infarto agudo	Evolución clínica satisfactoria. Se refuerzan medidas dietéticas y actividad física. Cita de seguimiento programada.	\N	2026-10-22 10:50:00
+217	2c9e3f3e-a92d-44c5-bb69-d85087a46d96	99	5	3	3	2026-10-12	16:00:00	30	Control de presión arterial e hipertensión	Evolución clínica satisfactoria. Se refuerzan medidas dietéticas y actividad física. Cita de seguimiento programada.	\N	2026-10-12 15:50:00
+218	8acb999e-0453-4498-b206-a931e7f31008	82	5	3	3	2026-09-23	16:30:00	30	Evaluación preoperatoria cardiológica	Paciente atendido en consultorio. Examen clínico adecuado. Tratamiento bien tolerado. Se ajustan dosis y se indican controles laboratoriales en 60 días.	\N	2026-09-23 16:20:00
+219	eefb2119-c527-4289-adef-b351bbb579bb	2	5	3	3	2026-09-16	15:30:00	30	Ecocardiografía de control	Evolución clínica satisfactoria. Se refuerzan medidas dietéticas y actividad física. Cita de seguimiento programada.	\N	2026-09-16 15:20:00
+220	54c26939-c1ff-4c94-b792-210be540ea0a	94	5	3	3	2026-09-23	14:00:00	30	Ecocardiografía de control	Examen segmentario sin hallazgos patológicos agudos. Se prescriben antiinflamatorios y reposo relativo por 5 días.	\N	2026-09-23 13:43:00
+221	f7eb7f3a-fa83-4377-90b8-4f1861bb0599	99	5	3	3	2026-10-12	16:30:00	30	Ecocardiografía de control	Consulta concluida. Signos vitales normales: PA 120/75, FC 70 lpm. Se entrega receta y pautas preventivas. Alta médica temporal.	\N	2026-10-12 16:22:00
+222	6dc2b08d-3cbe-4104-8d5a-18b57097e5d1	114	5	3	3	2026-11-02	15:00:00	30	Monitoreo post infarto agudo	Consulta concluida. Signos vitales normales: PA 120/75, FC 70 lpm. Se entrega receta y pautas preventivas. Alta médica temporal.	\N	2026-11-02 14:55:00
+223	fae36c63-fc74-43a4-8f0e-1f894fc9af35	109	5	3	3	2026-11-11	17:00:00	30	Ecocardiografía de control	Evolución clínica satisfactoria. Se refuerzan medidas dietéticas y actividad física. Cita de seguimiento programada.	\N	2026-11-11 16:54:00
+224	f8078c05-6138-473a-a349-3671b21578de	94	5	3	3	2026-10-15	11:30:00	30	Evaluación preoperatoria cardiológica	Consulta concluida. Signos vitales normales: PA 120/75, FC 70 lpm. Se entrega receta y pautas preventivas. Alta médica temporal.	\N	2026-10-15 11:17:00
+225	05c1778f-5549-4045-b6ca-ea301ac58f6b	91	5	3	3	2026-10-01	15:00:00	30	Monitoreo post infarto agudo	Paciente atendido en consultorio. Examen clínico adecuado. Tratamiento bien tolerado. Se ajustan dosis y se indican controles laboratoriales en 60 días.	\N	2026-10-01 14:46:00
+226	d9cac38b-090c-475e-96aa-a6e721f510f9	7	5	3	3	2026-10-29	15:00:00	30	Ecocardiografía de control	Examen segmentario sin hallazgos patológicos agudos. Se prescriben antiinflamatorios y reposo relativo por 5 días.	\N	2026-10-29 14:50:00
+227	24180928-870e-452f-977d-f6d572d74fb5	13	5	3	3	2026-10-20	11:30:00	30	Monitoreo post infarto agudo	Examen segmentario sin hallazgos patológicos agudos. Se prescriben antiinflamatorios y reposo relativo por 5 días.	\N	2026-10-20 11:20:00
+228	573356fb-d760-4094-ab6c-73d79934958b	106	5	3	3	2026-10-23	09:30:00	30	Monitoreo post infarto agudo	Consulta concluida. Signos vitales normales: PA 120/75, FC 70 lpm. Se entrega receta y pautas preventivas. Alta médica temporal.	\N	2026-10-23 09:17:00
+229	df8ea4cf-ab85-4b36-8564-57ed12e628b3	6	5	3	5	2026-10-19	14:00:00	30	Control de presión arterial e hipertensión	\N	Paciente no se presentó en horario fijado.	\N
+230	1b7c127e-abb7-4f22-9617-52ff9e901fd6	25	5	3	3	2026-11-06	09:30:00	30	Evaluación preoperatoria cardiológica	Examen segmentario sin hallazgos patológicos agudos. Se prescriben antiinflamatorios y reposo relativo por 5 días.	\N	2026-11-06 09:17:00
+231	42796954-6add-4ae6-b5ad-63edbdd80850	17	5	3	3	2026-10-02	17:00:00	30	Evaluación preoperatoria cardiológica	Consulta concluida. Signos vitales normales: PA 120/75, FC 70 lpm. Se entrega receta y pautas preventivas. Alta médica temporal.	\N	2026-10-02 16:50:00
+232	3269f11b-483b-4acf-83ee-d0e2925610fd	34	5	3	3	2026-10-15	11:00:00	30	Evaluación preoperatoria cardiológica	Consulta concluida. Signos vitales normales: PA 120/75, FC 70 lpm. Se entrega receta y pautas preventivas. Alta médica temporal.	\N	2026-10-15 10:47:00
+233	3bd7debb-ccc2-412c-b28f-9fdd8edd0938	13	5	3	3	2026-09-21	09:30:00	30	Evaluación preoperatoria cardiológica	Examen segmentario sin hallazgos patológicos agudos. Se prescriben antiinflamatorios y reposo relativo por 5 días.	\N	2026-09-21 09:22:00
+234	a20d3462-9a13-43f0-9c2d-755121b4bb74	27	7	5	3	2026-10-20	08:00:00	30	Gonalgia derecha al subir escaleras	Consulta concluida. Signos vitales normales: PA 120/75, FC 70 lpm. Se entrega receta y pautas preventivas. Alta médica temporal.	\N	2026-10-20 07:46:00
+235	ca969ba5-75e1-4e66-b226-b2b1dbf8ca92	83	7	5	3	2026-10-09	09:30:00	30	Revisión post fractura de muñeca	Evolución clínica satisfactoria. Se refuerzan medidas dietéticas y actividad física. Cita de seguimiento programada.	\N	2026-10-09 09:19:00
+236	dbc16b1b-551d-44b3-9194-e6751ee180c2	8	8	5	3	2026-10-07	08:00:00	30	Lumbalgia aguda tras levantamiento de peso	Paciente atendido en consultorio. Examen clínico adecuado. Tratamiento bien tolerado. Se ajustan dosis y se indican controles laboratoriales en 60 días.	\N	2026-10-07 07:46:00
+237	3f6c8b1d-ec5f-4279-a3a3-4b5cd905a5cb	31	8	5	3	2026-09-28	16:00:00	30	Revisión post fractura de muñeca	Consulta concluida. Signos vitales normales: PA 120/75, FC 70 lpm. Se entrega receta y pautas preventivas. Alta médica temporal.	\N	2026-09-28 15:48:00
+238	7f09b82a-1c34-4921-87eb-ba8f87ce93c6	91	8	5	3	2026-09-28	14:30:00	30	Revisión post fractura de muñeca	Consulta concluida. Signos vitales normales: PA 120/75, FC 70 lpm. Se entrega receta y pautas preventivas. Alta médica temporal.	\N	2026-09-28 14:22:00
+239	b2003d8b-8b1d-4099-a7db-45fdfac1347d	18	7	5	3	2026-10-27	10:00:00	30	Gonalgia derecha al subir escaleras	Paciente atendido en consultorio. Examen clínico adecuado. Tratamiento bien tolerado. Se ajustan dosis y se indican controles laboratoriales en 60 días.	\N	2026-10-27 09:48:00
+240	ed7c1542-d199-48a4-a75c-5f332d2f01bb	11	7	5	3	2026-10-09	08:30:00	30	Gonalgia derecha al subir escaleras	Evolución clínica satisfactoria. Se refuerzan medidas dietéticas y actividad física. Cita de seguimiento programada.	\N	2026-10-09 08:15:00
+241	e98d3896-b640-4a26-b760-0cf961446db4	16	7	5	5	2026-09-16	14:30:00	30	Evaluación de esguince de tobillo	\N	Paciente no se presentó en horario fijado.	\N
+242	09bcf218-321b-4bbf-8ef8-8fa276d3cdc8	18	7	5	3	2026-09-15	17:00:00	30	Evaluación de esguince de tobillo	Paciente atendido en consultorio. Examen clínico adecuado. Tratamiento bien tolerado. Se ajustan dosis y se indican controles laboratoriales en 60 días.	\N	2026-09-15 16:50:00
+243	8e99cdda-7598-4bf0-a02f-0a9bfa66fda0	102	8	5	3	2026-09-23	09:30:00	30	Gonalgia derecha al subir escaleras	Evolución clínica satisfactoria. Se refuerzan medidas dietéticas y actividad física. Cita de seguimiento programada.	\N	2026-09-23 09:19:00
+244	9b68f56f-43d1-4483-bf46-09ad4877b923	30	7	5	3	2026-09-24	08:00:00	30	Evaluación de esguince de tobillo	Examen segmentario sin hallazgos patológicos agudos. Se prescriben antiinflamatorios y reposo relativo por 5 días.	\N	2026-09-24 07:42:00
+245	6f584d8e-dfd9-47ac-a38a-cbf4c65bba9d	94	7	5	3	2026-10-02	16:30:00	30	Lumbalgia aguda tras levantamiento de peso	Paciente atendido en consultorio. Examen clínico adecuado. Tratamiento bien tolerado. Se ajustan dosis y se indican controles laboratoriales en 60 días.	\N	2026-10-02 16:14:00
+246	6887d804-17b1-4ae7-bdcf-4d9eaa3b96ac	110	7	5	3	2026-09-17	15:00:00	30	Evaluación de esguince de tobillo	Examen segmentario sin hallazgos patológicos agudos. Se prescriben antiinflamatorios y reposo relativo por 5 días.	\N	2026-09-17 14:45:00
+247	f59115b4-f5bf-4108-8397-ccaa6a524e33	100	8	5	3	2026-10-07	17:00:00	30	Revisión post fractura de muñeca	Paciente atendido en consultorio. Examen clínico adecuado. Tratamiento bien tolerado. Se ajustan dosis y se indican controles laboratoriales en 60 días.	\N	2026-10-07 16:46:00
+248	b08827cf-f776-44c3-9f4a-bad7e1131db1	80	8	5	3	2026-09-16	15:30:00	30	Evaluación de esguince de tobillo	Paciente atendido en consultorio. Examen clínico adecuado. Tratamiento bien tolerado. Se ajustan dosis y se indican controles laboratoriales en 60 días.	\N	2026-09-16 15:22:00
+249	1b790351-0280-4900-82aa-2efa985a4a9e	23	8	5	3	2026-10-07	11:30:00	30	Lumbalgia aguda tras levantamiento de peso	Paciente atendido en consultorio. Examen clínico adecuado. Tratamiento bien tolerado. Se ajustan dosis y se indican controles laboratoriales en 60 días.	\N	2026-10-07 11:14:00
+250	3f2850be-99e6-4695-b1cf-8201ad901ae6	111	8	5	3	2026-11-04	09:00:00	30	Lumbalgia aguda tras levantamiento de peso	Evolución clínica satisfactoria. Se refuerzan medidas dietéticas y actividad física. Cita de seguimiento programada.	\N	2026-11-04 08:49:00
+251	ddc24239-f76f-4902-ae7c-9393e15cfe8b	79	8	5	3	2026-10-19	14:00:00	30	Evaluación de esguince de tobillo	Paciente atendido en consultorio. Examen clínico adecuado. Tratamiento bien tolerado. Se ajustan dosis y se indican controles laboratoriales en 60 días.	\N	2026-10-19 13:42:00
+252	149cd3f2-e282-4a55-99b0-5e2d1e5fdb5a	77	8	5	3	2026-09-29	17:00:00	30	Revisión post fractura de muñeca	Examen segmentario sin hallazgos patológicos agudos. Se prescriben antiinflamatorios y reposo relativo por 5 días.	\N	2026-09-29 16:45:00
+253	0e8ab41c-e945-4da4-8778-97e1caeb481b	16	7	5	3	2026-10-15	16:30:00	30	Lumbalgia aguda tras levantamiento de peso	Examen segmentario sin hallazgos patológicos agudos. Se prescriben antiinflamatorios y reposo relativo por 5 días.	\N	2026-10-15 16:14:00
+254	6a10d9d3-817c-437d-8793-9b133b542306	18	6	4	3	2026-10-12	08:00:00	30	Papanicolaou de control	Paciente atendido en consultorio. Examen clínico adecuado. Tratamiento bien tolerado. Se ajustan dosis y se indican controles laboratoriales en 60 días.	\N	2026-10-12 07:52:00
+255	02cf76ac-8025-4123-a6ec-7938550b98f7	81	6	4	5	2026-10-22	17:30:00	30	Papanicolaou de control	\N	Paciente no se presentó en horario fijado.	\N
+256	9f48e2a1-c5ef-4898-b0ee-acc629a93010	22	6	4	3	2026-09-16	17:00:00	30	Control prenatal ecográfico 2do trimestre	Paciente atendido en consultorio. Examen clínico adecuado. Tratamiento bien tolerado. Se ajustan dosis y se indican controles laboratoriales en 60 días.	\N	2026-09-16 16:49:00
+257	26f9566d-5ac0-473d-9d06-4a7ba01fd3ec	88	6	4	5	2026-11-03	16:00:00	30	Control prenatal ecográfico 2do trimestre	\N	Paciente no se presentó en horario fijado.	\N
+258	b758e45a-49f3-4be8-85fc-8558160c5d54	77	6	4	3	2026-10-09	14:30:00	30	Control puerperal y lactancia	Evolución clínica satisfactoria. Se refuerzan medidas dietéticas y actividad física. Cita de seguimiento programada.	\N	2026-10-09 14:18:00
+259	1e2a0265-8a2a-46ae-a952-8cf278e84e31	106	6	4	5	2026-10-01	15:00:00	30	Control prenatal ecográfico 2do trimestre	\N	Paciente no se presentó en horario fijado.	\N
+260	c0e3202c-c3ca-4528-a7ca-cd988329f38d	96	6	4	3	2026-09-22	17:00:00	30	Control prenatal ecográfico 2do trimestre	Evolución clínica satisfactoria. Se refuerzan medidas dietéticas y actividad física. Cita de seguimiento programada.	\N	2026-09-22 16:49:00
+261	5b15f70f-a32c-45a0-8b34-c8e07f81755e	23	6	4	3	2026-09-30	15:30:00	30	Evaluación ginecológica preventiva anual	Evolución clínica satisfactoria. Se refuerzan medidas dietéticas y actividad física. Cita de seguimiento programada.	\N	2026-09-30 15:15:00
+262	ae07a305-d39d-4ddd-95e5-36edeeef54b9	111	6	4	3	2026-10-19	11:30:00	30	Papanicolaou de control	Examen segmentario sin hallazgos patológicos agudos. Se prescriben antiinflamatorios y reposo relativo por 5 días.	\N	2026-10-19 11:17:00
+263	85d2d67b-27c9-484c-9d4a-4f2ea200fc91	87	6	4	5	2026-10-19	10:00:00	30	Control prenatal ecográfico 2do trimestre	\N	Paciente no se presentó en horario fijado.	\N
+264	31b4aa00-982b-4d51-a5ce-4c73abc1cca1	28	6	4	3	2026-09-22	09:30:00	30	Control prenatal ecográfico 2do trimestre	Paciente atendido en consultorio. Examen clínico adecuado. Tratamiento bien tolerado. Se ajustan dosis y se indican controles laboratoriales en 60 días.	\N	2026-09-22 09:25:00
+265	d0cda0a8-06ed-4c8f-a463-ac449157b5dc	92	6	4	3	2026-10-30	11:00:00	30	Papanicolaou de control	Paciente atendido en consultorio. Examen clínico adecuado. Tratamiento bien tolerado. Se ajustan dosis y se indican controles laboratoriales en 60 días.	\N	2026-10-30 10:44:00
+266	a440ca38-afd8-4769-8e31-2d11c2bdc135	7	6	4	3	2026-09-30	17:30:00	30	Papanicolaou de control	Examen segmentario sin hallazgos patológicos agudos. Se prescriben antiinflamatorios y reposo relativo por 5 días.	\N	2026-09-30 17:17:00
+267	4584cd66-0231-41d2-addb-82e79168a059	30	6	4	3	2026-10-23	14:00:00	30	Control prenatal ecográfico 2do trimestre	Evolución clínica satisfactoria. Se refuerzan medidas dietéticas y actividad física. Cita de seguimiento programada.	\N	2026-10-23 13:52:00
+268	e2b773b4-1bbb-4980-986f-cd78bebf3f33	112	6	4	3	2026-10-20	16:00:00	30	Evaluación ginecológica preventiva anual	Evolución clínica satisfactoria. Se refuerzan medidas dietéticas y actividad física. Cita de seguimiento programada.	\N	2026-10-20 15:51:00
+269	139ba614-841b-467a-be3f-cdf911d7f264	93	6	4	3	2026-11-05	15:00:00	30	Evaluación ginecológica preventiva anual	Examen segmentario sin hallazgos patológicos agudos. Se prescriben antiinflamatorios y reposo relativo por 5 días.	\N	2026-11-05 14:53:00
+270	25fb8079-f0fe-4e8e-88a3-71479f3c7924	80	6	4	3	2026-09-23	14:30:00	30	Papanicolaou de control	Consulta concluida. Signos vitales normales: PA 120/75, FC 70 lpm. Se entrega receta y pautas preventivas. Alta médica temporal.	\N	2026-09-23 14:22:00
+271	e1a1ce80-96cf-4545-8cd6-0416b9b42f2c	12	6	4	3	2026-10-20	14:30:00	30	Papanicolaou de control	Paciente atendido en consultorio. Examen clínico adecuado. Tratamiento bien tolerado. Se ajustan dosis y se indican controles laboratoriales en 60 días.	\N	2026-10-20 14:14:00
+272	d64ab341-bf3d-44b8-a865-570289e7e497	5	9	6	3	2026-09-28	08:30:00	30	Evaluación de lesiones pigmentadas y lunares	Consulta concluida. Signos vitales normales: PA 120/75, FC 70 lpm. Se entrega receta y pautas preventivas. Alta médica temporal.	\N	2026-09-28 08:16:00
+273	2e01f404-d40e-4087-92af-a2bcf70f0fb8	107	9	6	3	2026-10-19	11:30:00	30	Evaluación de lesiones pigmentadas y lunares	Examen segmentario sin hallazgos patológicos agudos. Se prescriben antiinflamatorios y reposo relativo por 5 días.	\N	2026-10-19 11:17:00
+274	734a555e-eaba-486c-8e5d-c7fa9216b3c2	25	9	6	3	2026-09-24	16:00:00	30	Tratamiento de dermatitis atópica	Paciente atendido en consultorio. Examen clínico adecuado. Tratamiento bien tolerado. Se ajustan dosis y se indican controles laboratoriales en 60 días.	\N	2026-09-24 15:42:00
+275	00ffe0a4-99ea-4330-9c47-f2619c68b754	81	9	6	3	2026-10-15	11:00:00	30	Tratamiento de dermatitis atópica	Evolución clínica satisfactoria. Se refuerzan medidas dietéticas y actividad física. Cita de seguimiento programada.	\N	2026-10-15 10:49:00
+276	7d442331-8a62-4e95-bc72-bdf691620548	12	9	6	3	2026-11-05	15:30:00	30	Tratamiento de dermatitis atópica	Consulta concluida. Signos vitales normales: PA 120/75, FC 70 lpm. Se entrega receta y pautas preventivas. Alta médica temporal.	\N	2026-11-05 15:22:00
+277	2c3ebbbb-7d82-4479-a678-afb27d36d5cf	81	9	6	3	2026-11-10	08:30:00	30	Tratamiento de dermatitis atópica	Examen segmentario sin hallazgos patológicos agudos. Se prescriben antiinflamatorios y reposo relativo por 5 días.	\N	2026-11-10 08:17:00
+278	4272a056-a906-4769-ab52-0534483a0a43	84	9	6	3	2026-11-11	15:30:00	30	Tratamiento de dermatitis atópica	Consulta concluida. Signos vitales normales: PA 120/75, FC 70 lpm. Se entrega receta y pautas preventivas. Alta médica temporal.	\N	2026-11-11 15:25:00
+279	418dba00-0393-4e32-99f6-090c90938404	111	9	6	3	2026-09-23	17:00:00	30	Evaluación de lesiones pigmentadas y lunares	Examen segmentario sin hallazgos patológicos agudos. Se prescriben antiinflamatorios y reposo relativo por 5 días.	\N	2026-09-23 16:54:00
+280	cf507113-cfdc-46d5-b01c-0ab37fddce8c	94	9	6	3	2026-10-29	17:30:00	30	Brote de acné inflamatorio juvenil	Paciente atendido en consultorio. Examen clínico adecuado. Tratamiento bien tolerado. Se ajustan dosis y se indican controles laboratoriales en 60 días.	\N	2026-10-29 17:18:00
+281	cb7bb2e6-aaca-4baf-80fc-ea554f3791dc	97	9	6	3	2026-09-16	08:00:00	30	Evaluación de lesiones pigmentadas y lunares	Examen segmentario sin hallazgos patológicos agudos. Se prescriben antiinflamatorios y reposo relativo por 5 días.	\N	2026-09-16 07:54:00
+282	27a01617-c644-42bb-b84c-d983dcc587b7	7	10	7	3	2026-09-30	14:30:00	30	Monitoreo de medicación neurológica	Paciente atendido en consultorio. Examen clínico adecuado. Tratamiento bien tolerado. Se ajustan dosis y se indican controles laboratoriales en 60 días.	\N	2026-09-30 14:16:00
+283	86d3edcd-f6ce-4acc-9c48-47bd9cb6cc36	16	11	7	3	2026-09-17	14:00:00	30	Monitoreo de medicación neurológica	Examen segmentario sin hallazgos patológicos agudos. Se prescriben antiinflamatorios y reposo relativo por 5 días.	\N	2026-09-17 13:45:00
+284	9a185d7c-884e-46bb-8395-e521dafbd019	78	10	7	3	2026-09-21	15:30:00	30	Monitoreo de medicación neurológica	Evolución clínica satisfactoria. Se refuerzan medidas dietéticas y actividad física. Cita de seguimiento programada.	\N	2026-09-21 15:15:00
+285	c13968a7-d782-44ca-b80c-fde1d2d14630	83	10	7	3	2026-11-03	17:30:00	30	Cefalea migrañosa severa con fotofobia	Examen segmentario sin hallazgos patológicos agudos. Se prescriben antiinflamatorios y reposo relativo por 5 días.	\N	2026-11-03 17:24:00
+286	56298cf8-6167-4b44-b76a-21e79ff9c941	96	10	7	3	2026-10-09	08:30:00	30	Monitoreo de medicación neurológica	Evolución clínica satisfactoria. Se refuerzan medidas dietéticas y actividad física. Cita de seguimiento programada.	\N	2026-10-09 08:19:00
+287	efda6154-fa3e-4166-b927-aecebf563c6f	86	11	7	3	2026-10-26	11:30:00	30	Evaluación de episodios de vértigo	Evolución clínica satisfactoria. Se refuerzan medidas dietéticas y actividad física. Cita de seguimiento programada.	\N	2026-10-26 11:14:00
+288	bd6414b8-d162-44ab-9c1f-7fca145802ff	94	10	7	3	2026-09-29	08:00:00	30	Monitoreo de medicación neurológica	Consulta concluida. Signos vitales normales: PA 120/75, FC 70 lpm. Se entrega receta y pautas preventivas. Alta médica temporal.	\N	2026-09-29 07:47:00
+289	60840921-90f9-4191-ac1b-4b348c6d3d63	87	10	7	3	2026-09-22	11:30:00	30	Cefalea migrañosa severa con fotofobia	Paciente atendido en consultorio. Examen clínico adecuado. Tratamiento bien tolerado. Se ajustan dosis y se indican controles laboratoriales en 60 días.	\N	2026-09-22 11:20:00
+290	aa55d110-9065-4d1d-a09f-75165caf1ae2	5	16	12	3	2026-10-01	16:00:00	30	Ardor ocular y fatiga visual frente a pantallas	Examen segmentario sin hallazgos patológicos agudos. Se prescriben antiinflamatorios y reposo relativo por 5 días.	\N	2026-10-01 15:48:00
+291	49e4db4e-b83d-4b0e-abe7-55428a4fecec	22	16	12	3	2026-10-19	17:30:00	30	Control de presión intraocular	Evolución clínica satisfactoria. Se refuerzan medidas dietéticas y actividad física. Cita de seguimiento programada.	\N	2026-10-19 17:17:00
+292	5f9a190b-bd17-43ef-8fe4-11408420acb4	90	16	12	3	2026-10-22	11:00:00	30	Control de presión intraocular	Paciente atendido en consultorio. Examen clínico adecuado. Tratamiento bien tolerado. Se ajustan dosis y se indican controles laboratoriales en 60 días.	\N	2026-10-22 10:47:00
+293	69688606-28d6-4d77-ac85-db7a52c754ea	16	16	12	3	2026-09-17	08:00:00	30	Ardor ocular y fatiga visual frente a pantallas	Examen segmentario sin hallazgos patológicos agudos. Se prescriben antiinflamatorios y reposo relativo por 5 días.	\N	2026-09-17 07:55:00
+294	3c37a2c9-3208-4c50-991f-f21934cd12ea	1	16	12	3	2026-10-19	10:00:00	30	Ardor ocular y fatiga visual frente a pantallas	Consulta concluida. Signos vitales normales: PA 120/75, FC 70 lpm. Se entrega receta y pautas preventivas. Alta médica temporal.	\N	2026-10-19 09:47:00
+295	ffa96696-ff54-456e-9df0-55cbc9911b31	16	16	12	3	2026-11-10	11:30:00	30	Control de presión intraocular	Paciente atendido en consultorio. Examen clínico adecuado. Tratamiento bien tolerado. Se ajustan dosis y se indican controles laboratoriales en 60 días.	\N	2026-11-10 11:16:00
 \.
 
 
@@ -1354,6 +1658,158 @@ COPY public.historial_cambio_cita (id_historial, id_cita, id_usuario, estado_ant
 139	141	1	\N	1	CREACION	Cita médica agendada en el sistema	\N	\N	2026-12-14 08:00:00
 140	142	1	\N	1	CREACION	Cita médica agendada en el sistema	\N	\N	2026-12-15 15:00:00
 141	143	1	\N	1	CREACION	Cita médica agendada en el sistema	\N	\N	2026-12-15 09:30:00
+142	144	1	1	4	CANCELACION	Cancelación registrada por administración	\N	\N	2026-10-23 10:00:00
+143	145	1	1	4	CANCELACION	Cancelación registrada por administración	\N	\N	2026-09-22 16:30:00
+144	146	1	1	4	CANCELACION	Cancelación registrada por administración	\N	\N	2026-10-07 17:30:00
+145	147	1	1	4	CANCELACION	Cancelación registrada por administración	\N	\N	2026-09-22 09:00:00
+146	148	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-27 10:00:00
+147	149	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-29 17:30:00
+148	150	1	1	4	CANCELACION	Cancelación registrada por administración	\N	\N	2026-09-24 14:00:00
+149	151	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-09-24 17:30:00
+150	152	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-11-11 11:00:00
+151	153	1	1	4	CANCELACION	Cancelación registrada por administración	\N	\N	2026-10-28 16:00:00
+152	154	1	1	4	CANCELACION	Cancelación registrada por administración	\N	\N	2026-09-18 08:00:00
+153	155	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-09-28 10:30:00
+154	156	1	1	4	CANCELACION	Cancelación registrada por administración	\N	\N	2026-10-07 17:30:00
+155	157	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-22 15:30:00
+156	158	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-07 10:00:00
+157	159	1	1	4	CANCELACION	Cancelación registrada por administración	\N	\N	2026-09-23 15:30:00
+158	160	1	1	4	CANCELACION	Cancelación registrada por administración	\N	\N	2026-09-25 14:30:00
+159	161	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-09-22 09:00:00
+160	162	1	1	4	CANCELACION	Cancelación registrada por administración	\N	\N	2026-10-23 10:30:00
+161	163	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-11-12 08:30:00
+162	164	1	1	4	CANCELACION	Cancelación registrada por administración	\N	\N	2026-09-23 14:00:00
+163	165	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-11-04 11:00:00
+164	166	1	1	5	INASISTENCIA	Inasistencia constatada	\N	\N	2026-09-23 14:00:00
+165	167	1	1	4	CANCELACION	Cancelación registrada por administración	\N	\N	2026-10-09 16:30:00
+166	168	1	1	4	CANCELACION	Cancelación registrada por administración	\N	\N	2026-10-16 09:30:00
+167	169	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-09-21 15:30:00
+168	170	1	1	4	CANCELACION	Cancelación registrada por administración	\N	\N	2026-11-11 08:00:00
+169	171	1	1	4	CANCELACION	Cancelación registrada por administración	\N	\N	2026-10-09 08:00:00
+170	172	1	1	5	INASISTENCIA	Inasistencia constatada	\N	\N	2026-09-28 14:00:00
+171	173	1	1	4	CANCELACION	Cancelación registrada por administración	\N	\N	2026-09-17 17:00:00
+172	174	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-11-05 14:30:00
+173	175	1	1	4	CANCELACION	Cancelación registrada por administración	\N	\N	2026-10-28 16:00:00
+174	176	1	1	4	CANCELACION	Cancelación registrada por administración	\N	\N	2026-10-08 10:00:00
+175	177	1	1	4	CANCELACION	Cancelación registrada por administración	\N	\N	2026-10-07 15:00:00
+176	178	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-09-25 16:30:00
+177	179	1	1	4	CANCELACION	Cancelación registrada por administración	\N	\N	2026-10-29 10:00:00
+178	180	1	1	4	CANCELACION	Cancelación registrada por administración	\N	\N	2026-09-21 17:30:00
+179	181	1	1	5	INASISTENCIA	Inasistencia constatada	\N	\N	2026-09-29 16:30:00
+180	182	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-09 08:00:00
+181	183	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-09 16:00:00
+182	184	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-02 10:30:00
+183	185	1	1	5	INASISTENCIA	Inasistencia constatada	\N	\N	2026-10-15 11:00:00
+184	186	1	1	4	CANCELACION	Cancelación registrada por administración	\N	\N	2026-09-16 11:00:00
+185	187	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-09-28 09:30:00
+186	188	1	1	4	CANCELACION	Cancelación registrada por administración	\N	\N	2026-10-07 15:00:00
+187	189	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-09-22 09:00:00
+188	190	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-22 15:30:00
+189	191	1	1	5	INASISTENCIA	Inasistencia constatada	\N	\N	2026-11-04 10:30:00
+190	192	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-09-30 16:30:00
+191	193	1	1	4	CANCELACION	Cancelación registrada por administración	\N	\N	2026-09-21 16:00:00
+192	194	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-09-28 09:00:00
+193	195	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-09-29 10:30:00
+194	196	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-09-25 14:00:00
+195	197	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-29 11:00:00
+196	198	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-09-22 16:00:00
+197	199	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-29 14:30:00
+198	200	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-09-18 15:30:00
+199	201	1	1	4	CANCELACION	Cancelación registrada por administración	\N	\N	2026-11-11 09:00:00
+200	202	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-09-23 16:00:00
+201	203	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-13 10:00:00
+202	204	1	1	5	INASISTENCIA	Inasistencia constatada	\N	\N	2026-10-19 17:30:00
+203	205	1	1	4	CANCELACION	Cancelación registrada por administración	\N	\N	2026-10-06 17:30:00
+204	206	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-09-23 09:30:00
+205	207	1	1	4	CANCELACION	Cancelación registrada por administración	\N	\N	2026-10-23 11:30:00
+206	208	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-22 17:30:00
+207	209	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-26 17:30:00
+208	210	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-23 10:30:00
+209	211	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-30 10:00:00
+210	212	1	1	4	CANCELACION	Cancelación registrada por administración	\N	\N	2026-10-07 17:00:00
+211	213	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-26 15:00:00
+212	214	1	1	4	CANCELACION	Cancelación registrada por administración	\N	\N	2026-11-02 08:30:00
+213	215	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-11-06 08:30:00
+214	216	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-22 11:00:00
+215	217	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-12 16:00:00
+216	218	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-09-23 16:30:00
+217	219	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-09-16 15:30:00
+218	220	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-09-23 14:00:00
+219	221	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-12 16:30:00
+220	222	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-11-02 15:00:00
+221	223	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-11-11 17:00:00
+222	224	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-15 11:30:00
+223	225	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-01 15:00:00
+224	226	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-29 15:00:00
+225	227	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-20 11:30:00
+226	228	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-23 09:30:00
+227	229	1	1	5	INASISTENCIA	Inasistencia constatada	\N	\N	2026-10-19 14:00:00
+228	230	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-11-06 09:30:00
+229	231	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-02 17:00:00
+230	232	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-15 11:00:00
+231	233	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-09-21 09:30:00
+232	234	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-20 08:00:00
+233	235	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-09 09:30:00
+234	236	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-07 08:00:00
+235	237	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-09-28 16:00:00
+236	238	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-09-28 14:30:00
+237	239	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-27 10:00:00
+238	240	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-09 08:30:00
+239	241	1	1	5	INASISTENCIA	Inasistencia constatada	\N	\N	2026-09-16 14:30:00
+240	242	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-09-15 17:00:00
+241	243	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-09-23 09:30:00
+242	244	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-09-24 08:00:00
+243	245	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-02 16:30:00
+244	246	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-09-17 15:00:00
+245	247	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-07 17:00:00
+246	248	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-09-16 15:30:00
+247	249	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-07 11:30:00
+248	250	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-11-04 09:00:00
+249	251	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-19 14:00:00
+250	252	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-09-29 17:00:00
+251	253	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-15 16:30:00
+252	254	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-12 08:00:00
+253	255	1	1	5	INASISTENCIA	Inasistencia constatada	\N	\N	2026-10-22 17:30:00
+254	256	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-09-16 17:00:00
+255	257	1	1	5	INASISTENCIA	Inasistencia constatada	\N	\N	2026-11-03 16:00:00
+256	258	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-09 14:30:00
+257	259	1	1	5	INASISTENCIA	Inasistencia constatada	\N	\N	2026-10-01 15:00:00
+258	260	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-09-22 17:00:00
+259	261	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-09-30 15:30:00
+260	262	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-19 11:30:00
+261	263	1	1	5	INASISTENCIA	Inasistencia constatada	\N	\N	2026-10-19 10:00:00
+262	264	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-09-22 09:30:00
+263	265	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-30 11:00:00
+264	266	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-09-30 17:30:00
+265	267	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-23 14:00:00
+266	268	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-20 16:00:00
+267	269	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-11-05 15:00:00
+268	270	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-09-23 14:30:00
+269	271	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-20 14:30:00
+270	272	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-09-28 08:30:00
+271	273	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-19 11:30:00
+272	274	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-09-24 16:00:00
+273	275	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-15 11:00:00
+274	276	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-11-05 15:30:00
+275	277	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-11-10 08:30:00
+276	278	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-11-11 15:30:00
+277	279	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-09-23 17:00:00
+278	280	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-29 17:30:00
+279	281	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-09-16 08:00:00
+280	282	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-09-30 14:30:00
+281	283	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-09-17 14:00:00
+282	284	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-09-21 15:30:00
+283	285	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-11-03 17:30:00
+284	286	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-09 08:30:00
+285	287	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-26 11:30:00
+286	288	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-09-29 08:00:00
+287	289	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-09-22 11:30:00
+288	290	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-01 16:00:00
+289	291	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-19 17:30:00
+290	292	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-22 11:00:00
+291	293	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-09-17 08:00:00
+292	294	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-10-19 10:00:00
+293	295	1	1	3	ATENCION	Consulta médica concluida con éxito	\N	\N	2026-11-10 11:30:00
 \.
 
 
@@ -1674,14 +2130,14 @@ COPY public.usuario (id_usuario, id_rol, id_medico, id_paciente, nombre_usuario,
 -- Name: auditoria_id_auditoria_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.auditoria_id_auditoria_seq', 264, true);
+SELECT pg_catalog.setval('public.auditoria_id_auditoria_seq', 416, true);
 
 
 --
 -- Name: cita_medica_id_cita_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.cita_medica_id_cita_seq', 143, true);
+SELECT pg_catalog.setval('public.cita_medica_id_cita_seq', 295, true);
 
 
 --
@@ -1702,7 +2158,7 @@ SELECT pg_catalog.setval('public.estado_cita_id_estado_cita_seq', 5, true);
 -- Name: historial_cambio_cita_id_historial_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.historial_cambio_cita_id_historial_seq', 141, true);
+SELECT pg_catalog.setval('public.historial_cambio_cita_id_historial_seq', 293, true);
 
 
 --
@@ -2204,5 +2660,5 @@ ALTER TABLE ONLY public.usuario
 -- PostgreSQL database dump complete
 --
 
-\unrestrict yqm0n17KE3XB7W2iHpX0wCn2DBoG2igVbjgWt3Fi6CH4aYvmEb2MfETXQbjY1ry
+\unrestrict HHoQhff6drOwci3tyEzaNwMzbbLc8WCFdbDEos0xFhM68FKooBub6scyE6fiWxN
 

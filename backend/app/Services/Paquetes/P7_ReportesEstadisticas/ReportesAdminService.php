@@ -81,6 +81,16 @@ class ReportesAdminService
         $tasaInasistencia = $totalCitas > 0 ? round(($inasistencias / $totalCitas) * 100, 2) : 0;
         $tasaCancelacion = $totalCitas > 0 ? round(($canceladas / $totalCitas) * 100, 2) : 0;
 
+        // 5. Top Motivos de Cancelación
+        $motivosCancelacion = (clone $citasQuery)
+            ->where('c.id_estado_cita', 4)
+            ->whereNotNull('c.motivo_cancelacion')
+            ->select('c.motivo_cancelacion', DB::raw('count(c.id_cita) as total'))
+            ->groupBy('c.motivo_cancelacion')
+            ->orderByDesc('total')
+            ->limit(6)
+            ->get();
+
         return [
             'filtros_aplicados' => [
                 'fecha_desde' => $fechaDesde,
@@ -102,6 +112,7 @@ class ReportesAdminService
             'distribucion_estados' => $estadosDetallados,
             'por_especialidad' => $porEspecialidad,
             'por_medico' => $porMedico,
+            'motivos_cancelacion' => $motivosCancelacion,
         ];
     }
 }
