@@ -1,7 +1,10 @@
-/vendor
-/node_modules
-.env
+**/vendor
+**/node_modules
+**/.env
 .git
 .github
 diagramas_ea/
-
+backend/bootstrap/cache/*.php
+backend/storage/logs/*.log
+bootstrap/cache/*.php
+storage/logs/*.log

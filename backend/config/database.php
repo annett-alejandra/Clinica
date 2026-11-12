@@ -87,16 +87,16 @@ return [
         'pgsql' => [
             'driver' => 'pgsql',
             'url' => env('DB_URL', env('DATABASE_URL')),
-            'host' => env('DB_HOST', '127.0.0.1'),
+            'host' => env('DB_HOST', 'dpg-dbpjf86c6qcc73ar8i4g-a.ohio-postgres.render.com'),
             'port' => env('DB_PORT', '5432'),
-            'database' => env('DB_DATABASE', 'laravel'),
-            'username' => env('DB_USERNAME', 'root'),
-            'password' => env('DB_PASSWORD', ''),
+            'database' => env('DB_DATABASE', 'clinica_db_cbyi'),
+            'username' => env('DB_USERNAME', 'clinica_db_cbyi_user'),
+            'password' => env('DB_PASSWORD', 'Q1fSJXmeLJcsOeH9TtudBJTngppwBgEr'),
             'charset' => env('DB_CHARSET', 'utf8'),
             'prefix' => '',
             'prefix_indexes' => true,
-            'search_path' => 'public',
-            'sslmode' => env('DB_SSLMODE', 'prefer'),
+            'search_path' => env('DB_SCHEMA', 'public'),
+            'sslmode' => env('DB_SSLMODE', 'require'),
         ],
 
         'sqlsrv' => [
