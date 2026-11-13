@@ -26,10 +26,10 @@ if ! grep -q "^APP_KEY=base64:" .env; then
     php artisan key:generate --force
 fi
 
-# Pre-compilar configuración, rutas y vistas Blade en volúmenes nativos Linux
-php artisan config:cache || true
-php artisan route:cache || true
-php artisan view:cache || true
+# Limpiar cachés para reflejar cambios inmediatos de código en desarrollo local
+php artisan config:clear || true
+php artisan route:clear || true
+php artisan view:clear || true
 
 # Iniciar el servidor
 exec "$@"

@@ -5,13 +5,14 @@ services:
       dockerfile: Dockerfile
     container_name: clinica_app
     restart: unless-stopped
+    working_dir: /var/www
     ports:
       - "8000:8000"
     volumes:
-      - ./backend:/var/www/html
-      - clinica_vendor:/var/www/html/vendor
-      - clinica_storage:/var/www/html/storage
-      - clinica_cache:/var/www/html/bootstrap/cache
+      - ./backend:/var/www
+      - clinica_vendor:/var/www/vendor
+      - clinica_storage:/var/www/storage
+      - clinica_cache:/var/www/bootstrap/cache
       - ./backend/docker-entrypoint.sh:/usr/local/bin/docker-entrypoint.sh
       - ./backend/docker/php.ini:/usr/local/etc/php/conf.d/custom.ini
     environment:
@@ -24,6 +25,7 @@ services:
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
       PHP_CLI_SERVER_WORKERS: 6
+    entrypoint: ["/usr/local/bin/docker-entrypoint.sh"]
     command: ["php", "-S", "0.0.0.0:8000", "-t", "public"]
     depends_on:
       db:
@@ -41,6 +43,7 @@ services:
       - "5432:5432"
     volumes:
       - clinica_pgdata:/var/lib/postgresql/data
+      - ./backend/database/poblacion_completa_clinica.sql:/docker-entrypoint-initdb.d/init.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d clinica_vida_salud"]
       interval: 5s
