@@ -6,7 +6,7 @@
 <div class="container py-12">
     <div class="flex flex-col md:flex-row md:items-center justify-between pb-6 mb-8 border-b border-slate-200 gap-4">
         <div>
-            <span class="text-xs font-mono font-semibold uppercase tracking-widest text-slate-500">PAQUETE 02 · CU06</span>
+            <span class="text-xs font-mono font-semibold uppercase tracking-widest text-slate-500">HORARIOS DE ATENCIÓN CLÍNICA</span>
             <h1 class="text-3xl font-serif text-slate-900 mt-1">Horarios y Turnos de Atención</h1>
             <p class="text-sm text-slate-500 mt-1">Configuración semanal de turnos, duración de cita en minutos y cupos máximos por médico.</p>
         </div>

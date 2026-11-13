@@ -5,7 +5,7 @@
 @section('content')
 <div class="container py-12 max-w-xl mx-auto">
     <div class="pb-6 mb-8 border-b border-rose-200">
-        <span class="text-xs font-mono font-semibold uppercase tracking-widest text-rose-500">PAQUETE 04 · CU13</span>
+        <span class="text-xs font-mono font-semibold uppercase tracking-widest text-rose-500">CANCELACIÓN DE CITAS</span>
         <h1 class="text-3xl font-serif text-slate-900 mt-1">Cancelar Cita Médica</h1>
         <p class="text-sm text-slate-500 mt-1">La anulación libera de forma inmediata el espacio en la agenda del especialista.</p>
     </div>

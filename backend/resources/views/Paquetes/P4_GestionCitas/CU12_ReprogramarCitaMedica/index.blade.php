@@ -5,7 +5,7 @@
 @section('content')
 <div class="container py-12 max-w-2xl mx-auto">
     <div class="pb-6 mb-8 border-b border-slate-200">
-        <span class="text-xs font-mono font-semibold uppercase tracking-widest text-slate-500">PAQUETE 04 · CU12</span>
+        <span class="text-xs font-mono font-semibold uppercase tracking-widest text-slate-500">REPROGRAMACIÓN DE CITAS</span>
         <h1 class="text-3xl font-serif text-slate-900 mt-1">Reprogramar Cita Médica</h1>
         <p class="text-sm text-slate-500 mt-1">Modificación de fecha u hora liberando de inmediato la franja anterior.</p>
     </div>

@@ -414,11 +414,11 @@
             <div class="mt-10 pt-8 border-t border-slate-200/80">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-5">
                     <div>
-                        <span class="text-[11px] font-bold uppercase tracking-wider text-[#0284C7]">Catálogo Oficial Conectado a PostgreSQL (CU04 / CU10)</span>
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-[#0284C7]">Catálogo Oficial de Especialidades</span>
                         <h4 class="font-bold text-base text-[#0F172A]">Especialidades Activas para Reserva Directa</h4>
                     </div>
                     <a href="{{ url('/disponibilidad') }}" class="text-xs font-semibold text-[#0284C7] hover:underline">
-                        Consultar horarios detallados (CU10) →
+                        Consultar horarios detallados →
                     </a>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -466,7 +466,7 @@
                 <a href="{{ route('login') }}"
                    class="px-6 py-3.5 bg-[#0284C7] hover:bg-[#0369A1] text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-lg flex items-center space-x-2">
                     <x-icon name="log-in" class="w-4 h-4" />
-                    <span>Iniciar Sesión (CU01)</span>
+                    <span>Iniciar Sesión</span>
                 </a>
                 <a href="{{ url('/registro-paciente') }}"
                    class="px-6 py-3.5 bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-xl text-xs font-bold uppercase tracking-wider transition-all">
@@ -494,11 +494,11 @@
             <div>
                 <h5 class="text-xs font-bold uppercase tracking-wider text-white mb-4">Acceso Rápido</h5>
                 <ul class="space-y-2.5 text-xs text-slate-400">
-                    <li><a href="{{ route('portal', ['rol' => 'medico']) }}" class="hover:text-white transition-colors">Portal Médico Especialista (CU15/16)</a></li>
-                    <li><a href="{{ route('portal', ['rol' => 'enfermeria']) }}" class="hover:text-white transition-colors">Consola Enfermería y Recepción (CU14)</a></li>
-                    <li><a href="{{ route('portal', ['rol' => 'paciente']) }}" class="hover:text-white transition-colors">Portal del Paciente y Familia (CU08/18)</a></li>
-                    <li><a href="{{ url('/citas') }}" class="hover:text-white transition-colors">Programación de Citas Médicas (CU11)</a></li>
-                    <li><a href="{{ url('/reportes-administrativos') }}" class="hover:text-white transition-colors">Reportes e Indicadores (CU19)</a></li>
+                    <li><a href="{{ route('portal', ['rol' => 'medico']) }}" class="hover:text-white transition-colors">Portal Médico Especialista</a></li>
+                    <li><a href="{{ route('portal', ['rol' => 'enfermeria']) }}" class="hover:text-white transition-colors">Consola Enfermería y Recepción</a></li>
+                    <li><a href="{{ route('portal', ['rol' => 'paciente']) }}" class="hover:text-white transition-colors">Portal del Paciente y Familia</a></li>
+                    <li><a href="{{ url('/citas') }}" class="hover:text-white transition-colors">Programación de Citas Médicas</a></li>
+                    <li><a href="{{ url('/reportes-administrativos') }}" class="hover:text-white transition-colors">Reportes e Indicadores</a></li>
                 </ul>
             </div>
 

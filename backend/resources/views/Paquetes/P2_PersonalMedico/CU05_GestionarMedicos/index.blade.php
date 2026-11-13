@@ -6,7 +6,7 @@
 <div class="container py-12">
     <div class="flex flex-col md:flex-row md:items-center justify-between pb-6 mb-8 border-b border-slate-200 gap-4">
         <div>
-            <span class="text-xs font-mono font-semibold uppercase tracking-widest text-slate-500">PAQUETE 02 · CU05</span>
+            <span class="text-xs font-mono font-semibold uppercase tracking-widest text-slate-500">PERSONAL MÉDICO ESPECIALISTA</span>
             <h1 class="text-3xl font-serif text-slate-900 mt-1">Gestión de Personal Médico</h1>
             <p class="text-sm text-slate-500 mt-1">Registro de facultativos, matrícula profesional, consultorios y especialidades adscritas.</p>
         </div>

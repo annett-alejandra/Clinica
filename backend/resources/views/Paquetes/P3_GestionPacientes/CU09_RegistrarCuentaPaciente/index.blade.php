@@ -5,7 +5,7 @@
 @section('content')
 <div class="container py-16 max-w-xl mx-auto">
     <div class="text-center mb-8">
-        <span class="text-xs font-mono font-semibold uppercase tracking-widest text-emerald-600">PAQUETE 03 · CU09</span>
+        <span class="text-xs font-mono font-semibold uppercase tracking-widest text-emerald-600">REGISTRO DE PACIENTE</span>
         <h1 class="text-3xl font-serif text-slate-900 mt-1">Auto-registro de Pacientes</h1>
         <p class="text-sm text-slate-500 mt-1">Crea tu cuenta web para agendar citas y consultar tu historial médico.</p>
     </div>
@@ -70,7 +70,7 @@
         <div class="mt-6 pt-6 border-t border-slate-100 text-center text-xs text-slate-500">
             ¿Ya tienes una cuenta creada?
             <a href="{{ url('/login') }}" class="font-semibold text-sky-600 hover:text-sky-800">
-                Inicia sesión aquí (CU01)
+                Inicia sesión aquí 
             </a>
         </div>
     </div>

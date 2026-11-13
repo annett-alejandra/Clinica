@@ -6,7 +6,7 @@
 <div class="container py-12">
     <div class="flex flex-col md:flex-row md:items-center justify-between pb-6 mb-8 border-b border-slate-200 gap-4">
         <div>
-            <span class="text-xs font-mono font-semibold uppercase tracking-widest text-slate-500">PAQUETE 05 · CU14</span>
+            <span class="text-xs font-mono font-semibold uppercase tracking-widest text-slate-500">CONTROL DE ASISTENCIA</span>
             <h1 class="text-3xl font-serif text-slate-900 mt-1">Control Operativo de Citas</h1>
             <p class="text-sm text-slate-500 mt-1">Recepción: confirmación de citas, registro de llegada a sala de espera y marcación de inasistencia.</p>
         </div>

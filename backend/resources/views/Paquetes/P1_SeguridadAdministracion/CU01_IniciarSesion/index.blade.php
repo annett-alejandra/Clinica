@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Iniciar Sesión (CU01) — Clínica Vida Salud')
+@section('title', 'Iniciar Sesión — Clínica Vida Salud')
 
 @section('content')
 <div class="py-12 px-4 max-w-xl mx-auto"
@@ -15,7 +15,7 @@
          }
      }">
     <div class="text-center mb-8">
-        <span class="text-xs font-bold uppercase tracking-widest text-[#0284C7]">PAQUETE 01 · CU01 SEGURIDAD Y ACCESO CLÍNICO</span>
+        <span class="text-xs font-bold uppercase tracking-widest text-[#0284C7]">SEGURIDAD Y ACCESO CLÍNICO</span>
         <h1 class="text-3xl md:text-4xl font-serif text-[#0F172A] mt-1">Iniciar Sesión en el Sistema</h1>
         <p class="text-sm text-slate-500 mt-1">Ingresa con tus credenciales según tu rol oficial (Administrador, Médico, Recepcionista o Paciente).</p>
     </div>
@@ -94,13 +94,13 @@
             <div class="flex items-center justify-between text-xs">
                 <span class="text-slate-500">Contraseña demo: <strong class="text-slate-700">clinica123</strong></span>
                 <a href="{{ url('/registro-paciente') }}" class="font-semibold text-[#0284C7] hover:underline">
-                    ¿Nuevo paciente? Registrarse (CU09)
+                    ¿Nuevo paciente? Registrarse
                 </a>
             </div>
 
             <button type="submit" class="w-full bg-[#0284C7] hover:bg-[#0369A1] text-white font-semibold py-3.5 rounded-xl shadow-md shadow-[#0284C7]/20 transition-all text-sm flex items-center justify-center space-x-2">
                 <x-icon name="log-in" class="w-4 h-4" />
-                <span>Ingresar al Sistema Clínico (CU01)</span>
+                <span>Ingresar al Sistema Clínico</span>
             </button>
         </form>
 

@@ -70,7 +70,7 @@
                 <a href="#projeto" class="hover:text-[#0284C7] transition-colors">El Proyecto</a>
                 <a href="#ambientes" class="hover:text-[#0284C7] transition-colors">Instalaciones 360°</a>
                 <a href="#especialidades" class="hover:text-[#0284C7] transition-colors">Especialidades</a>
-                <a href="{{ url('/disponibilidad') }}" class="hover:text-[#0284C7] transition-colors">Disponibilidad (CU10)</a>
+                <a href="{{ url('/disponibilidad') }}" class="hover:text-[#0284C7] transition-colors">Disponibilidad</a>
             </div>
         @else
             <div class="hidden lg:flex items-center space-x-3 bg-slate-100 px-3.5 py-1.5 rounded-xl border border-slate-200/70">
@@ -99,7 +99,7 @@
                          x-transition.opacity.duration.150ms
                          class="absolute right-0 mt-2 w-80 max-h-[75vh] overflow-y-auto bg-white rounded-2xl shadow-2xl border border-slate-200 p-3 z-50">
                         <div class="px-2 py-1.5 border-b border-slate-100 mb-2 flex items-center justify-between">
-                            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Casos de Uso Disponibles</span>
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Módulos del Sistema</span>
                             <span class="text-[10px] font-bold text-[#0284C7] bg-sky-50 px-2 py-0.5 rounded-full">{{ $rolActual }}</span>
                         </div>
                         @foreach ($modulosMenu as $grupo => $items)
@@ -110,7 +110,6 @@
                                         <a href="{{ url($item['url'] ?? $item['ruta'] ?? '#') }}"
                                            class="flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-700 hover:bg-sky-50 hover:text-[#0284C7] transition-colors">
                                             <span>{{ $item['titulo'] }}</span>
-                                            <span class="text-[10px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">{{ $item['cu'] }}</span>
                                         </a>
                                     @endforeach
                                 </div>
@@ -149,7 +148,7 @@
                                 @csrf
                                 <button type="submit" class="w-full text-left py-1.5 text-xs font-semibold text-red-600 hover:text-red-700 flex items-center space-x-2">
                                     <x-icon name="log-out" class="w-3.5 h-3.5" />
-                                    <span>Cerrar sesión (CU02)</span>
+                                    <span>Cerrar sesión</span>
                                 </button>
                             </form>
                         </div>
@@ -224,7 +223,7 @@
                     <x-icon name="calendar" class="w-5 h-5" />
                 </div>
                 <div>
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-[#0284C7] block">CU10 & CU11 · Reserva en Tiempo Real</span>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-[#0284C7] block">Reserva en Tiempo Real</span>
                     <h4 class="font-bold text-lg text-[#0F172A]">Agendar Hora Médica</h4>
                 </div>
             </div>
@@ -267,7 +266,7 @@
                 <template x-if="cargando">
                     <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-500 flex items-center space-x-2">
                         <span class="w-2 h-2 rounded-full bg-[#0284C7] animate-ping"></span>
-                        <span>Consultando agendas y bloques horarios disponibles (CU10)...</span>
+                        <span>Consultando agendas y bloques horarios disponibles...</span>
                     </div>
                 </template>
 
@@ -324,7 +323,7 @@
                 <div class="pt-2 flex flex-col sm:flex-row gap-2.5">
                     <button type="submit"
                             class="flex-1 bg-[#0284C7] hover:bg-[#0369A1] text-white font-semibold py-3 rounded-xl shadow-lg shadow-[#0284C7]/25 transition-all text-sm">
-                        Confirmar Reserva de Cita (CU11)
+                        Confirmar Reserva de Cita
                     </button>
                     <a href="{{ url('/citas') }}"
                        class="px-4 py-3 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 font-semibold text-xs flex items-center justify-center">

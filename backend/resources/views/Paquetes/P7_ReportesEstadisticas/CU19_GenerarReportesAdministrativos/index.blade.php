@@ -6,7 +6,7 @@
 <div class="container py-12">
     <div class="flex flex-col md:flex-row md:items-center justify-between pb-6 mb-8 border-b border-slate-200 gap-4">
         <div>
-            <span class="text-xs font-mono font-semibold uppercase tracking-widest text-slate-500">PAQUETE 07 · CU19</span>
+            <span class="text-xs font-mono font-semibold uppercase tracking-widest text-slate-500">REPORTES Y ESTADÍSTICAS GERENCIALES</span>
             <h1 class="text-3xl font-serif text-slate-900 mt-1">Reportes y Métricas Gerenciales</h1>
             <p class="text-sm text-slate-500 mt-1">Evolución de citas, volúmenes de atención médica, efectividad y tasas de inasistencia.</p>
         </div>

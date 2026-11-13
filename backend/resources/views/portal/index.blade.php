@@ -117,7 +117,7 @@
 
                 <div class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm">
                     <div class="flex justify-between items-start mb-3">
-                        <span class="text-xs font-semibold text-slate-500">Atenciones del Mes (CU15)</span>
+                        <span class="text-xs font-semibold text-slate-500">Atenciones del Mes</span>
                         <span class="p-2 rounded-lg bg-amber-50 text-amber-600">
                             <x-icon name="clock" class="w-4 h-4" />
                         </span>
@@ -127,7 +127,7 @@
                 </div>
             </div>
 
-            <!--Accesos Rápidos a Casos de Uso del Médico -->
+            <!--Accesos Rápidos a Módulos del Médico -->
             <div class="flex flex-wrap items-center justify-between gap-3 bg-sky-50/70 border border-sky-200/70 rounded-2xl px-5 py-3.5">
                 <div class="flex items-center space-x-2.5 text-xs font-semibold text-slate-700">
                     <x-icon name="stethoscope" class="w-4 h-4 text-[#0284C7]" />
@@ -140,13 +140,13 @@
                 </div>
                 <div class="flex flex-wrap gap-2">
                     <a href="{{ url('/atencion-medica') }}" class="px-3.5 py-1.5 rounded-lg bg-[#0284C7] text-white text-xs font-semibold hover:bg-[#0369A1] transition-colors">
-                        CU15 Registrar Cita Atendida
+                        Registrar Cita Atendida
                     </a>
                     <a href="{{ url('/agenda-medica') }}" class="px-3.5 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-700 text-xs font-semibold hover:border-[#0284C7] transition-colors">
-                        CU16 Consultar Agenda Médica
+                        Consultar Agenda Médica
                     </a>
                     <a href="{{ url('/horarios') }}" class="px-3.5 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-700 text-xs font-semibold hover:border-[#0284C7] transition-colors">
-                        CU06 Mis Horarios
+                        Mis Horarios
                     </a>
                 </div>
             </div>
@@ -156,7 +156,7 @@
                 <div class="p-6 border-b border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <h3 class="font-bold text-lg text-[#0F172A]">Monitoreo Clínico de Pacientes y Consultas</h3>
-                        <p class="text-xs text-slate-500">Signos vitales en tiempo real, estado de triage y registro de atención médica (CU15)</p>
+                        <p class="text-xs text-slate-500">Signos vitales en tiempo real, estado de triage y registro de atención médica</p>
                     </div>
 
                     <div class="flex flex-col sm:flex-row gap-3">
@@ -246,7 +246,7 @@
                                             <button type="button"
                                                     @click="citaAtender = p"
                                                     class="text-xs font-semibold text-white bg-[#0284C7] hover:bg-[#0369A1] px-3 py-1.5 rounded-lg transition-colors">
-                                                Atender Cita (CU15) →
+                                                Atender Cita →
                                             </button>
                                         </template>
                                         <template x-if="!p.id_cita || (p.id_estado_cita != 1 && p.id_estado_cita != 2)">
@@ -309,13 +309,13 @@
                     </button>
                     <a href="{{ url('/atencion-medica') }}"
                        class="px-4 py-2 rounded-xl bg-[#0284C7] text-white text-xs font-semibold hover:bg-[#0369A1]">
-                        Ir a Registro Clínico (CU15)
+                        Ir a Registro Clínico
                     </a>
                 </div>
             </div>
         </div>
 
-        <!-- Modal CU15 Registrar Cita Atendida -->
+        <!-- Modal Registrar Cita Atendida -->
         <div x-show="citaAtender !== null"
              x-cloak
              class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm">
@@ -326,7 +326,7 @@
                         class="absolute top-5 right-5 text-slate-400 hover:text-slate-700 p-2 rounded-full hover:bg-slate-100">
                     <x-icon name="x" class="w-5 h-5" />
                 </button>
-                <span class="text-xs font-bold uppercase tracking-wider text-[#0284C7] block mb-1">CU15 • REGISTRAR ATENCIÓN MÉDICA</span>
+                <span class="text-xs font-bold uppercase tracking-wider text-[#0284C7] block mb-1">REGISTRAR ATENCIÓN MÉDICA</span>
                 <h4 class="font-serif text-2xl text-[#0F172A] mb-1" x-text="citaAtender?.name"></h4>
                 <p class="text-xs text-slate-500 mb-4" x-text="citaAtender?.diagnosis"></p>
 
@@ -356,7 +356,7 @@
                             Cancelar
                         </button>
                         <button type="submit" class="px-5 py-2.5 rounded-xl bg-[#0284C7] hover:bg-[#0369A1] text-white text-xs font-semibold shadow-md">
-                            Guardar Atención Médica (CU15)
+                            Guardar Atención Médica
                         </button>
                     </div>
                 </form>
@@ -408,7 +408,7 @@
                     <button type="button"
                             @click="$dispatch('abrir-reserva')"
                             class="mt-6 w-full py-3 rounded-xl bg-[#0284C7] hover:bg-[#0369A1] text-white text-xs font-semibold transition-all">
-                        + Nuevo Ingreso de Triage / Cita (CU11)
+                        + Nueva Cita / Ingreso
                     </button>
                 </div>
 
@@ -421,13 +421,13 @@
                         </div>
                         <div class="flex flex-wrap gap-2">
                             <a href="{{ url('/pacientes') }}" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold">
-                                CU07 Pacientes
+                                Pacientes
                             </a>
                             <a href="{{ url('/medicos') }}" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold">
-                                CU05 Médicos
+                                Médicos
                             </a>
                             <a href="{{ url('/historial-paciente') }}" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold">
-                                CU17 Historial
+                                Historial
                             </a>
                         </div>
                     </div>
@@ -460,15 +460,15 @@
             <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden">
                 <div class="p-6 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                        <span class="text-[11px] font-bold uppercase tracking-wider text-[#0284C7]">CU12 • CU13 • CU14 — RECEPCIÓN Y ADMISIÓN HOSPITALARIA</span>
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-[#0284C7]">RECEPCIÓN Y ADMISIÓN HOSPITALARIA</span>
                         <h3 class="font-bold text-lg text-[#0F172A]">Control de Confirmación, Llegada a Sala e Inasistencia</h3>
                     </div>
                     <div class="flex flex-wrap gap-2">
                         <a href="{{ url('/control-atencion') }}" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold">
-                            Ver Módulo CU14 Completo
+                            Control de Asistencia
                         </a>
                         <a href="{{ url('/citas') }}" class="px-3.5 py-2 rounded-xl bg-[#0284C7] hover:bg-[#0369A1] text-white text-xs font-semibold">
-                            + Programar Cita (CU11)
+                            + Programar Cita
                         </a>
                     </div>
                 </div>
@@ -481,7 +481,7 @@
                                 <th class="py-3.5 px-6">Paciente</th>
                                 <th class="py-3.5 px-6">Médico / Especialidad</th>
                                 <th class="py-3.5 px-6">Estado Actual</th>
-                                <th class="py-3.5 px-6 text-right">Acciones Operativas (CU12 / CU13 / CU14)</th>
+                                <th class="py-3.5 px-6 text-right">Acciones Operativas</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-200/70 text-sm">
@@ -522,7 +522,7 @@
                                                     @csrf
                                                     @method('PATCH')
                                                     <button type="submit" class="px-2.5 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-semibold border border-emerald-200">
-                                                        Confirmar (CU14)
+                                                        Confirmar
                                                     </button>
                                                 </form>
                                             @endif
@@ -542,11 +542,11 @@
                                             </form>
                                             <a href="{{ url("/citas/{$cita->id_cita}/reprogramar") }}"
                                                class="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold">
-                                                CU12 Reprogramar
+                                                Reprogramar
                                             </a>
                                             <a href="{{ url("/citas/{$cita->id_cita}/cancelar") }}"
                                                class="px-2.5 py-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 text-xs font-semibold border border-red-200">
-                                                CU13 Cancelar
+                                                Cancelar
                                             </a>
                                         </div>
                                     </td>
@@ -554,7 +554,7 @@
                             @empty
                                 <tr>
                                     <td colspan="5" class="py-8 text-center text-slate-400 text-sm">
-                                        No hay citas pendientes en recepción en este momento. Puedes programar una nueva cita en CU11.
+                                        No hay citas pendientes en recepción en este momento. Puedes programar una nueva cita en el sistema.
                                     </td>
                                 </tr>
                             @endforelse
@@ -583,29 +583,29 @@
                         Bienvenido(a), {{ $pac ? $pac->nombres . ' ' . $pac->apellidos : ' a su espacio de salud' }}
                     </h3>
                     <p class="text-sky-100 text-xs sm:text-sm">
-                        Revise sus próximas consultas médicas (CU18), descargue resultados de laboratorio e imagenología o actualice su perfil (CU08).
+                        Revise sus próximas consultas médicas, descargue resultados de laboratorio e imagenología o actualice su perfil.
                     </p>
                 </div>
                 <div class="flex flex-wrap gap-3 shrink-0">
                     <button type="button"
                             @click="$dispatch('abrir-reserva')"
                             class="px-5 py-3 bg-white text-[#0284C7] rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-sky-50 transition-all shadow-md">
-                        + Agendar Nueva Consulta (CU11)
+                        + Agendar Nueva Consulta
                     </button>
                     <a href="{{ url('/perfil-paciente') }}"
                        class="px-4 py-3 bg-white/15 hover:bg-white/25 border border-white/30 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all">
-                        Mi Perfil (CU08)
+                        Mi Perfil
                     </a>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Upcoming Appointments (CU18) -->
+                <!-- Upcoming Appointments -->
                 <div class="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-sm">
                     <div class="flex items-center justify-between mb-4">
                         <div class="flex items-center space-x-2">
                             <x-icon name="calendar" class="w-4 h-4 text-[#0284C7]" />
-                            <h4 class="font-bold text-base text-[#0F172A]">Próximas Citas y Controles (CU18)</h4>
+                            <h4 class="font-bold text-base text-[#0F172A]">Próximas Citas y Controles</h4>
                         </div>
                         <a href="{{ url('/mis-citas') }}" class="text-xs font-semibold text-[#0284C7] hover:underline">
                             Ver todas →
@@ -670,7 +670,7 @@
                             <h4 class="font-bold text-base text-[#0F172A]">Exámenes y Resultados Disponibles</h4>
                         </div>
                         <a href="{{ url('/mis-citas') }}" class="text-xs font-semibold text-[#0284C7] hover:underline">
-                            Historial (CU18)
+                            Historial →
                         </a>
                     </div>
                     <div class="space-y-3">
@@ -706,37 +706,37 @@
             <!-- Global KPIs -->
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
                 <div class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm">
-                    <span class="text-xs font-semibold text-slate-500 block mb-1">Usuarios Sistema (CU03)</span>
+                    <span class="text-xs font-semibold text-slate-500 block mb-1">Usuarios Sistema</span>
                     <span class="text-2xl font-bold text-[#0F172A]">{{ $panel['totales']['usuarios'] ?? 0 }}</span>
                 </div>
                 <div class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm">
-                    <span class="text-xs font-semibold text-slate-500 block mb-1">Médicos Activos (CU05)</span>
+                    <span class="text-xs font-semibold text-slate-500 block mb-1">Médicos Activos</span>
                     <span class="text-2xl font-bold text-[#0284C7]">{{ $panel['totales']['medicos'] ?? 0 }}</span>
                 </div>
                 <div class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm">
-                    <span class="text-xs font-semibold text-slate-500 block mb-1">Pacientes (CU07)</span>
+                    <span class="text-xs font-semibold text-slate-500 block mb-1">Pacientes</span>
                     <span class="text-2xl font-bold text-emerald-600">{{ $panel['totales']['pacientes'] ?? 0 }}</span>
                 </div>
                 <div class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm">
-                    <span class="text-xs font-semibold text-slate-500 block mb-1">Especialidades (CU04)</span>
+                    <span class="text-xs font-semibold text-slate-500 block mb-1">Especialidades</span>
                     <span class="text-2xl font-bold text-[#0F172A]">{{ $panel['totales']['especialidades'] ?? 0 }}</span>
                 </div>
                 <div class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm">
-                    <span class="text-xs font-semibold text-slate-500 block mb-1">Citas del Mes (CU19)</span>
+                    <span class="text-xs font-semibold text-slate-500 block mb-1">Citas del Mes</span>
                     <span class="text-2xl font-bold text-[#0284C7]">{{ $panel['totales']['citas_mes'] ?? 0 }}</span>
                 </div>
             </div>
 
-            <!-- Panel Completo de los 19 Casos de Uso -->
+            <!-- Panel Completo de los Módulos Clínicos -->
             <div class="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-sm">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6">
                     <div>
-                        <span class="text-xs font-bold uppercase tracking-wider text-[#0284C7]">ARQUITECTURA MODULAR DE 7 PAQUETES</span>
-                        <h3 class="font-bold text-lg text-[#0F172A]">Centro de Control de los 19 Casos de Uso (CU01 a CU19)</h3>
+                        <span class="text-xs font-bold uppercase tracking-wider text-[#0284C7]">ARQUITECTURA MODULAR DE GESTIÓN CLÍNICA</span>
+                        <h3 class="font-bold text-lg text-[#0F172A]">Centro de Control y Gestión Clínica</h3>
                     </div>
                     <a href="{{ url('/reportes-administrativos') }}"
                        class="px-4 py-2 rounded-xl bg-[#0284C7] hover:bg-[#0369A1] text-white text-xs font-semibold">
-                        Abrir Reportes Ejecutivos (CU19) →
+                        Abrir Reportes Ejecutivos →
                     </a>
                 </div>
 
@@ -752,9 +752,6 @@
                                             <span class="text-xs font-bold text-[#0F172A] group-hover:text-[#0284C7] block">{{ $item['titulo'] }}</span>
                                             <span class="text-[11px] text-slate-500">{{ $item['desc'] ?? $item['resumen'] ?? '' }}</span>
                                         </div>
-                                        <span class="text-[10px] font-bold text-[#0284C7] bg-sky-50 px-2 py-0.5 rounded shrink-0 ml-2">
-                                            {{ $item['cu'] }}
-                                        </span>
                                     </a>
                                 @endforeach
                             </div>
@@ -768,10 +765,10 @@
                 <div class="p-6 border-b border-slate-200 flex items-center justify-between">
                     <div>
                         <h3 class="font-bold text-base text-[#0F172A]">Bitácora de Auditoría y Trazabilidad Clínica</h3>
-                        <p class="text-xs text-slate-500">Últimos eventos registrados en PostgreSQL por los casos de uso</p>
+                        <p class="text-xs text-slate-500">Últimos eventos registrados en PostgreSQL por los módulos clínicos</p>
                     </div>
                     <a href="{{ url('/usuarios') }}" class="text-xs font-semibold text-[#0284C7] hover:underline">
-                        Gestionar Usuarios y Roles (CU03) →
+                        Gestionar Usuarios y Roles →
                     </a>
                 </div>
                 <div class="overflow-x-auto">
