@@ -762,36 +762,59 @@
 
             <!-- Bitácora de Auditoría en Tiempo Real -->
             <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden">
-                <div class="p-6 border-b border-slate-200 flex items-center justify-between">
+                <div class="p-6 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div>
-                        <h3 class="font-bold text-base text-[#0F172A]">Bitácora de Auditoría y Trazabilidad Clínica</h3>
-                        <p class="text-xs text-slate-500">Últimos eventos registrados en PostgreSQL por los módulos clínicos</p>
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <h3 class="font-bold text-base text-[#0F172A]">Bitácora de Auditoría y Trazabilidad en Tiempo Real</h3>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-0.5">Control de entradas (login), salidas (logout), actividad médica y modificaciones administrativas</p>
                     </div>
-                    <a href="{{ url('/usuarios') }}" class="text-xs font-semibold text-[#0284C7] hover:underline">
-                        Gestionar Usuarios y Roles →
-                    </a>
+                    <div class="flex items-center gap-2">
+                        <a href="{{ route('auditoria') }}" class="btn-primary py-1.5 px-3.5 text-xs flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            <span>Ver Módulo Completo de Auditoría →</span>
+                        </a>
+                    </div>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-slate-50/80 text-[11px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-200">
                                 <th class="py-3 px-6">ID</th>
-                                <th class="py-3 px-6">Tabla / Entidad</th>
-                                <th class="py-3 px-6">Operación</th>
-                                <th class="py-3 px-6">Descripción</th>
-                                <th class="py-3 px-6">Fecha</th>
+                                <th class="py-3 px-6">Usuario / Operador</th>
+                                <th class="py-3 px-6">Acción</th>
+                                <th class="py-3 px-6">Entidad Afectada</th>
+                                <th class="py-3 px-6">Fecha y Hora</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-200/70 text-xs">
                             @forelse ($panel['auditoria'] ?? [] as $log)
+                                @php
+                                    $isLogin = str_contains($log->accion, 'LOGIN') && !str_contains($log->accion, 'FALLIDO');
+                                    $isLogout = str_contains($log->accion, 'LOGOUT');
+                                    $isFallido = str_contains($log->accion, 'FALLIDO');
+                                    $badge = match(true) {
+                                        $isLogin => 'bg-emerald-50 text-emerald-800 border-emerald-300 font-bold',
+                                        $isLogout => 'bg-blue-50 text-blue-800 border-blue-200 font-bold',
+                                        $isFallido => 'bg-rose-50 text-rose-800 border-rose-300 font-extrabold',
+                                        default => 'bg-slate-100 text-slate-700 border-slate-200 font-medium',
+                                    };
+                                @endphp
                                 <tr class="hover:bg-slate-50">
-                                    <td class="py-3 px-6 font-bold text-[#0284C7]">#{{ $log->id_auditoria }}</td>
-                                    <td class="py-3 px-6 font-semibold text-slate-700">{{ $log->tabla_afectada }}</td>
-                                    <td class="py-3 px-6">
-                                        <span class="px-2 py-0.5 rounded bg-sky-50 text-[#0284C7] font-semibold">{{ $log->operacion }}</span>
+                                    <td class="py-3 px-6 font-bold text-[#0284C7] font-mono">#{{ $log->id_auditoria }}</td>
+                                    <td class="py-3 px-6 font-semibold text-slate-800">
+                                        {{ $log->usuario?->nombre_usuario ?? 'Sistema / Anónimo' }}
                                     </td>
-                                    <td class="py-3 px-6 text-slate-600">{{ $log->descripcion }}</td>
-                                    <td class="py-3 px-6 text-slate-400">{{ $log->fecha_evento }}</td>
+                                    <td class="py-3 px-6">
+                                        <span class="inline-flex px-2 py-0.5 rounded text-[10px] uppercase tracking-wider border {{ $badge }}">
+                                            {{ $log->accion }}
+                                        </span>
+                                    </td>
+                                    <td class="py-3 px-6 font-mono text-slate-600">{{ $log->tabla_afectada }}</td>
+                                    <td class="py-3 px-6 text-slate-500 font-mono text-[11px]">
+                                        {{ \Carbon\Carbon::parse($log->fecha_hora)->format('d/m/Y H:i:s') }}
+                                    </td>
                                 </tr>
                             @empty
                                 <tr>

@@ -17,8 +17,6 @@ class Auditoria extends Model
     // fecha_hora la establece PostgreSQL; detalle debe contener solo metadatos necesarios.
     protected $fillable = ['id_usuario', 'accion', 'tabla_afectada', 'id_registro_afectado', 'detalle'];
 
-    protected $hidden = ['detalle'];
-
     protected function casts(): array
     {
         return [

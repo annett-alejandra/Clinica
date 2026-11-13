@@ -107,39 +107,102 @@ Route::get('/usuarios', function (Request $request) {
 Route::post('/usuarios', [UsuariosController::class, 'store'])->middleware('rol:Administrador');
 
 // Módulo de Auditoría y Seguridad del Sistema (Exclusivo Administrador)
+// CU03 - AUDITORÍA Y SEGURIDAD: Exclusivo Administrador del Sistema
 Route::get('/auditoria', function (Request $request) {
     $accion = $request->query('accion');
     $tabla = $request->query('tabla');
+    $categoria = $request->query('categoria', 'todas');
     $busqueda = trim($request->query('q', ''));
+    $desde = $request->query('desde');
+    $hasta = $request->query('hasta');
 
-    $query = \App\Models\Paquetes\P1_SeguridadAdministracion\Auditoria::with('usuario')
+    // Métricas globales de seguridad para el Administrador
+    $kpis = [
+        'total' => \App\Models\Paquetes\P1_SeguridadAdministracion\Auditoria::count(),
+        'logins' => \App\Models\Paquetes\P1_SeguridadAdministracion\Auditoria::where('accion', 'LOGIN')->count(),
+        'logouts' => \App\Models\Paquetes\P1_SeguridadAdministracion\Auditoria::where('accion', 'LOGOUT')->count(),
+        'fallidos' => \App\Models\Paquetes\P1_SeguridadAdministracion\Auditoria::where('accion', 'INTENTO_LOGIN_FALLIDO')->count(),
+        'clinicos' => \App\Models\Paquetes\P1_SeguridadAdministracion\Auditoria::where(function ($q) {
+            $q->where('tabla_afectada', 'like', '%cita%')
+              ->orWhere('tabla_afectada', 'like', '%paciente%')
+              ->orWhere('accion', 'like', '%CITA%')
+              ->orWhere('accion', 'like', '%PACIENTE%')
+              ->orWhere('accion', 'like', '%ATENDIDA%');
+        })->count(),
+    ];
+
+    $query = \App\Models\Paquetes\P1_SeguridadAdministracion\Auditoria::with('usuario.rol')
         ->orderBy('id_auditoria', 'desc');
 
+    // Filtro por categorías rápidas (Quién entra, Quién sale, Alertas, etc.)
+    if ($categoria === 'entradas') {
+        $query->where('accion', 'LOGIN');
+    } elseif ($categoria === 'salidas') {
+        $query->where('accion', 'LOGOUT');
+    } elseif ($categoria === 'fallidos') {
+        $query->where('accion', 'INTENTO_LOGIN_FALLIDO');
+    } elseif ($categoria === 'accesos') {
+        $query->whereIn('accion', ['LOGIN', 'LOGOUT', 'INTENTO_LOGIN_FALLIDO', 'RESTABLECER_PASSWORD', 'RECUPERAR_PASSWORD']);
+    } elseif ($categoria === 'clinica') {
+        $query->where(function ($q) {
+            $q->where('tabla_afectada', 'like', '%cita%')
+              ->orWhere('tabla_afectada', 'like', '%paciente%')
+              ->orWhere('accion', 'like', '%CITA%')
+              ->orWhere('accion', 'like', '%PACIENTE%')
+              ->orWhere('accion', 'like', '%ATENDIDA%')
+              ->orWhere('accion', 'like', '%LLEGADA%')
+              ->orWhere('accion', 'like', '%EXPEDIENTE%');
+        });
+    } elseif ($categoria === 'admin') {
+        $query->where(function ($q) {
+            $q->where('tabla_afectada', 'like', '%horario%')
+              ->orWhere('tabla_afectada', 'like', '%usuario%')
+              ->orWhere('tabla_afectada', 'like', '%especialidad%')
+              ->orWhere('tabla_afectada', 'like', '%medico%');
+        });
+    }
+
+    // Filtros por combos
     if ($accion && $accion !== 'todas') {
         $query->where('accion', $accion);
     }
     if ($tabla && $tabla !== 'todas') {
         $query->where('tabla_afectada', $tabla);
     }
+
+    // Filtro por rango de fechas
+    if ($desde) {
+        $query->whereDate('fecha_hora', '>=', $desde);
+    }
+    if ($hasta) {
+        $query->whereDate('fecha_hora', '<=', $hasta);
+    }
+
+    // Búsqueda general
     if ($busqueda !== '') {
         $query->where(function ($q) use ($busqueda) {
             $q->where('accion', 'ilike', "%{$busqueda}%")
               ->orWhere('tabla_afectada', 'ilike', "%{$busqueda}%")
+              ->orWhereRaw("detalle::text ilike ?", ["%{$busqueda}%"])
               ->orWhereHas('usuario', fn($u) => $u->where('nombre_usuario', 'ilike', "%{$busqueda}%")->orWhere('correo', 'ilike', "%{$busqueda}%"));
         });
     }
 
-    $auditorias = $query->paginate(20)->withQueryString();
+    $auditorias = $query->paginate(25)->withQueryString();
 
     $acciones = \App\Models\Paquetes\P1_SeguridadAdministracion\Auditoria::select('accion')
         ->distinct()
+        ->orderBy('accion')
         ->pluck('accion');
 
     $tablas = \App\Models\Paquetes\P1_SeguridadAdministracion\Auditoria::select('tabla_afectada')
         ->distinct()
+        ->orderBy('tabla_afectada')
         ->pluck('tabla_afectada');
 
-    return view('Paquetes.P1_SeguridadAdministracion.Auditoria.index', compact('auditorias', 'acciones', 'tablas', 'accion', 'tabla', 'busqueda'));
+    return view('Paquetes.P1_SeguridadAdministracion.Auditoria.index', compact(
+        'auditorias', 'acciones', 'tablas', 'accion', 'tabla', 'busqueda', 'categoria', 'desde', 'hasta', 'kpis'
+    ));
 })->middleware('rol:Administrador')->name('auditoria');
 
 // CU04: Especialidades Médicas (Admin)
