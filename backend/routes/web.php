@@ -3,6 +3,7 @@
 use App\Http\Controllers\InicioController;
 use App\Http\Controllers\PortalController;
 use App\Http\Controllers\Paquetes\P1_SeguridadAdministracion\CU01_IniciarSesion\LoginWebController;
+use App\Http\Controllers\Paquetes\P1_SeguridadAdministracion\CU01_IniciarSesion\RecuperarPasswordController;
 use App\Http\Controllers\Paquetes\P1_SeguridadAdministracion\CU02_CerrarSesion\LogoutWebController;
 use App\Http\Controllers\Paquetes\P1_SeguridadAdministracion\CU03_GestionarUsuariosRoles\UsuariosController;
 use App\Http\Controllers\Paquetes\P1_SeguridadAdministracion\CU04_GestionarEspecialidadesMedicas\EspecialidadController;
@@ -27,6 +28,7 @@ use App\Models\Paquetes\P2_PersonalMedico\Medico;
 use App\Models\Paquetes\P3_GestionPacientes\Paciente;
 use App\Models\Paquetes\P4_GestionCitas\CitaMedica;
 use App\Models\User;
+use App\Services\Paquetes\P3_GestionPacientes\PacienteService;
 use App\Services\PortalService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -66,6 +68,12 @@ Route::post('/login', LoginWebController::class)->middleware('throttle:10,1');
 Route::get('/logout', fn() => view('Paquetes.P1_SeguridadAdministracion.CU02_CerrarSesion.index'))->name('logout');
 Route::post('/logout', LogoutWebController::class);
 
+// Recuperación de Contraseña con Validación de Políticas
+Route::get('/recuperar-password', [RecuperarPasswordController::class, 'index'])->name('recuperar.password');
+Route::post('/recuperar-password/solicitar', [RecuperarPasswordController::class, 'solicitar'])->name('recuperar.solicitar');
+Route::post('/recuperar-password/confirmar', [RecuperarPasswordController::class, 'confirmar'])->name('recuperar.confirmar');
+Route::get('/recuperar-password/reiniciar', [RecuperarPasswordController::class, 'reiniciar'])->name('recuperar.reiniciar');
+
 // CU03: Gestión de Usuarios y Roles (Admin)
 Route::get('/usuarios', function () {
     $usuarios = User::with('rol')->get();
@@ -98,9 +106,11 @@ Route::post('/horarios', [HorariosController::class, 'store'])->middleware('rol:
 Route::delete('/horarios/{id}', [HorariosController::class, 'destroy'])->middleware('rol:Administrador,Recepcionista,Médico');
 
 // CU07: Directorio de Pacientes (Admin, Recepción)
-Route::get('/pacientes', function () {
-    $pacientes = Paciente::all();
-    return view('Paquetes.P3_GestionPacientes.CU07_GestionarPacientes.index', compact('pacientes'));
+Route::get('/pacientes', function (Request $request, PacienteService $pacienteService) {
+    $termino = $request->query('q');
+    $soloActivos = $request->query('estado') === 'activos';
+    $pacientes = $pacienteService->listar($termino, $soloActivos);
+    return view('Paquetes.P3_GestionPacientes.CU07_GestionarPacientes.index', compact('pacientes', 'termino'));
 })->middleware('rol:Administrador,Recepcionista');
 Route::post('/pacientes', [PacientesController::class, 'store'])->middleware('rol:Administrador,Recepcionista');
 
@@ -153,15 +163,25 @@ Route::get('/citas', function (Request $request) {
 
     $pacientes = Paciente::where('estado', true)
         ->when($esPaciente && $idPaciente > 0, fn ($q) => $q->where('id_paciente', $idPaciente))
+        ->orderBy('id_paciente', 'desc')
         ->get();
-    $especialidades = Especialidad::where('estado', true)->get();
-    $medicos = Medico::where('estado', true)->get();
+
+    $especialidades = Especialidad::where('estado', true)
+        ->orderBy('nombre_especialidad')
+        ->get();
+
+    $medicos = Medico::where('estado', true)
+        ->with(['especialidades', 'horariosAtencion'])
+        ->orderBy('nombre_completo')
+        ->get();
+
     $citas = CitaMedica::with(['paciente', 'medico', 'especialidad', 'estado'])
         ->when($esPaciente && $idPaciente > 0, fn ($q) => $q->where('id_paciente', $idPaciente))
         ->orderBy('fecha_cita', 'desc')
         ->orderBy('hora_cita', 'desc')
-        ->take(15)
+        ->take(20)
         ->get();
+
     return view('Paquetes.P4_GestionCitas.CU11_ProgramarCitaMedica.index', compact('pacientes', 'especialidades', 'medicos', 'citas'));
 })->middleware('rol:Administrador,Recepcionista,Paciente');
 Route::post('/citas', [CitaMedicaController::class, 'store'])->middleware('rol:Administrador,Recepcionista,Paciente');

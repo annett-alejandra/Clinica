@@ -10,8 +10,7 @@
         <p class="text-sm text-slate-500 mt-1">Modificación de fecha u hora liberando de inmediato la franja anterior.</p>
     </div>
 
-    @include('components.alerts')
-
+    
     <div class="bg-white p-6 md:p-8 rounded-xl border border-slate-200 shadow-sm">
         @if(isset($cita))
             <div class="bg-sky-50/60 border border-sky-100 rounded-lg p-4 mb-6 text-sm">
@@ -28,7 +27,7 @@
                     </div>
                 </div>
                 <div class="mt-3 pt-3 border-t border-sky-100 text-xs text-amber-700 font-medium">
-                    Horario Actual: {{ $cita->fecha_cita }} a las {{ substr($cita->hora_cita, 0, 5) }} ({{ $cita->estado?->nombre_estado }})
+                    Horario Actual: {{ \Carbon\Carbon::parse($cita->fecha_cita)->format('d/m/Y') }} a las {{ substr($cita->hora_cita, 0, 5) }} ({{ $cita->estado?->nombre_estado }})
                 </div>
             </div>
 

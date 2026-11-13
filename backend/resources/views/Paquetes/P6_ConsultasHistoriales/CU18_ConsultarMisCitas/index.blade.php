@@ -13,8 +13,7 @@
         <a href="{{ url('/citas') }}" class="btn-primary">+ Agendar Nueva Cita</a>
     </div>
 
-    @include('components.alerts')
-
+    
     <!-- Pestañas Editorial -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <!-- Próximas Citas -->
@@ -39,7 +38,7 @@
                             </div>
                             <div class="text-right">
                                 <span class="text-lg font-bold text-sky-700 font-mono block">{{ substr($cita->hora_cita, 0, 5) }}</span>
-                                <span class="text-xs text-slate-500">{{ $cita->fecha_cita }}</span>
+                                <span class="text-xs text-slate-500">{{ \Carbon\Carbon::parse($cita->fecha_cita)->format('d/m/Y') }}</span>
                             </div>
                         </div>
 
@@ -72,7 +71,7 @@
                     <div class="bg-white p-4 rounded-xl border border-slate-200 text-sm">
                         <div class="flex justify-between items-center mb-1">
                             <strong class="text-slate-800">{{ $c->especialidad?->nombre_especialidad }}</strong>
-                            <span class="text-xs text-slate-400">{{ $c->fecha_cita }}</span>
+                            <span class="text-xs text-slate-400">{{ \Carbon\Carbon::parse($c->fecha_cita)->format('d/m/Y') }}</span>
                         </div>
                         <p class="text-xs text-slate-500 mb-2">Dr(a). {{ $c->medico?->nombre_completo }}</p>
                         @if($c->observacion_atencion)

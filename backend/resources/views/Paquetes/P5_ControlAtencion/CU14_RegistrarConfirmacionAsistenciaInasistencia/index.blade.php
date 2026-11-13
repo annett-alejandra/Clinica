@@ -12,8 +12,7 @@
         </div>
     </div>
 
-    @include('components.alerts')
-
+    
     <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm text-slate-700">
@@ -32,7 +31,7 @@
                         <tr class="hover:bg-slate-50/50 transition-colors">
                             <td class="px-6 py-4">
                                 <strong class="text-slate-900 text-base">{{ substr($cita->hora_cita, 0, 5) }}</strong>
-                                <span class="text-xs text-slate-500 block">{{ $cita->fecha_cita }}</span>
+                                <span class="text-xs text-slate-500 block">{{ \Carbon\Carbon::parse($cita->fecha_cita)->format('d/m/Y') }}</span>
                             </td>
                             <td class="px-6 py-4">
                                 <div class="font-semibold text-slate-900">{{ $cita->paciente?->nombre_completo }}</div>

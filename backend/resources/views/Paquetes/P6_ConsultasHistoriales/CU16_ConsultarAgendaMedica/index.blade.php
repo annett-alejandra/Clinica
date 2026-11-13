@@ -13,8 +13,7 @@
         <a href="{{ url('/citas') }}" class="btn-primary">+ Programar Cita</a>
     </div>
 
-    @include('components.alerts')
-
+    
     <!-- Filtros de Búsqueda -->
     <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm mb-8">
         <form action="{{ url('/agenda-medica') }}" method="GET" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 items-end">
@@ -89,7 +88,7 @@
                                     {{ substr($cita->codigo_unico, 0, 8) }}...
                                 </span>
                                 <div class="font-bold text-slate-900 text-sm">
-                                    {{ $cita->fecha_cita }} a las {{ substr($cita->hora_cita, 0, 5) }}
+                                    {{ \Carbon\Carbon::parse($cita->fecha_cita)->format('d/m/Y') }} a las {{ substr($cita->hora_cita, 0, 5) }}
                                 </div>
                             </td>
                             <td class="px-6 py-4">

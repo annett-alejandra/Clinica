@@ -10,15 +10,14 @@
         <p class="text-sm text-slate-500 mt-1">La anulación libera de forma inmediata el espacio en la agenda del especialista.</p>
     </div>
 
-    @include('components.alerts')
-
+    
     <div class="bg-white p-6 md:p-8 rounded-xl border border-rose-100 shadow-sm">
         @if(isset($cita))
             <div class="bg-rose-50/60 border border-rose-100 rounded-lg p-4 mb-6 text-sm text-slate-700">
                 <div class="mb-2"><strong>Código:</strong> <span class="font-mono">{{ $cita->codigo_unico }}</span></div>
                 <div><strong>Paciente:</strong> {{ $cita->paciente?->nombre_completo }}</div>
                 <div><strong>Médico:</strong> {{ $cita->medico?->nombre_completo }} ({{ $cita->especialidad?->nombre_especialidad }})</div>
-                <div class="text-rose-700 mt-2 font-medium">Fecha: {{ $cita->fecha_cita }} a las {{ substr($cita->hora_cita, 0, 5) }}</div>
+                <div class="text-rose-700 mt-2 font-medium">Fecha: {{ \Carbon\Carbon::parse($cita->fecha_cita)->format('d/m/Y') }} a las {{ substr($cita->hora_cita, 0, 5) }}</div>
             </div>
 
             <form action="{{ url('/citas/'.$cita->id_cita.'/cancelar') }}" method="POST" class="space-y-4">

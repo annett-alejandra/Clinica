@@ -173,6 +173,8 @@ document.addEventListener('alpine:init', () => {
     Alpine.data('reserva', (cfg) => ({
         abierto: false,
         especialidad: '',
+        idEspecialidad: '',
+        idMedico: '',
         fecha: '',
         hoy: hoyLocal(),
         cargando: false,
@@ -188,9 +190,16 @@ document.addEventListener('alpine:init', () => {
             this.reiniciarSeleccion();
             if (idEspecialidad) {
                 this.especialidad = String(idEspecialidad);
+                this.idEspecialidad = String(idEspecialidad);
+            }
+            if (!this.fecha) {
+                this.fecha = this.hoy;
             }
             this.abierto = true;
             document.body.style.overflow = 'hidden';
+            if (this.especialidad && this.fecha) {
+                this.buscar();
+            }
         },
 
         cerrar() {
@@ -200,8 +209,13 @@ document.addEventListener('alpine:init', () => {
 
         reiniciarSeleccion() {
             this.medico = null;
+            this.idMedico = '';
             this.hora = '';
             this.duracion = 30;
+        },
+
+        consultar() {
+            return this.buscar();
         },
 
         async buscar() {
@@ -210,14 +224,14 @@ document.addEventListener('alpine:init', () => {
             this.oferta = [];
             this.reiniciarSeleccion();
 
-            if (!this.especialidad || !this.fecha) {
-                this.error = 'Selecciona una especialidad y una fecha.';
+            const espId = this.idEspecialidad || this.especialidad;
+            if (!espId || !this.fecha) {
                 return;
             }
 
             this.cargando = true;
             try {
-                const params = new URLSearchParams({ id_especialidad: this.especialidad, fecha: this.fecha });
+                const params = new URLSearchParams({ id_especialidad: espId, fecha: this.fecha });
                 const respuesta = await fetch(`${cfg.urlDisponibilidad}?${params}`, {
                     headers: { Accept: 'application/json' },
                 });
@@ -238,13 +252,21 @@ document.addEventListener('alpine:init', () => {
         },
 
         elegir(bloque, cupo) {
-            this.medico = bloque.medico;
-            this.hora = cupo.hora_inicio;
-            this.duracion = cupo.duracion_minutos;
+            this.medico = bloque.medico || bloque;
+            this.idMedico = String(bloque.medico ? bloque.medico.id_medico : (bloque.id_medico || ''));
+            const horaStr = typeof cupo === 'string' ? cupo : (cupo.hora_inicio || '');
+            this.hora = horaStr.substring(0, 5);
+            this.duracion = (cupo && cupo.duracion_minutos) ? cupo.duracion_minutos : 30;
+        },
+
+        elegirCupo(bloque, cupo) {
+            return this.elegir(bloque, cupo);
         },
 
         esElegido(bloque, cupo) {
-            return this.medico && this.medico.id_medico === bloque.medico.id_medico && this.hora === cupo.hora_inicio;
+            const bId = bloque.medico ? bloque.medico.id_medico : bloque.id_medico;
+            const horaStr = typeof cupo === 'string' ? cupo : cupo.hora_inicio;
+            return this.idMedico == bId && this.hora === horaStr.substring(0, 5);
         },
     }));
 

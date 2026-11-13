@@ -12,8 +12,7 @@
         </div>
     </div>
 
-    @include('components.alerts')
-
+    
     <!-- Buscador por Cédula / Identificador -->
     <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm max-w-xl mb-8">
         <form action="{{ url('/historial-paciente') }}" method="GET" class="flex gap-3">
@@ -65,7 +64,7 @@
                             @php $est = (int) $c->id_estado_cita; @endphp
                             <tr class="hover:bg-slate-50/50 transition-colors">
                                 <td class="px-6 py-4">
-                                    <strong class="text-slate-900">{{ $c->fecha_cita }}</strong>
+                                    <strong class="text-slate-900">{{ \Carbon\Carbon::parse($c->fecha_cita)->format('d/m/Y') }}</strong>
                                     <span class="text-xs text-slate-400 block">{{ substr($c->hora_cita, 0, 5) }}</span>
                                 </td>
                                 <td class="px-6 py-4">

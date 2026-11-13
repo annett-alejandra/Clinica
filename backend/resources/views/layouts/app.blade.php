@@ -273,19 +273,19 @@
                 <template x-if="!cargando && oferta.length > 0">
                     <div class="space-y-2.5 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
                         <p class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Seleccione Médico y Horario Disponible:</p>
-                        <template x-for="item in oferta" :key="item.id_medico">
+                        <template x-for="item in oferta" :key="(item.medico ? item.medico.id_medico : item.id_medico)">
                             <div class="bg-white p-3 rounded-lg border border-slate-200">
-                                <p class="text-xs font-bold text-slate-800" x-text="item.nombre_completo"></p>
-                                <p class="text-[11px] text-slate-400 mb-2" x-text="'Consultorio: ' + (item.consultorio || 'Pabellón Central')"></p>
+                                <p class="text-xs font-bold text-slate-800" x-text="item.medico ? item.medico.nombre_completo : (item.nombre_completo || 'Médico Especialista')"></p>
+                                <p class="text-[11px] text-slate-400 mb-2" x-text="'Registro: ' + (item.medico ? item.medico.registro_profesional : (item.consultorio || 'Central'))"></p>
                                 <div class="flex flex-wrap gap-1.5">
-                                    <template x-for="cupo in item.cupos" :key="item.id_medico + '-' + cupo">
+                                    <template x-for="cupo in item.cupos" :key="(item.medico ? item.medico.id_medico : item.id_medico) + '-' + (typeof cupo === 'string' ? cupo : cupo.hora_inicio)">
                                         <button type="button"
                                                 @click="elegirCupo(item, cupo)"
-                                                :class="idMedico == item.id_medico && hora === cupo
+                                                :class="esElegido(item, cupo)
                                                     ? 'bg-[#0284C7] text-white border-[#0284C7]'
                                                     : 'bg-slate-50 text-slate-700 border-slate-200 hover:border-[#0284C7]'"
                                                 class="px-2.5 py-1 rounded-md text-xs font-semibold border transition-colors"
-                                                x-text="cupo.substring(0, 5)">
+                                                x-text="(typeof cupo === 'string' ? cupo : cupo.hora_inicio).substring(0, 5)">
                                         </button>
                                     </template>
                                 </div>

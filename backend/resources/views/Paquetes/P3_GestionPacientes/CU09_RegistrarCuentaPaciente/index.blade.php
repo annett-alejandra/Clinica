@@ -10,8 +10,7 @@
         <p class="text-sm text-slate-500 mt-1">Crea tu cuenta web para agendar citas y consultar tu historial médico.</p>
     </div>
 
-    @include('components.alerts')
-
+    
     <div class="bg-white p-6 md:p-8 rounded-xl border border-slate-200 shadow-sm">
         <form action="{{ url('/registro-paciente') }}" method="POST" class="space-y-4">
             @csrf

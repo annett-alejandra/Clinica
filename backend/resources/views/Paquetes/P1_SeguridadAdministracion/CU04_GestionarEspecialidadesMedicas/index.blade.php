@@ -12,8 +12,7 @@
         </div>
     </div>
 
-    @include('components.alerts')
-
+    
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <!-- Formulario de Registro -->
         <div class="lg:col-span-4 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">

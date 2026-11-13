@@ -12,8 +12,7 @@
         </div>
     </div>
 
-    @include('components.alerts')
-
+    
     <!-- Tarjetas de KPIs -->
     @if(isset($reporte['kpis']))
         @php $k = $reporte['kpis']; @endphp

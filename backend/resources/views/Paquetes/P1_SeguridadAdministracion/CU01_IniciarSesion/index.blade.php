@@ -93,8 +93,8 @@
 
             <div class="flex items-center justify-between text-xs">
                 <span class="text-slate-500">Contraseña demo: <strong class="text-slate-700">clinica123</strong></span>
-                <a href="{{ url('/registro-paciente') }}" class="font-semibold text-[#0284C7] hover:underline">
-                    ¿Nuevo paciente? Registrarse
+                <a href="{{ route('recuperar.password') }}" class="font-semibold text-[#0284C7] hover:underline">
+                    ¿Olvidaste tu contraseña?
                 </a>
             </div>
 
@@ -105,7 +105,7 @@
         </form>
 
         <div class="mt-6 pt-5 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
-            <span>Autenticación segura con Hash Bcrypt</span>
+            <a href="{{ url('/registro-paciente') }}" class="font-semibold text-slate-600 hover:text-[#0284C7]">¿Nuevo paciente? Registrarse</a>
             <a href="{{ route('inicio') }}" class="text-slate-600 hover:text-slate-900 font-medium">← Volver a la portada</a>
         </div>
     </div>

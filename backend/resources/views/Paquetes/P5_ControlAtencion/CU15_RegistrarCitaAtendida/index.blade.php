@@ -15,8 +15,7 @@
         </span>
     </div>
 
-    @include('components.alerts')
-
+    
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         @forelse($citas ?? [] as $cita)
             @php $atendida = ((int)$cita->id_estado_cita === 3); @endphp

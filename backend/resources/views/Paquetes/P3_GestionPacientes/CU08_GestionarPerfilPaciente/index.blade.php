@@ -15,8 +15,7 @@
         </span>
     </div>
 
-    @include('components.alerts')
-
+    
     <div class="max-w-3xl mx-auto bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden p-6 md:p-8">
         @if(isset($paciente))
             <!-- Ficha de Datos Inmutables -->

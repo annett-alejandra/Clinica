@@ -12,8 +12,7 @@
         </div>
     </div>
 
-    @include('components.alerts')
-
+    
     <!-- Filtros de Consulta -->
     <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm max-w-4xl mb-8">
         <form action="{{ url('/disponibilidad') }}" method="GET" class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
