@@ -75,11 +75,72 @@ Route::post('/recuperar-password/confirmar', [RecuperarPasswordController::class
 Route::get('/recuperar-password/reiniciar', [RecuperarPasswordController::class, 'reiniciar'])->name('recuperar.reiniciar');
 
 // CU03: Gestión de Usuarios y Roles (Admin)
-Route::get('/usuarios', function () {
-    $usuarios = User::with('rol')->get();
-    return view('Paquetes.P1_SeguridadAdministracion.CU03_GestionarUsuariosRoles.index', compact('usuarios'));
+Route::get('/usuarios', function (Request $request) {
+    $busqueda = trim($request->query('q', ''));
+    $rolFiltro = $request->query('rol', 'todos');
+
+    $query = User::with('rol')->orderBy('id_usuario', 'desc');
+
+    if ($busqueda !== '') {
+        $query->where(function ($q) use ($busqueda) {
+            $q->where('nombre_usuario', 'ilike', "%{$busqueda}%")
+              ->orWhere('correo', 'ilike', "%{$busqueda}%");
+        });
+    }
+
+    if ($rolFiltro !== 'todos' && $rolFiltro !== '') {
+        $query->whereHas('rol', fn ($q) => $q->where('nombre_rol', $rolFiltro));
+    }
+
+    $usuarios = $query->paginate(15)->withQueryString();
+
+    $conteos = [
+        'total' => User::count(),
+        'admin' => User::whereHas('rol', fn ($q) => $q->where('nombre_rol', 'Administrador'))->count(),
+        'medico' => User::whereHas('rol', fn ($q) => $q->where('nombre_rol', 'Médico'))->count(),
+        'recepcion' => User::whereHas('rol', fn ($q) => $q->where('nombre_rol', 'Recepcionista'))->count(),
+        'paciente' => User::whereHas('rol', fn ($q) => $q->where('nombre_rol', 'Paciente'))->count(),
+    ];
+
+    return view('Paquetes.P1_SeguridadAdministracion.CU03_GestionarUsuariosRoles.index', compact('usuarios', 'conteos', 'busqueda', 'rolFiltro'));
 })->middleware('rol:Administrador');
 Route::post('/usuarios', [UsuariosController::class, 'store'])->middleware('rol:Administrador');
+
+// Módulo de Auditoría y Seguridad del Sistema (Exclusivo Administrador)
+Route::get('/auditoria', function (Request $request) {
+    $accion = $request->query('accion');
+    $tabla = $request->query('tabla');
+    $busqueda = trim($request->query('q', ''));
+
+    $query = \App\Models\Paquetes\P1_SeguridadAdministracion\Auditoria::with('usuario')
+        ->orderBy('id_auditoria', 'desc');
+
+    if ($accion && $accion !== 'todas') {
+        $query->where('accion', $accion);
+    }
+    if ($tabla && $tabla !== 'todas') {
+        $query->where('tabla_afectada', $tabla);
+    }
+    if ($busqueda !== '') {
+        $query->where(function ($q) use ($busqueda) {
+            $q->where('accion', 'ilike', "%{$busqueda}%")
+              ->orWhere('tabla_afectada', 'ilike', "%{$busqueda}%")
+              ->orWhereHas('usuario', fn($u) => $u->where('nombre_usuario', 'ilike', "%{$busqueda}%")->orWhere('correo', 'ilike', "%{$busqueda}%"));
+        });
+    }
+
+    $auditorias = $query->paginate(20)->withQueryString();
+
+    $acciones = \App\Models\Paquetes\P1_SeguridadAdministracion\Auditoria::select('accion')
+        ->distinct()
+        ->pluck('accion');
+
+    $tablas = \App\Models\Paquetes\P1_SeguridadAdministracion\Auditoria::select('tabla_afectada')
+        ->distinct()
+        ->pluck('tabla_afectada');
+
+    return view('Paquetes.P1_SeguridadAdministracion.Auditoria.index', compact('auditorias', 'acciones', 'tablas', 'accion', 'tabla', 'busqueda'));
+})->middleware('rol:Administrador')->name('auditoria');
 
 // CU04: Especialidades Médicas (Admin)
 Route::get('/especialidades', function () {
@@ -131,20 +192,21 @@ Route::post('/registro-paciente', [RegistroPacienteController::class, 'register'
 
 // CU10: Consultar Disponibilidad Médica (Público / Todos)
 Route::get('/disponibilidad', function (Request $request) {
-    $especialidades = Especialidad::where('estado', true)->get();
-    $medicos = Medico::where('estado', true)->get();
+    $especialidades = Especialidad::where('estado', true)->orderBy('nombre_especialidad')->get();
+    $medicos = Medico::where('estado', true)->with(['especialidades', 'horariosAtencion'])->orderBy('nombre_completo')->get();
     $turnos = [];
+    $ofertaMedica = [];
 
-    if ($request->filled('id_medico') && $request->filled('fecha')) {
+    if ($request->filled('fecha')) {
         $service = app(\App\Services\Paquetes\P4_GestionCitas\DisponibilidadService::class);
-        $idMedico = (int) $request->id_medico;
+        $idMedico = $request->filled('id_medico') && (int)$request->id_medico > 0 ? (int) $request->id_medico : null;
         $idEspecialidad = $request->filled('id_especialidad')
             ? (int) $request->id_especialidad
-            : (int) Medico::find($idMedico)?->especialidades()->value('especialidades.id_especialidad');
+            : ($idMedico ? (int) Medico::find($idMedico)?->especialidades()->value('especialidades.id_especialidad') : 1);
 
         try {
-            $oferta = $service->consultar($idEspecialidad, $idMedico, $request->fecha);
-            $turnos = collect($oferta)->flatMap(fn (array $o) => $o['cupos'])->values()->all();
+            $ofertaMedica = $service->consultar($idEspecialidad, $idMedico, $request->fecha);
+            $turnos = collect($ofertaMedica)->flatMap(fn (array $o) => $o['cupos'])->values()->all();
         } catch (\Throwable $e) {
             session()->now('error', $e instanceof \InvalidArgumentException
                 ? $e->getMessage()
@@ -152,7 +214,7 @@ Route::get('/disponibilidad', function (Request $request) {
         }
     }
 
-    return view('Paquetes.P4_GestionCitas.CU10_ConsultarDisponibilidadMedica.index', compact('especialidades', 'medicos', 'turnos'));
+    return view('Paquetes.P4_GestionCitas.CU10_ConsultarDisponibilidadMedica.index', compact('especialidades', 'medicos', 'turnos', 'ofertaMedica'));
 });
 
 // CU11: Programar Cita Médica (Admin, Recepción, Paciente)
@@ -216,32 +278,74 @@ Route::patch('/control-atencion/citas/{id}/inasistencia', [ControlAsistenciaCont
 // CU15: Registrar Cita Atendida (Médico)
 Route::get('/atencion-medica', function (Request $request) {
     $usuario = $request->user();
-    $idMedico = $usuario?->tieneRol('Médico') && $usuario->id_medico
-        ? (int) $usuario->id_medico
-        : (int) ($request->query('id_medico') ?: Medico::where('estado', true)->value('id_medico') ?: 1);
+    $esMedico = $usuario?->tieneRol('Médico') && $usuario->id_medico;
+    $idMedico = $request->filled('id_medico')
+        ? (int) $request->id_medico
+        : ($esMedico ? (int) $usuario->id_medico : (Medico::where('estado', true)->value('id_medico') ?: 1));
+
+    $medicos = Medico::where('estado', true)->orderBy('nombre_completo')->get();
+
     $citas = CitaMedica::with(['paciente', 'medico', 'especialidad', 'estado'])
         ->where('id_medico', $idMedico)
         ->orderBy('fecha_cita', 'desc')
         ->orderBy('hora_cita', 'asc')
         ->get();
-    return view('Paquetes.P5_ControlAtencion.CU15_RegistrarCitaAtendida.index', compact('citas'));
+    return view('Paquetes.P5_ControlAtencion.CU15_RegistrarCitaAtendida.index', compact('citas', 'medicos', 'idMedico'));
 })->middleware('rol:Médico,Administrador');
 Route::patch('/citas/{id}/atender', CitaAtendidaController::class)->middleware('rol:Médico,Administrador');
 
 // CU16: Consultar Agenda Médica (Admin, Recepción, Médico)
 Route::get('/agenda-medica', function (Request $request) {
-    $medicos = Medico::where('estado', true)->get();
-    $especialidades = Especialidad::where('estado', true)->get();
+    $usuario = $request->user();
+    $esMedico = $usuario?->tieneRol('Médico') && $usuario->id_medico;
     
+    $idMedicoSeleccionado = $request->filled('id_medico')
+        ? (int) $request->id_medico
+        : ($esMedico ? (int) $usuario->id_medico : null);
+
+    $medicos = Medico::where('estado', true)->with('horariosAtencion')->orderBy('nombre_completo')->get();
+    $especialidades = Especialidad::where('estado', true)->orderBy('nombre_especialidad')->get();
+
+    // Cálculo de Semana para Vista Google Calendar
+    $fechaRef = $request->query('semana') ? \Carbon\Carbon::parse($request->query('semana')) : \Carbon\Carbon::now();
+    $inicioSemana = $fechaRef->copy()->startOfWeek(\Carbon\Carbon::MONDAY);
+    $finSemana = $fechaRef->copy()->endOfWeek(\Carbon\Carbon::SUNDAY);
+
+    $semanaAnterior = $inicioSemana->copy()->subWeek()->format('Y-m-d');
+    $semanaSiguiente = $inicioSemana->copy()->addWeek()->format('Y-m-d');
+    $semanaHoy = \Carbon\Carbon::now()->startOfWeek(\Carbon\Carbon::MONDAY)->format('Y-m-d');
+
+    $diasSemana = [];
+    for ($i = 0; $i < 7; $i++) {
+        $d = $inicioSemana->copy()->addDays($i);
+        $diasSemana[] = [
+            'fecha' => $d->format('Y-m-d'),
+            'dia_nombre' => match ($d->dayOfWeekIso) {
+                1 => 'Lunes', 2 => 'Martes', 3 => 'Miércoles',
+                4 => 'Jueves', 5 => 'Viernes', 6 => 'Sábado', 7 => 'Domingo'
+            },
+            'dia_mes' => $d->format('d/m'),
+            'dia_iso' => $d->dayOfWeekIso,
+            'es_hoy' => $d->isToday(),
+        ];
+    }
+
+    // Horarios del médico seleccionado si existe
+    $medicoActual = $idMedicoSeleccionado ? Medico::with('horariosAtencion')->find($idMedicoSeleccionado) : ($esMedico ? Medico::with('horariosAtencion')->find($usuario->id_medico) : $medicos->first());
+    $horariosMedico = $medicoActual?->horariosAtencion ?? collect();
+
     $query = CitaMedica::with(['paciente', 'medico', 'especialidad', 'estado'])
         ->orderBy('fecha_cita', 'asc')
         ->orderBy('hora_cita', 'asc');
 
+    if ($idMedicoSeleccionado) {
+        $query->where('id_medico', $idMedicoSeleccionado);
+    }
     if ($request->filled('fecha_cita')) {
         $query->whereDate('fecha_cita', $request->fecha_cita);
-    }
-    if ($request->filled('id_medico')) {
-        $query->where('id_medico', $request->id_medico);
+    } else {
+        // En vista calendario, filtrar por la semana activa
+        $query->whereBetween('fecha_cita', [$inicioSemana->format('Y-m-d'), $finSemana->format('Y-m-d')]);
     }
     if ($request->filled('id_especialidad')) {
         $query->where('id_especialidad', $request->id_especialidad);
@@ -251,27 +355,47 @@ Route::get('/agenda-medica', function (Request $request) {
     }
 
     $citas = $query->get();
-    return view('Paquetes.P6_ConsultasHistoriales.CU16_ConsultarAgendaMedica.index', compact('citas', 'medicos', 'especialidades'));
+
+    return view('Paquetes.P6_ConsultasHistoriales.CU16_ConsultarAgendaMedica.index', compact(
+        'citas', 'medicos', 'especialidades', 'medicoActual', 'idMedicoSeleccionado',
+        'diasSemana', 'inicioSemana', 'finSemana', 'semanaAnterior', 'semanaSiguiente', 'semanaHoy', 'horariosMedico'
+    ));
 })->middleware('rol:Administrador,Recepcionista,Médico');
 
-// CU17: Consultar Historial de Citas por Paciente (Admin, Recepción)
+// CU17: Consultar Historial de Citas por Paciente (Admin, Recepción, Médico)
 Route::get('/historial-paciente', function (Request $request) {
-    $identificador = $request->query('identificador');
+    $busqueda = trim($request->query('identificador', $request->query('q', '')));
     $paciente = null;
     $citas = collect();
 
-    if ($identificador) {
-        $paciente = Paciente::where('ci', $identificador)->orWhere('id_paciente', is_numeric($identificador) ? (int)$identificador : 0)->first();
-        if ($paciente) {
-            $citas = CitaMedica::with(['medico', 'especialidad', 'estado'])
-                ->where('id_paciente', $paciente->id_paciente)
-                ->orderBy('fecha_cita', 'desc')
-                ->get();
-        }
+    // Lista de pacientes sugeridos para selección rápida
+    $pacientesSugeridos = Paciente::where('estado', true)
+        ->orderByRaw("CASE WHEN ci = '13730890' THEN 0 ELSE 1 END")
+        ->orderBy('id_paciente', 'desc')
+        ->take(8)
+        ->get();
+
+    if ($busqueda !== '') {
+        $paciente = Paciente::where('ci', $busqueda)
+            ->orWhere('id_paciente', is_numeric($busqueda) ? (int)$busqueda : 0)
+            ->orWhere('correo', 'ilike', "%{$busqueda}%")
+            ->orWhere('nombre_completo', 'ilike', "%{$busqueda}%")
+            ->first();
+    } else {
+        // Por defecto cargar a Annett Cruz si no hay búsqueda para mostrar expediente clínico completo
+        $paciente = Paciente::where('ci', '13730890')->first() ?? $pacientesSugeridos->first();
     }
 
-    return view('Paquetes.P6_ConsultasHistoriales.CU17_ConsultarHistorialCitasPaciente.index', compact('paciente', 'citas'));
-})->middleware('rol:Administrador,Recepcionista');
+    if ($paciente) {
+        $citas = CitaMedica::with(['medico', 'especialidad', 'estado'])
+            ->where('id_paciente', $paciente->id_paciente)
+            ->orderBy('fecha_cita', 'desc')
+            ->orderBy('hora_cita', 'desc')
+            ->get();
+    }
+
+    return view('Paquetes.P6_ConsultasHistoriales.CU17_ConsultarHistorialCitasPaciente.index', compact('paciente', 'citas', 'pacientesSugeridos', 'busqueda'));
+})->middleware('rol:Administrador,Recepcionista,Médico');
 
 // CU18: Consultar Mis Citas (Paciente)
 Route::get('/mis-citas', function (Request $request) {

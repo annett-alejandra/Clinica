@@ -86,15 +86,20 @@
                 <!-- Cuentas de Demostración Rápidas -->
                 <div class="pt-2 border-t border-slate-100">
                     <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Selección Rápida de Cuenta Demo:</p>
-                    <div class="grid grid-cols-2 gap-2 text-xs">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
                         <button type="button" @click="cargarEmailDemo('admin@clinica.com')"
                                 class="p-2 rounded-lg border border-slate-200 text-left hover:border-[#0284C7] hover:bg-sky-50/50 transition-colors">
                             <strong class="text-slate-800 block text-[11px]">Administrador</strong>
                             <span class="text-slate-500 text-[10px]">admin@clinica.com</span>
                         </button>
+                        <button type="button" @click="cargarEmailDemo('cruzrojasannett@gmail.com')"
+                                class="p-2 rounded-lg border border-amber-300 bg-amber-50/50 text-left hover:border-[#0284C7] transition-colors">
+                            <strong class="text-slate-800 block text-[11px]">Annett Cruz (CI 13730890)</strong>
+                            <span class="text-slate-500 text-[10px]">cruzrojasannett@gmail.com</span>
+                        </button>
                         <button type="button" @click="cargarEmailDemo('fernando.justiniano@mail.com')"
                                 class="p-2 rounded-lg border border-slate-200 text-left hover:border-[#0284C7] hover:bg-sky-50/50 transition-colors">
-                            <strong class="text-slate-800 block text-[11px]">Paciente</strong>
+                            <strong class="text-slate-800 block text-[11px]">Paciente Demo</strong>
                             <span class="text-slate-500 text-[10px]">fernando.justiniano@mail.com</span>
                         </button>
                     </div>
@@ -229,3 +234,4 @@
     </div>
 </div>
 @endsection
+

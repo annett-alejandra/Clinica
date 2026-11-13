@@ -151,6 +151,7 @@
                                 <th class="px-6 py-4">Contacto</th>
                                 <th class="px-6 py-4">Nacimiento</th>
                                 <th class="px-6 py-4">Estado</th>
+                                <th class="px-6 py-4 text-right">Historial Clínico</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
@@ -159,8 +160,8 @@
                                     class="hover:bg-slate-50/50 transition-colors">
                                     <td class="px-6 py-4">
                                         <div class="flex items-center gap-2">
-                                            <span class="font-mono text-xs font-bold text-sky-700 bg-sky-50 px-2 py-0.5 rounded border border-sky-100">
-                                                CI: {{ $pac->ci }}
+                                            <span class="font-mono text-xs font-bold {{ $pac->ci == '13730890' ? 'text-amber-800 bg-amber-50 border-amber-300' : 'text-sky-700 bg-sky-50 border-sky-100' }} px-2 py-0.5 rounded border">
+                                                {{ $pac->ci == '13730890' ? '⭐ CI: ' : 'CI: ' }}{{ $pac->ci }}
                                             </span>
                                             <span class="text-[10px] text-slate-400">#{{ $pac->id_paciente }}</span>
                                         </div>
@@ -192,10 +193,16 @@
                                             {{ $pac->estado ? 'Activo' : 'Inactivo' }}
                                         </span>
                                     </td>
+                                    <td class="px-6 py-4 text-right">
+                                        <a href="{{ url('/historial-paciente?identificador='.$pac->ci) }}"
+                                           class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-sky-50 hover:bg-[#0284C7] text-[#0284C7] hover:text-white font-semibold text-xs border border-sky-200 transition-all">
+                                            <span>Ver Ficha →</span>
+                                        </a>
+                                    </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="4" class="px-6 py-12 text-center text-slate-400">
+                                    <td colspan="5" class="px-6 py-12 text-center text-slate-400">
                                         No hay pacientes registrados en el sistema.
                                     </td>
                                 </tr>

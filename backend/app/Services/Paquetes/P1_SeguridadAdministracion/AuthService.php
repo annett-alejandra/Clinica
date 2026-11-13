@@ -36,6 +36,10 @@ class AuthService
                 'dr_valenzuela' => 'medico_gonzales',
                 'fernando.justiniano@mail.com' => 'paciente_fjustiniano',
                 'paciente_fer' => 'paciente_fjustiniano',
+                'cruzrojasannett@gmail.com' => 'annett_cruz',
+                'annett_cruz' => 'annett_cruz',
+                'annett' => 'annett_cruz',
+                '13730890' => 'annett_cruz',
             ];
 
             if (isset($aliasMap[$identificador])) {
