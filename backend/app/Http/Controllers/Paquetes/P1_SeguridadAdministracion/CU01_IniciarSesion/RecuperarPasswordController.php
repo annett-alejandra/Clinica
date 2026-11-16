@@ -70,6 +70,17 @@ class RecuperarPasswordController extends Controller
         }
 
         if (!$usuario) {
+            AuditService::registrar(
+                null,
+                'INTENTO_RECUPERACION_FALLIDO',
+                'usuarios',
+                null,
+                [
+                    'accion_ejecutada' => 'INTENTO_FALLIDO',
+                    'identificador' => $identificador,
+                    'motivo_justificacion' => 'Correo o usuario no encontrado en recuperación de contraseña',
+                ]
+            );
             return back()->withInput()->with('error', 'No encontramos ninguna cuenta asociada al correo o usuario indicado.');
         }
 
@@ -125,6 +136,17 @@ class RecuperarPasswordController extends Controller
 
         // Aceptar el código generado en sesión o el código universal demo 123456
         if ($codigoIngresado !== $codigoSesion && $codigoIngresado !== '123456') {
+            AuditService::registrar(
+                session('recovery_user_id'),
+                'CODIGO_RECUPERACION_INVALIDO',
+                'usuarios',
+                session('recovery_user_id'),
+                [
+                    'accion_ejecutada' => 'INTENTO_FALLIDO',
+                    'identificador' => session('recovery_email'),
+                    'motivo_justificacion' => 'Código de seguridad incorrecto o caducado',
+                ]
+            );
             return back()->withInput()->with('error', 'El código de seguridad ingresado es incorrecto o ha caducado.');
         }
 

@@ -3,16 +3,17 @@
 @section('title', 'Recuperar Contraseña — Clínica Vida Salud')
 
 @section('content')
-<div class="py-12 px-4 max-w-xl mx-auto"
-     x-data="{
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('recuperarPassword', () => ({
         paso: {{ $paso }},
-        correo: '{{ old('correo', $correo) }}',
-        codigo: '{{ old('codigo', '') }}',
+        correo: @js(old('correo', $correo)),
+        codigo: @js(old('codigo', '')),
         password: '',
         password_confirmation: '',
         verPass: false,
-        codigoDemo: '{{ $codigoDemo }}',
-        
+        codigoDemo: @js($codigoDemo),
+
         cargarEmailDemo(email) {
             this.correo = email;
         },
@@ -23,12 +24,16 @@
         get tieneMayuscula() { return /[A-Z]/.test(this.password); },
         get tieneMinuscula() { return /[a-z]/.test(this.password); },
         get tieneNumero() { return /[0-9]/.test(this.password); },
-        get tieneSimbolo() { return /[!@#$%^&*(),.?\":{}|<>_\-]/.test(this.password); },
+        get tieneSimbolo() { return /[!@#$%^&*(),.?":{}|<>_\-]/.test(this.password); },
         get coinciden() { return this.password.length > 0 && this.password === this.password_confirmation; },
         get esValida() {
             return this.tieneMinimo && this.tieneMayuscula && this.tieneMinuscula && this.tieneNumero && this.tieneSimbolo && this.coinciden;
         }
-     }">
+    }));
+});
+</script>
+
+<div class="py-12 px-4 max-w-xl mx-auto" x-data="recuperarPassword">
 
     <!-- Cabecera -->
     <div class="text-center mb-8">
