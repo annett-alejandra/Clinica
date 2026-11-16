@@ -7,7 +7,7 @@ services:
     restart: unless-stopped
     working_dir: /var/www
     ports:
-      - "8000:8000"
+      - "8085:8000"
     volumes:
       - ./backend:/var/www
       - clinica_vendor:/var/www/vendor
@@ -24,6 +24,7 @@ services:
       DB_DATABASE: clinica_vida_salud
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
+      DB_SSLMODE: "prefer"
       PHP_CLI_SERVER_WORKERS: 6
     entrypoint: ["/usr/local/bin/docker-entrypoint.sh"]
     command: ["php", "-S", "0.0.0.0:8000", "-t", "public"]
@@ -40,7 +41,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - clinica_pgdata:/var/lib/postgresql/data
       - ./backend/database/poblacion_completa_clinica.sql:/docker-entrypoint-initdb.d/init.sql:ro
