@@ -31,6 +31,7 @@ class CancelarCitaService
 
         return DB::transaction(function () use ($cita, $motivoCancelacion, $idUsuario) {
             $estadoAnterior = (int) $cita->id_estado_cita;
+            $estadoAnteriorNombre = $cita->estado?->nombre_estado ?? ($estadoAnterior === 2 ? 'Confirmada' : 'Programada');
             $fechaHora = Carbon::parse("{$cita->fecha_cita->format('Y-m-d')} {$cita->hora_cita}");
 
             // Actualizar la cita a Cancelada (ID = 4)
@@ -50,20 +51,15 @@ class CancelarCitaService
                 'observacion' => $cita->motivo_cancelacion,
             ]);
 
-            // Auditoría
-            $this->auditService->registrar(
-                idUsuario: $idUsuario ?? 1,
-                accion: 'CANCELAR_CITA',
-                tablaAfectada: 'citas_medicas',
-                idRegistroAfectado: $cita->id_cita,
-                detalle: [
-                    'codigo_unico' => $cita->codigo_unico,
-                    'paciente' => $cita->paciente?->nombre_completo,
-                    'medico' => $cita->medico?->nombre_completo,
-                    'fecha_cita' => $cita->fecha_cita->format('Y-m-d'),
-                    'hora_cita' => $cita->hora_cita,
-                    'motivo_cancelacion' => $cita->motivo_cancelacion,
-                ]
+            // Auditoría completa
+            AuditService::registrarCita(
+                cita: $cita,
+                operadorId: $idUsuario ?? auth()->id(),
+                accionBd: 'CANCELAR_CITA',
+                accionEjecutada: 'CANCELACION',
+                estadoAnterior: $estadoAnteriorNombre,
+                estadoNuevo: 'Cancelada',
+                motivoJustificacion: $cita->motivo_cancelacion
             );
 
             return $cita->fresh(['paciente', 'medico', 'especialidad', 'estado']);

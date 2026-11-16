@@ -72,6 +72,9 @@ class ReprogramarCitaService
                 ]);
             }
 
+            $estadoAnteriorId = (int) $cita->id_estado_cita;
+            $estadoAnteriorNombre = $cita->estado?->nombre_estado ?? ($estadoAnteriorId === 2 ? 'Confirmada' : 'Programada');
+
             // Actualizar la cita
             $cita->fecha_cita = $nuevaFecha;
             $cita->hora_cita = $nuevaHora;
@@ -85,22 +88,23 @@ class ReprogramarCitaService
                 'tipo_cambio' => 'REPROGRAMACION',
                 'fecha_hora_anterior' => $fechaHoraAnterior,
                 'fecha_hora_nueva' => $nuevoInicio,
-                'estado_anterior' => $cita->getOriginal('id_estado_cita'),
+                'estado_anterior' => $estadoAnteriorId,
                 'estado_nuevo' => 1,
                 'observacion' => $motivoReprogramacion,
             ]);
 
             // Registrar en bitácora general de auditoría
-            $this->auditService->registrar(
-                idUsuario: $idUsuario ?? 1,
-                accion: 'REPROGRAMAR_CITA',
-                tablaAfectada: 'citas_medicas',
-                idRegistroAfectado: $cita->id_cita,
-                detalle: [
-                    'codigo_unico' => $cita->codigo_unico,
-                    'anterior' => $fechaHoraAnterior->toIso8601String(),
-                    'nuevo' => $nuevoInicio->toIso8601String(),
-                    'motivo' => $motivoReprogramacion,
+            AuditService::registrarCita(
+                cita: $cita,
+                operadorId: $idUsuario ?? auth()->id(),
+                accionBd: 'REPROGRAMAR_CITA',
+                accionEjecutada: 'REPROGRAMACION',
+                estadoAnterior: $estadoAnteriorNombre,
+                estadoNuevo: 'Programada',
+                motivoJustificacion: $motivoReprogramacion,
+                extra: [
+                    'horario_anterior' => $fechaHoraAnterior->format('Y-m-d H:i'),
+                    'horario_nuevo' => $nuevoInicio->format('Y-m-d H:i'),
                 ]
             );
 

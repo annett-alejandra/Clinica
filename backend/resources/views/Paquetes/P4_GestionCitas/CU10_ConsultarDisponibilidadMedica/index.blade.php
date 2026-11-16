@@ -16,11 +16,74 @@ document.addEventListener('alpine:init', () => {
             return this.medicos.filter(m => m.especialidades && m.especialidades.some(e => e.id_especialidad == this.especialidadId));
         },
 
+        renderOpcionesMedicos() {
+            const select = this.$refs.selectMedico;
+            if (!select) return;
+            const currentVal = String(this.medicoId || '');
+            select.innerHTML = '';
+
+            const defaultOpt = document.createElement('option');
+            defaultOpt.value = '';
+            defaultOpt.textContent = this.especialidadId
+                ? 'Todos los médicos de esta área'
+                : 'Todos los médicos (agrupados por especialidad)';
+            select.appendChild(defaultOpt);
+
+            if (this.especialidadId) {
+                this.medicosFiltrados.forEach(m => {
+                    const opt = document.createElement('option');
+                    opt.value = String(m.id_medico);
+                    opt.textContent = `${m.nombre_completo} (${m.registro_profesional || 'Médico'})`;
+                    if (String(m.id_medico) === currentVal) opt.selected = true;
+                    select.appendChild(opt);
+                });
+            } else {
+                const grupos = {};
+                this.medicos.forEach(m => {
+                    const espPrincipal = (m.especialidades && m.especialidades.length > 0)
+                        ? m.especialidades[0].nombre_especialidad
+                        : 'Medicina General';
+                    if (!grupos[espPrincipal]) grupos[espPrincipal] = [];
+                    grupos[espPrincipal].push(m);
+                });
+
+                Object.keys(grupos).sort().forEach(espNombre => {
+                    const optgroup = document.createElement('optgroup');
+                    optgroup.label = espNombre;
+                    grupos[espNombre].forEach(m => {
+                        const opt = document.createElement('option');
+                        opt.value = String(m.id_medico);
+                        opt.textContent = `${m.nombre_completo} (${m.registro_profesional || 'Médico'})`;
+                        if (String(m.id_medico) === currentVal) opt.selected = true;
+                        optgroup.appendChild(opt);
+                    });
+                    select.appendChild(optgroup);
+                });
+            }
+        },
+
         onEspecialidadChange() {
             const filtrados = this.medicosFiltrados;
             if (!filtrados.some(m => m.id_medico == this.medicoId)) {
                 this.medicoId = '';
             }
+            this.renderOpcionesMedicos();
+        },
+
+        onMedicoChange() {
+            if (!this.especialidadId && this.medicoId) {
+                const m = this.medicos.find(doc => doc.id_medico == this.medicoId);
+                if (m && m.especialidades && m.especialidades.length > 0) {
+                    this.especialidadId = String(m.especialidades[0].id_especialidad);
+                    this.renderOpcionesMedicos();
+                }
+            }
+        },
+
+        init() {
+            this.$nextTick(() => {
+                this.renderOpcionesMedicos();
+            });
         }
     }));
 });
@@ -71,14 +134,9 @@ document.addEventListener('alpine:init', () => {
                         <span x-text="medicosFiltrados.length"></span> doctores
                     </span>
                 </div>
-                <select name="id_medico" x-model="medicoId"
+                <select name="id_medico" x-ref="selectMedico" x-model="medicoId" @change="onMedicoChange()"
                         class="w-full text-sm border-slate-200 rounded-xl p-2.5 bg-slate-50 border focus:bg-white focus:border-[#0284C7] focus:outline-none">
-                    <option value="">Todos los médicos de esta área</option>
-                    <template x-for="m in medicosFiltrados" :key="m.id_medico">
-                        <option :value="m.id_medico"
-                                :selected="medicoId == m.id_medico"
-                                x-text="m.nombre_completo + ' (' + (m.registro_profesional || 'Médico') + ')'"></option>
-                    </template>
+                    <option value="">Cargando médicos...</option>
                 </select>
             </div>
 

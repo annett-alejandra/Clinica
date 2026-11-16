@@ -361,12 +361,29 @@ Route::patch('/citas/{id}/atender', CitaAtendidaController::class)->middleware('
 Route::get('/agenda-medica', function (Request $request) {
     $usuario = $request->user();
     $esMedico = $usuario?->tieneRol('Médico') && $usuario->id_medico;
-    
-    $idMedicoSeleccionado = $request->filled('id_medico')
-        ? (int) $request->id_medico
-        : ($esMedico ? (int) $usuario->id_medico : null);
 
-    $medicos = Medico::where('estado', true)->with('horariosAtencion')->orderBy('nombre_completo')->get();
+    // Aislamiento estricto para Médico; comparación paralela o selección múltiple para Admin/Recepción
+    $medicosIdsSeleccionados = [];
+    if ($esMedico) {
+        $idMedicoSeleccionado = (int) $usuario->id_medico;
+        $medicosIdsSeleccionados = [$idMedicoSeleccionado];
+    } else {
+        $idsInput = $request->input('medicos_ids', []);
+        if (is_array($idsInput) && count($idsInput) > 0) {
+            $medicosIdsSeleccionados = array_values(array_filter(array_map('intval', $idsInput)));
+            $idMedicoSeleccionado = count($medicosIdsSeleccionados) === 1 ? $medicosIdsSeleccionados[0] : null;
+        } elseif ($request->filled('id_medico')) {
+            $idMedicoSeleccionado = (int) $request->id_medico;
+            $medicosIdsSeleccionados = [$idMedicoSeleccionado];
+        } else {
+            $idMedicoSeleccionado = null;
+        }
+    }
+
+    $medicos = Medico::where('estado', true)
+        ->with(['horariosAtencion', 'especialidades'])
+        ->orderBy('nombre_completo')
+        ->get();
     $especialidades = Especialidad::where('estado', true)->orderBy('nombre_especialidad')->get();
 
     // Cálculo de Semana para Vista Google Calendar
@@ -393,21 +410,28 @@ Route::get('/agenda-medica', function (Request $request) {
         ];
     }
 
-    // Horarios del médico seleccionado si existe
-    $medicoActual = $idMedicoSeleccionado ? Medico::with('horariosAtencion')->find($idMedicoSeleccionado) : ($esMedico ? Medico::with('horariosAtencion')->find($usuario->id_medico) : $medicos->first());
-    $horariosMedico = $medicoActual?->horariosAtencion ?? collect();
+    // Horarios según médico único o múltiples médicos en paralelo
+    $modoParalelo = !$esMedico && (count($medicosIdsSeleccionados) !== 1);
+    $medicoActual = ($idMedicoSeleccionado)
+        ? $medicos->firstWhere('id_medico', $idMedicoSeleccionado)
+        : null;
+
+    $medicosActivosFiltro = count($medicosIdsSeleccionados) > 0
+        ? $medicos->whereIn('id_medico', $medicosIdsSeleccionados)
+        : $medicos;
+
+    $horariosMedico = $medicosActivosFiltro->flatMap(fn($m) => $m->horariosAtencion);
 
     $query = CitaMedica::with(['paciente', 'medico', 'especialidad', 'estado'])
         ->orderBy('fecha_cita', 'asc')
         ->orderBy('hora_cita', 'asc');
 
-    if ($idMedicoSeleccionado) {
-        $query->where('id_medico', $idMedicoSeleccionado);
+    if (count($medicosIdsSeleccionados) > 0) {
+        $query->whereIn('id_medico', $medicosIdsSeleccionados);
     }
     if ($request->filled('fecha_cita')) {
         $query->whereDate('fecha_cita', $request->fecha_cita);
     } else {
-        // En vista calendario, filtrar por la semana activa
         $query->whereBetween('fecha_cita', [$inicioSemana->format('Y-m-d'), $finSemana->format('Y-m-d')]);
     }
     if ($request->filled('id_especialidad')) {
@@ -421,6 +445,7 @@ Route::get('/agenda-medica', function (Request $request) {
 
     return view('Paquetes.P6_ConsultasHistoriales.CU16_ConsultarAgendaMedica.index', compact(
         'citas', 'medicos', 'especialidades', 'medicoActual', 'idMedicoSeleccionado',
+        'medicosIdsSeleccionados', 'medicosActivosFiltro', 'modoParalelo', 'esMedico',
         'diasSemana', 'inicioSemana', 'finSemana', 'semanaAnterior', 'semanaSiguiente', 'semanaHoy', 'horariosMedico'
     ));
 })->middleware('rol:Administrador,Recepcionista,Médico');

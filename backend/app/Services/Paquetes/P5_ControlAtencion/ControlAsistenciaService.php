@@ -42,12 +42,14 @@ class ControlAsistenciaService
                 'observacion' => 'Confirmación de asistencia recibida por recepción',
             ]);
 
-            $this->auditService->registrar(
-                idUsuario: $idUsuario ?? 1,
-                accion: 'CONFIRMAR_CITA',
-                tablaAfectada: 'citas_medicas',
-                idRegistroAfectado: $cita->id_cita,
-                detalle: ['codigo_unico' => $cita->codigo_unico]
+            AuditService::registrarCita(
+                cita: $cita,
+                operadorId: $idUsuario ?? auth()->id(),
+                accionBd: 'CONFIRMAR_CITA',
+                accionEjecutada: 'CONFIRMACION',
+                estadoAnterior: 'Programada',
+                estadoNuevo: 'Confirmada',
+                motivoJustificacion: 'Confirmación de asistencia recibida por recepción'
             );
 
             return $cita->fresh(['paciente', 'medico', 'especialidad', 'estado']);
@@ -70,6 +72,7 @@ class ControlAsistenciaService
 
         return DB::transaction(function () use ($cita, $idUsuario) {
             $estadoAnterior = (int) $cita->id_estado_cita;
+            $estadoAnteriorNombre = $cita->estado?->nombre_estado ?? ($estadoAnterior === 2 ? 'Confirmada' : 'Programada');
             $cita->id_estado_cita = 2; // Asegurar confirmada
             $cita->fecha_hora_llegada = Carbon::now();
             $cita->save();
@@ -83,15 +86,15 @@ class ControlAsistenciaService
                 'observacion' => 'Paciente presente en sala de espera a las ' . Carbon::now()->format('H:i'),
             ]);
 
-            $this->auditService->registrar(
-                idUsuario: $idUsuario ?? 1,
-                accion: 'REGISTRAR_LLEGADA_PACIENTE',
-                tablaAfectada: 'citas_medicas',
-                idRegistroAfectado: $cita->id_cita,
-                detalle: [
-                    'codigo_unico' => $cita->codigo_unico,
-                    'fecha_hora_llegada' => $cita->fecha_hora_llegada->toIso8601String(),
-                ]
+            AuditService::registrarCita(
+                cita: $cita,
+                operadorId: $idUsuario ?? auth()->id(),
+                accionBd: 'REGISTRAR_LLEGADA_PACIENTE',
+                accionEjecutada: 'MODIFICACION',
+                estadoAnterior: $estadoAnteriorNombre,
+                estadoNuevo: 'Confirmada',
+                motivoJustificacion: 'Paciente presente en sala de espera',
+                extra: ['fecha_hora_llegada' => $cita->fecha_hora_llegada->toIso8601String()]
             );
 
             return $cita->fresh(['paciente', 'medico', 'especialidad', 'estado']);
@@ -114,6 +117,8 @@ class ControlAsistenciaService
 
         return DB::transaction(function () use ($cita, $motivo, $idUsuario) {
             $estadoAnterior = (int) $cita->id_estado_cita;
+            $estadoAnteriorNombre = $cita->estado?->nombre_estado ?? ($estadoAnterior === 2 ? 'Confirmada' : 'Programada');
+            $motivoFinal = $motivo ?: 'Paciente no se presentó en la hora agendada';
             $cita->id_estado_cita = 5; // Inasistencia
             $cita->save();
 
@@ -123,15 +128,17 @@ class ControlAsistenciaService
                 'tipo_cambio' => 'INASISTENCIA',
                 'estado_anterior' => $estadoAnterior,
                 'estado_nuevo' => 5,
-                'observacion' => $motivo ?: 'Paciente no se presentó en la hora agendada',
+                'observacion' => $motivoFinal,
             ]);
 
-            $this->auditService->registrar(
-                idUsuario: $idUsuario ?? 1,
-                accion: 'MARCAR_INASISTENCIA',
-                tablaAfectada: 'citas_medicas',
-                idRegistroAfectado: $cita->id_cita,
-                detalle: ['codigo_unico' => $cita->codigo_unico, 'motivo' => $motivo]
+            AuditService::registrarCita(
+                cita: $cita,
+                operadorId: $idUsuario ?? auth()->id(),
+                accionBd: 'MARCAR_INASISTENCIA',
+                accionEjecutada: 'INASISTENCIA',
+                estadoAnterior: $estadoAnteriorNombre,
+                estadoNuevo: 'Inasistencia',
+                motivoJustificacion: $motivoFinal
             );
 
             return $cita->fresh(['paciente', 'medico', 'especialidad', 'estado']);

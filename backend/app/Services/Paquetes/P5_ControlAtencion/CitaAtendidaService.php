@@ -41,6 +41,7 @@ class CitaAtendidaService
 
         return DB::transaction(function () use ($cita, $datos, $usuario) {
             $estadoAnterior = (int) $cita->id_estado_cita;
+            $estadoAnteriorNombre = $cita->estado?->nombre_estado ?? ($estadoAnterior === 2 ? 'Confirmada' : 'Programada');
             $cita->id_estado_cita = 3; // Atendida
             $cita->observacion_atencion = $datos['observacion_atencion'] ?? 'Consulta médica completada con éxito.';
             $cita->save();
@@ -54,17 +55,14 @@ class CitaAtendidaService
                 'observacion' => $cita->observacion_atencion,
             ]);
 
-            $this->auditService->registrar(
-                idUsuario: $usuario->id_usuario,
-                accion: 'REGISTRAR_CITA_ATENDIDA',
-                tablaAfectada: 'citas_medicas',
-                idRegistroAfectado: $cita->id_cita,
-                detalle: [
-                    'codigo_unico' => $cita->codigo_unico,
-                    'paciente' => $cita->paciente?->nombre_completo,
-                    'medico' => $cita->medico?->nombre_completo,
-                    'observacion' => $cita->observacion_atencion,
-                ]
+            AuditService::registrarCita(
+                cita: $cita,
+                operadorId: $usuario->id_usuario,
+                accionBd: 'REGISTRAR_CITA_ATENDIDA',
+                accionEjecutada: 'ATENCION',
+                estadoAnterior: $estadoAnteriorNombre,
+                estadoNuevo: 'Atendida',
+                motivoJustificacion: $cita->observacion_atencion
             );
 
             return $cita->fresh(['paciente', 'medico', 'especialidad', 'estado']);

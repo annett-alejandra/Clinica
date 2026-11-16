@@ -291,10 +291,29 @@
                                 @endif
                             </td>
 
-                            <!-- Tabla / Registro -->
-                            <td class="px-5 py-3.5 font-mono text-[11px] whitespace-nowrap">
-                                <span class="text-slate-800 font-bold block">{{ $aud->tabla_afectada }}</span>
-                                <span class="text-slate-400">ID Reg: {{ $aud->id_registro_afectado ?? '—' }}</span>
+                            <!-- Tabla / Registro y Trazabilidad Clínica -->
+                            <td class="px-5 py-3.5 text-[11px] max-w-xs">
+                                <div class="font-mono">
+                                    <span class="text-slate-800 font-bold">{{ $aud->tabla_afectada }}</span>
+                                    <span class="text-slate-400">(#{{ $aud->id_registro_afectado ?? '—' }})</span>
+                                </div>
+                                @if(!empty($detalle['estado_nuevo']))
+                                    <div class="mt-1 flex items-center gap-1 text-[10px]">
+                                        <span class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 font-semibold">{{ $detalle['estado_anterior'] ?? 'Nuevo' }}</span>
+                                        <span class="text-slate-400">➔</span>
+                                        <span class="px-1.5 py-0.5 rounded bg-sky-50 text-sky-700 border border-sky-200 font-bold">{{ $detalle['estado_nuevo'] }}</span>
+                                    </div>
+                                @endif
+                                @if(!empty($detalle['paciente']['ci']))
+                                    <div class="mt-0.5 text-[10px] text-slate-500 truncate">
+                                        Pac: <strong class="text-slate-700">{{ $detalle['paciente']['nombre_completo'] ?? '' }}</strong> (CI: {{ $detalle['paciente']['ci'] }})
+                                    </div>
+                                @endif
+                                @if(!empty($detalle['motivo_justificacion']))
+                                    <div class="mt-0.5 text-[10px] text-slate-500 italic truncate" title="{{ $detalle['motivo_justificacion'] }}">
+                                        "{{ $detalle['motivo_justificacion'] }}"
+                                    </div>
+                                @endif
                             </td>
 
                             <!-- Detalle / JSON Inspector -->

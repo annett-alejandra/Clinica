@@ -21,6 +21,53 @@ document.addEventListener('alpine:init', () => {
             return this.medicos.filter(m => m.especialidades && m.especialidades.some(e => e.id_especialidad == this.especialidadId));
         },
 
+        renderOpcionesMedicos() {
+            const select = this.$refs.selectMedico;
+            if (!select) return;
+            const currentVal = String(this.medicoId || '');
+            select.innerHTML = '';
+
+            const defaultOpt = document.createElement('option');
+            defaultOpt.value = '';
+            defaultOpt.textContent = this.especialidadId
+                ? 'Seleccione médico especialista...'
+                : 'Todos los médicos (agrupados por especialidad)...';
+            select.appendChild(defaultOpt);
+
+            if (this.especialidadId) {
+                this.medicosFiltrados.forEach(m => {
+                    const opt = document.createElement('option');
+                    opt.value = String(m.id_medico);
+                    opt.textContent = `${m.nombre_completo} (${m.registro_profesional || 'Médico'})`;
+                    if (String(m.id_medico) === currentVal) opt.selected = true;
+                    select.appendChild(opt);
+                });
+            } else {
+                // Agrupar todos los médicos por su especialidad principal (sin duplicar)
+                const grupos = {};
+                this.medicos.forEach(m => {
+                    const espPrincipal = (m.especialidades && m.especialidades.length > 0)
+                        ? m.especialidades[0].nombre_especialidad
+                        : 'Medicina General';
+                    if (!grupos[espPrincipal]) grupos[espPrincipal] = [];
+                    grupos[espPrincipal].push(m);
+                });
+
+                Object.keys(grupos).sort().forEach(espNombre => {
+                    const optgroup = document.createElement('optgroup');
+                    optgroup.label = espNombre;
+                    grupos[espNombre].forEach(m => {
+                        const opt = document.createElement('option');
+                        opt.value = String(m.id_medico);
+                        opt.textContent = `${m.nombre_completo} (${m.registro_profesional || 'Médico'})`;
+                        if (String(m.id_medico) === currentVal) opt.selected = true;
+                        optgroup.appendChild(opt);
+                    });
+                    select.appendChild(optgroup);
+                });
+            }
+        },
+
         get medicoSeleccionado() {
             if (!this.medicoId) return null;
             return this.medicos.find(m => m.id_medico == this.medicoId);
@@ -39,14 +86,22 @@ document.addEventListener('alpine:init', () => {
         onEspecialidadChange() {
             const filtrados = this.medicosFiltrados;
             if (filtrados.length === 1) {
-                this.medicoId = filtrados[0].id_medico;
+                this.medicoId = String(filtrados[0].id_medico);
             } else if (!filtrados.some(m => m.id_medico == this.medicoId)) {
                 this.medicoId = '';
             }
+            this.renderOpcionesMedicos();
             this.consultarCupos();
         },
 
         onMedicoChange() {
+            if (!this.especialidadId && this.medicoId) {
+                const m = this.medicoSeleccionado;
+                if (m && m.especialidades && m.especialidades.length > 0) {
+                    this.especialidadId = String(m.especialidades[0].id_especialidad);
+                    this.renderOpcionesMedicos();
+                }
+            }
             this.consultarCupos();
         },
 
@@ -114,9 +169,12 @@ document.addEventListener('alpine:init', () => {
         },
 
         init() {
-            if (this.especialidadId && this.fecha) {
-                this.consultarCupos();
-            }
+            this.$nextTick(() => {
+                this.renderOpcionesMedicos();
+                if (this.especialidadId && this.fecha) {
+                    this.consultarCupos();
+                }
+            });
         }
     }));
 });
@@ -180,12 +238,9 @@ document.addEventListener('alpine:init', () => {
                             <span x-text="medicosFiltrados.length"></span> médicos disponibles
                         </span>
                     </div>
-                    <select name="id_medico" x-model="medicoId" @change="onMedicoChange()"
+                    <select name="id_medico" x-ref="selectMedico" x-model="medicoId" @change="onMedicoChange()"
                             class="w-full text-sm border-slate-200 rounded-lg p-2.5 bg-slate-50 border focus:bg-white focus:border-[#0284C7] focus:outline-none" required>
-                        <option value="">Seleccione médico...</option>
-                        <template x-for="m in medicosFiltrados" :key="m.id_medico">
-                            <option :value="m.id_medico" x-text="m.nombre_completo + ' (' + (m.registro_profesional || 'Médico') + ')'"></option>
-                        </template>
+                        <option value="">Cargando médicos...</option>
                     </select>
 
                     <!-- Resumen del Horario del Médico Seleccionado -->

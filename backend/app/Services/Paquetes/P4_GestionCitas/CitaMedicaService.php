@@ -115,18 +115,14 @@ class CitaMedicaService
                     'motivo' => $datos['motivo'] ?? null,
                 ]);
 
-                AuditService::registrar(
-                    $operadorId,
-                    'PROGRAMAR_CITA',
-                    'citas_medicas',
-                    $cita->id_cita,
-                    [
-                        'codigo_unico' => $codigoUnico,
-                        'id_paciente' => $idPaciente,
-                        'id_medico' => $idMedico,
-                        'fecha_cita' => $fechaCita,
-                        'hora_cita' => $horaCita,
-                    ]
+                AuditService::registrarCita(
+                    cita: $cita,
+                    operadorId: $operadorId ?? auth()->id(),
+                    accionBd: 'PROGRAMAR_CITA',
+                    accionEjecutada: 'CREACION',
+                    estadoAnterior: null,
+                    estadoNuevo: 'Programada',
+                    motivoJustificacion: $datos['motivo'] ?? 'Reserva de consulta médica'
                 );
 
                 return $cita->load(['paciente', 'medico', 'especialidad', 'estadoCita'])->makeVisible(['motivo']);

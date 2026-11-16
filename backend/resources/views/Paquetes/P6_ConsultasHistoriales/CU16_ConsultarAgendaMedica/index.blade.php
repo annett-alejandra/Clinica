@@ -6,6 +6,7 @@
 <div class="container py-12"
      x-data="{
         vista: 'calendario',
+        mostrarComparador: {{ count($medicosIdsSeleccionados ?? []) > 1 ? 'true' : 'false' }},
         idMedico: '{{ $idMedicoSeleccionado ?? '' }}'
      }">
 
@@ -28,88 +29,136 @@
     </div>
 
     <!-- Barra de Navegación Semanal (Estilo Google Calendar) -->
-    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm mb-8 flex flex-col md:flex-row items-center justify-between gap-4">
-        
-        <!-- Controles de Semana (Anterior, Hoy, Siguiente) -->
-        <div class="flex items-center gap-2">
-            @php
-                $paramMedico = $idMedicoSeleccionado ? '&id_medico='.$idMedicoSeleccionado : '';
-            @endphp
-            <a href="{{ url('/agenda-medica?semana='.$semanaAnterior.$paramMedico) }}"
-               class="p-2 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-600 transition-colors shadow-sm"
-               title="Semana Anterior">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="15 18 9 12 15 6"/>
-                </svg>
-            </a>
+    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm mb-6 space-y-4">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+            <!-- Controles de Semana (Anterior, Hoy, Siguiente) -->
+            <div class="flex items-center gap-2">
+                @php
+                    $queryFiltroMedicos = '';
+                    if (!$esMedico && count($medicosIdsSeleccionados ?? []) > 0) {
+                        foreach ($medicosIdsSeleccionados as $mid) {
+                            $queryFiltroMedicos .= '&medicos_ids[]=' . $mid;
+                        }
+                    }
+                @endphp
+                <a href="{{ url('/agenda-medica?semana='.$semanaAnterior.$queryFiltroMedicos) }}"
+                   class="p-2 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-600 transition-colors shadow-sm"
+                   title="Semana Anterior">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="15 18 9 12 15 6"/>
+                    </svg>
+                </a>
 
-            <a href="{{ url('/agenda-medica?semana='.$semanaHoy.$paramMedico) }}"
-               class="px-3.5 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-sm transition-colors">
-                Hoy
-            </a>
+                <a href="{{ url('/agenda-medica?semana='.$semanaHoy.$queryFiltroMedicos) }}"
+                   class="px-3.5 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-sm transition-colors">
+                    Hoy
+                </a>
 
-            <a href="{{ url('/agenda-medica?semana='.$semanaSiguiente.$paramMedico) }}"
-               class="p-2 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-600 transition-colors shadow-sm"
-               title="Semana Siguiente">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="9 18 15 12 9 6"/>
-                </svg>
-            </a>
+                <a href="{{ url('/agenda-medica?semana='.$semanaSiguiente.$queryFiltroMedicos) }}"
+                   class="p-2 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-600 transition-colors shadow-sm"
+                   title="Semana Siguiente">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"/>
+                    </svg>
+                </a>
 
-            <div class="ml-2">
-                <span class="text-xs font-bold text-slate-900 block">
-                    Semana del {{ $inicioSemana->format('d/m/Y') }} al {{ $finSemana->format('d/m/Y') }}
-                </span>
-                <span class="text-[11px] text-slate-400">
-                    Mes de {{ $inicioSemana->locale('es')->isoFormat('MMMM YYYY') }}
-                </span>
+                <div class="ml-2">
+                    <span class="text-xs font-bold text-slate-900 block">
+                        Semana del {{ $inicioSemana->format('d/m/Y') }} al {{ $finSemana->format('d/m/Y') }}
+                    </span>
+                    <span class="text-[11px] text-slate-400">
+                        Mes de {{ $inicioSemana->locale('es')->isoFormat('MMMM YYYY') }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Selector de Médico (Solo Admin/Recepcionista) y Conmutador de Vista -->
+            <div class="flex flex-wrap items-center gap-3 w-full md:w-auto justify-end">
+                @if(!$esMedico)
+                    <form action="{{ url('/agenda-medica') }}" method="GET" class="flex items-center gap-2">
+                        <input type="hidden" name="semana" value="{{ $inicioSemana->format('Y-m-d') }}">
+                        <select name="id_medico" onchange="this.form.submit()"
+                                class="text-xs font-semibold border-slate-200 rounded-xl px-3 py-2 bg-slate-50 border focus:bg-white focus:border-[#0284C7] focus:outline-none">
+                            <option value="">Todos los Médicos (Vista Paralela)</option>
+                            @foreach($medicos as $m)
+                                <option value="{{ $m->id_medico }}" {{ (isset($idMedicoSeleccionado) && $idMedicoSeleccionado == $m->id_medico) ? 'selected' : '' }}>
+                                    Dr(a). {{ $m->nombre_completo }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </form>
+
+                    <button type="button" @click="mostrarComparador = !mostrarComparador"
+                            :class="mostrarComparador ? 'bg-sky-50 text-[#0284C7] border-[#0284C7]' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'"
+                            class="px-3 py-2 rounded-xl border text-xs font-semibold transition-all flex items-center gap-1.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                        <span>Comparar Paralelo</span>
+                    </button>
+                @else
+                    <span class="px-3 py-1.5 rounded-xl bg-sky-50 text-[#0284C7] border border-sky-200 text-xs font-bold">
+                        Agenda Personal Exclusiva
+                    </span>
+                @endif
+
+                <!-- Botones de Conmutación de Vista -->
+                <div class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
+                    <button type="button" @click="vista = 'calendario'"
+                            :class="vista === 'calendario' ? 'bg-white text-[#0284C7] shadow-sm font-bold' : 'text-slate-600 font-medium'"
+                            class="px-3 py-1.5 rounded-lg text-xs transition-all flex items-center gap-1.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
+                            <line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/>
+                        </svg>
+                        <span>Calendario</span>
+                    </button>
+                    <button type="button" @click="vista = 'tabla'"
+                            :class="vista === 'tabla' ? 'bg-white text-[#0284C7] shadow-sm font-bold' : 'text-slate-600 font-medium'"
+                            class="px-3 py-1.5 rounded-lg text-xs transition-all flex items-center gap-1.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/>
+                            <line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/>
+                        </svg>
+                        <span>Tabla</span>
+                    </button>
+                </div>
             </div>
         </div>
 
-        <!-- Selector de Médico y Conmutador de Vista -->
-        <div class="flex items-center gap-3 w-full md:w-auto justify-end">
-            <!-- Selector de Médico -->
-            <form action="{{ url('/agenda-medica') }}" method="GET" class="flex items-center gap-2">
-                <input type="hidden" name="semana" value="{{ $inicioSemana->format('Y-m-d') }}">
-                <select name="id_medico" onchange="this.form.submit()"
-                        class="text-xs font-semibold border-slate-200 rounded-xl px-3 py-2 bg-slate-50 border focus:bg-white focus:border-[#0284C7] focus:outline-none">
-                    <option value="">Todos los Médicos</option>
-                    @foreach($medicos as $m)
-                        <option value="{{ $m->id_medico }}" {{ (isset($idMedicoSeleccionado) && $idMedicoSeleccionado == $m->id_medico) ? 'selected' : '' }}>
-                            Dr(a). {{ $m->nombre_completo }}
-                        </option>
-                    @endforeach
-                </select>
-            </form>
-
-            <!-- Botones de Conmutación de Vista -->
-            <div class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
-                <button type="button" @click="vista = 'calendario'"
-                        :class="vista === 'calendario' ? 'bg-white text-[#0284C7] shadow-sm font-bold' : 'text-slate-600 font-medium'"
-                        class="px-3 py-1.5 rounded-lg text-xs transition-all flex items-center gap-1.5">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
-                        <line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/>
-                    </svg>
-                    <span>Calendario</span>
-                </button>
-                <button type="button" @click="vista = 'tabla'"
-                        :class="vista === 'tabla' ? 'bg-white text-[#0284C7] shadow-sm font-bold' : 'text-slate-600 font-medium'"
-                        class="px-3 py-1.5 rounded-lg text-xs transition-all flex items-center gap-1.5">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/>
-                        <line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/>
-                    </svg>
-                    <span>Tabla</span>
-                </button>
+        <!-- Selector Múltiple de Médicos en Paralelo (Solo Admin/Recepción) -->
+        @if(!$esMedico)
+            <div x-show="mostrarComparador" x-cloak class="pt-4 border-t border-slate-100">
+                <form action="{{ url('/agenda-medica') }}" method="GET" class="space-y-3">
+                    <input type="hidden" name="semana" value="{{ $inicioSemana->format('Y-m-d') }}">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                            Superponer y comparar agendas de médicos en paralelo:
+                        </span>
+                        <div class="flex items-center gap-2">
+                            <a href="{{ url('/agenda-medica?semana='.$inicioSemana->format('Y-m-d')) }}" class="text-xs text-slate-500 hover:text-slate-800 underline">Ver Todos</a>
+                            <button type="submit" class="btn-primary py-1.5 px-4 text-xs">Aplicar Comparación</button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+                        @foreach($medicos as $m)
+                            <label class="flex items-center gap-2 p-2 rounded-xl border text-xs cursor-pointer transition-colors {{ in_array($m->id_medico, $medicosIdsSeleccionados ?? []) ? 'bg-sky-50 border-[#0284C7] text-sky-900 font-semibold' : 'bg-slate-50/70 border-slate-200 text-slate-700 hover:bg-slate-100' }}">
+                                <input type="checkbox" name="medicos_ids[]" value="{{ $m->id_medico }}"
+                                       {{ in_array($m->id_medico, $medicosIdsSeleccionados ?? []) ? 'checked' : '' }}
+                                       class="rounded text-[#0284C7] focus:ring-[#0284C7]">
+                                <span class="truncate">{{ $m->nombre_completo }}</span>
+                            </label>
+                        @endforeach
+                    </div>
+                </form>
             </div>
-        </div>
+        @endif
     </div>
 
     <!-- VISTA 1: CALENDARIO SEMANAL INTERACTIVO (GOOGLE CALENDAR STYLE) -->
     <div x-show="vista === 'calendario'" class="space-y-6">
         
-        <!-- Ficha Resumen del Médico Activo -->
+        <!-- Ficha Resumen del Médico Activo o Modo Paralelo -->
         @if($medicoActual)
             <div class="bg-sky-50/70 border border-sky-100 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                 <div class="flex items-center gap-3">
@@ -117,7 +166,7 @@
                         {{ strtoupper(substr($medicoActual->nombre_completo, 0, 2)) }}
                     </div>
                     <div>
-                        <span class="text-[10px] font-bold uppercase tracking-wider text-[#0284C7] block">Agenda de Turnos Activa:</span>
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-[#0284C7] block">Agenda de Turnos Individual:</span>
                         <strong class="text-sm text-slate-900">{{ $medicoActual->nombre_completo }}</strong>
                         <span class="text-slate-500">· Reg: {{ $medicoActual->registro_profesional }}</span>
                     </div>
@@ -130,6 +179,23 @@
                         <span>Lunes a Viernes (08:00 - 18:00)</span>
                     @endif
                 </div>
+            </div>
+        @elseif($modoParalelo)
+            <div class="bg-indigo-50/70 border border-indigo-100 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold">
+                        {{ $medicosActivosFiltro->count() }}
+                    </div>
+                    <div>
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-700 block">Modo Comparación Paralela Multi-Médico:</span>
+                        <strong class="text-sm text-slate-900">
+                            {{ count($medicosIdsSeleccionados ?? []) > 0 ? $medicosActivosFiltro->pluck('nombre_completo')->implode(' · ') : 'Todos los Especialistas Activos de la Clínica' }}
+                        </strong>
+                    </div>
+                </div>
+                <span class="px-3 py-1 rounded-full bg-white text-indigo-700 border border-indigo-200 font-bold text-[11px]">
+                    {{ $citas->count() }} citas en la semana
+                </span>
             </div>
         @endif
 
@@ -147,15 +213,19 @@
                     <div class="p-3 border-b text-center {{ $dia['es_hoy'] ? 'bg-[#0284C7] text-white' : 'bg-slate-50 text-slate-800' }}">
                         <span class="text-[10px] uppercase font-bold tracking-wider block opacity-90">{{ $dia['dia_nombre'] }}</span>
                         <strong class="text-sm font-bold">{{ $dia['dia_mes'] }}</strong>
-                        @if($dia['es_hoy'])
-                            <span class="inline-block mt-0.5 px-2 py-0.2 rounded-full text-[9px] font-extrabold uppercase bg-white text-[#0284C7]">Hoy</span>
-                        @endif
+                        <span class="block text-[10px] mt-0.5 {{ $dia['es_hoy'] ? 'text-sky-100' : 'text-slate-400' }}">
+                            {{ $citasDelDia->count() }} {{ $citasDelDia->count() === 1 ? 'cita' : 'citas' }}
+                        </span>
                     </div>
 
                     <!-- Turno de Atención del Día -->
-                    @if($horarioDia->count() > 0)
+                    @if(!$modoParalelo && $horarioDia->count() > 0)
                         <div class="px-2 py-1.5 bg-sky-50/60 border-b border-sky-100 text-[10px] text-sky-800 text-center font-semibold">
                             ⏰ {{ $horarioDia->map(fn($h) => substr($h->hora_inicio, 0, 5).'-'.substr($h->hora_fin, 0, 5))->implode(', ') }}
+                        </div>
+                    @elseif($modoParalelo)
+                        <div class="px-2 py-1 bg-indigo-50/50 border-b border-indigo-100 text-[10px] text-indigo-700 text-center font-medium">
+                            Vista Global Paralela
                         </div>
                     @else
                         <div class="px-2 py-1 bg-slate-50/50 border-b border-slate-100 text-[10px] text-slate-400 text-center">
@@ -166,13 +236,30 @@
                     <!-- Bloques de Citas Médicas Agendadas -->
                     <div class="p-2.5 flex-1 space-y-2 overflow-y-auto max-h-[420px]">
                         @forelse($citasDelDia as $cita)
-                            <div class="p-2.5 rounded-xl border text-xs transition-all space-y-1.5 {{ $cita->id_estado_cita == 3 ? 'bg-emerald-50/70 border-emerald-200 text-emerald-950' : ($cita->id_estado_cita == 1 ? 'bg-sky-50/70 border-sky-200 text-sky-950' : ($cita->id_estado_cita == 4 ? 'bg-rose-50 border-rose-200 text-rose-950' : 'bg-slate-50 border-slate-200 text-slate-900')) }}">
-                                
+                            @php
+                                $estiloEstado = match((int) $cita->id_estado_cita) {
+                                    3 => 'bg-emerald-50/70 border-emerald-200 text-emerald-950',
+                                    1 => 'bg-sky-50/70 border-sky-200 text-sky-950',
+                                    2 => 'bg-indigo-50/70 border-indigo-200 text-indigo-950',
+                                    4 => 'bg-rose-50 border-rose-200 text-rose-950',
+                                    5 => 'bg-amber-50 border-amber-200 text-amber-950',
+                                    default => 'bg-slate-50 border-slate-200 text-slate-900',
+                                };
+                                $badgeEstado = match((int) $cita->id_estado_cita) {
+                                    3 => 'bg-emerald-100 text-emerald-800',
+                                    1 => 'bg-sky-100 text-sky-800',
+                                    2 => 'bg-indigo-100 text-indigo-800',
+                                    4 => 'bg-rose-100 text-rose-800',
+                                    5 => 'bg-amber-100 text-amber-800',
+                                    default => 'bg-slate-200 text-slate-700',
+                                };
+                            @endphp
+                            <div class="p-2.5 rounded-xl border text-xs transition-all space-y-1 {{ $estiloEstado }}">
                                 <div class="flex items-center justify-between">
                                     <span class="font-mono font-bold text-xs {{ $cita->id_estado_cita == 3 ? 'text-emerald-700' : 'text-[#0284C7]' }}">
                                         {{ substr($cita->hora_cita, 0, 5) }}
                                     </span>
-                                    <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase {{ $cita->id_estado_cita == 3 ? 'bg-emerald-100 text-emerald-800' : ($cita->id_estado_cita == 1 ? 'bg-sky-100 text-sky-800' : 'bg-slate-200 text-slate-700') }}">
+                                    <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase {{ $badgeEstado }}">
                                         {{ $cita->estado?->nombre_estado ?? 'Cita' }}
                                     </span>
                                 </div>
@@ -181,11 +268,17 @@
                                     {{ $cita->paciente?->nombre_completo ?? 'Paciente' }}
                                 </strong>
 
+                                @if($modoParalelo)
+                                    <span class="text-[10px] font-bold text-indigo-700 bg-white/80 px-1.5 py-0.5 rounded border border-indigo-100 block truncate">
+                                        🩺 {{ $cita->medico?->nombre_completo }}
+                                    </span>
+                                @endif
+
                                 <span class="text-[10px] text-slate-500 block truncate">
                                     {{ $cita->especialidad?->nombre_especialidad }}
                                 </span>
 
-                                @if($cita->id_estado_cita == 1 && (auth()->user()?->tieneRol('Médico') || auth()->user()?->tieneRol('Administrador')))
+                                @if(in_array((int)$cita->id_estado_cita, [1, 2]) && (auth()->user()?->tieneRol('Médico') || auth()->user()?->tieneRol('Administrador')))
                                     <div class="pt-1 border-t border-slate-200/60">
                                         <a href="{{ url('/atencion-medica?id_medico='.$cita->id_medico) }}" class="text-[10px] font-bold text-[#0284C7] hover:underline flex items-center gap-0.5">
                                             <span>Atender consulta →</span>
