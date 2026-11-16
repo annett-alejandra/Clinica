@@ -3,13 +3,14 @@
 @section('title', 'Programación y Reserva de Citas — Clínica Vida Salud')
 
 @section('content')
-<div class="container py-12"
-     x-data="{
-        pacienteId: '{{ old('id_paciente', '') }}',
-        especialidadId: '{{ old('id_especialidad', '') }}',
-        medicoId: '{{ old('id_medico', '') }}',
-        fecha: '{{ old('fecha_cita', date('Y-m-d')) }}',
-        hora: '{{ old('hora_cita', '08:30') }}',
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('reservaCitas', () => ({
+        pacienteId: '{{ old('id_paciente', request('id_paciente', '')) }}',
+        especialidadId: '{{ old('id_especialidad', request('id_especialidad', '')) }}',
+        medicoId: '{{ old('id_medico', request('id_medico', '')) }}',
+        fecha: '{{ old('fecha_cita', request('fecha_cita', date('Y-m-d'))) }}',
+        hora: '{{ old('hora_cita', request('hora_cita', '')) }}',
         cargandoCupos: false,
         cuposDisponibles: [],
         medicos: @json($medicos),
@@ -117,7 +118,11 @@
                 this.consultarCupos();
             }
         }
-     }">
+    }));
+});
+</script>
+
+<div class="container py-12" x-data="reservaCitas">
 
     <!-- Cabecera -->
     <div class="flex flex-col md:flex-row md:items-center justify-between pb-6 mb-8 border-b border-slate-200 gap-4">

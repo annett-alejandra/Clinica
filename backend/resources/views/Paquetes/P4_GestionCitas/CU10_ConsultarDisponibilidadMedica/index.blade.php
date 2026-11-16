@@ -3,8 +3,9 @@
 @section('title', 'Consulta de Disponibilidad y Oferta Médica — Clínica Vida Salud')
 
 @section('content')
-<div class="container py-12"
-     x-data="{
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('disponibilidadMedica', () => ({
         especialidadId: '{{ request('id_especialidad', '') }}',
         medicoId: '{{ request('id_medico', '') }}',
         fecha: '{{ request('fecha', date('Y-m-d')) }}',
@@ -21,7 +22,11 @@
                 this.medicoId = '';
             }
         }
-     }">
+    }));
+});
+</script>
+
+<div class="container py-12" x-data="disponibilidadMedica">
 
     <!-- Cabecera -->
     <div class="flex flex-col md:flex-row md:items-center justify-between pb-6 mb-8 border-b border-slate-200 gap-4">
