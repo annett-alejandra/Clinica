@@ -359,19 +359,41 @@ Route::get('/citas', function (Request $request) {
 })->middleware('rol:Administrador,Recepcionista,Paciente');
 Route::post('/citas', [CitaMedicaController::class, 'store'])->middleware('rol:Administrador,Recepcionista,Paciente');
 
-// CU12: Reprogramar Cita Médica (Recepción, Admin)
-Route::get('/citas/{id}/reprogramar', function (int $id) {
+// CU12: Reprogramar Cita Médica (Recepción, Admin, y Paciente para sus propias citas)
+Route::get('/citas/{id}/reprogramar', function (Request $request, int $id) {
     $cita = CitaMedica::with(['paciente', 'medico', 'especialidad', 'estado'])->findOrFail($id);
+    $usuario = $request->user();
+    if ($usuario?->tieneRol('Paciente') && (int) $cita->id_paciente !== (int) $usuario->id_paciente) {
+        \App\Services\Paquetes\P1_SeguridadAdministracion\AuditService::registrar(
+            $usuario->id_usuario,
+            'ACCESO_DENEGADO',
+            'citas_medicas',
+            $id,
+            ['accion_ejecutada' => 'ACCESO_DENEGADO', 'motivo_justificacion' => 'Paciente intentó abrir reprogramación de cita ajena']
+        );
+        return redirect('/mis-citas')->with('error', 'Acceso denegado: solo puedes reprogramar tus propias citas.');
+    }
     return view('Paquetes.P4_GestionCitas.CU12_ReprogramarCitaMedica.index', compact('cita'));
-})->middleware('rol:Administrador,Recepcionista');
-Route::patch('/citas/{id}/reprogramar', ReprogramarCitaController::class)->middleware('rol:Administrador,Recepcionista');
+})->middleware('rol:Administrador,Recepcionista,Paciente');
+Route::patch('/citas/{id}/reprogramar', ReprogramarCitaController::class)->middleware('rol:Administrador,Recepcionista,Paciente');
 
-// CU13: Cancelar Cita Médica (Recepción, Admin)
-Route::get('/citas/{id}/cancelar', function (int $id) {
+// CU13: Cancelar Cita Médica (Recepción, Admin, y Paciente para sus propias citas)
+Route::get('/citas/{id}/cancelar', function (Request $request, int $id) {
     $cita = CitaMedica::with(['paciente', 'medico', 'especialidad', 'estado'])->findOrFail($id);
+    $usuario = $request->user();
+    if ($usuario?->tieneRol('Paciente') && (int) $cita->id_paciente !== (int) $usuario->id_paciente) {
+        \App\Services\Paquetes\P1_SeguridadAdministracion\AuditService::registrar(
+            $usuario->id_usuario,
+            'ACCESO_DENEGADO',
+            'citas_medicas',
+            $id,
+            ['accion_ejecutada' => 'ACCESO_DENEGADO', 'motivo_justificacion' => 'Paciente intentó abrir cancelación de cita ajena']
+        );
+        return redirect('/mis-citas')->with('error', 'Acceso denegado: solo puedes cancelar tus propias citas.');
+    }
     return view('Paquetes.P4_GestionCitas.CU13_CancelarCitaMedica.index', compact('cita'));
-})->middleware('rol:Administrador,Recepcionista');
-Route::patch('/citas/{id}/cancelar', CancelarCitaController::class)->middleware('rol:Administrador,Recepcionista');
+})->middleware('rol:Administrador,Recepcionista,Paciente');
+Route::patch('/citas/{id}/cancelar', CancelarCitaController::class)->middleware('rol:Administrador,Recepcionista,Paciente');
 
 // CU14: Registrar Confirmación, Asistencia e Inasistencia (Recepción, Admin)
 Route::get('/control-atencion', function () {

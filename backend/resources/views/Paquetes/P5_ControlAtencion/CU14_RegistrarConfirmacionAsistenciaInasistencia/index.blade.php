@@ -63,7 +63,7 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 text-right">
-                                <div class="flex items-center justify-end gap-2">
+                                <div class="flex flex-wrap items-center justify-end gap-1.5">
                                     @if($est === 1)
                                         <form action="{{ url('/control-atencion/citas/'.$cita->id_cita.'/confirmar') }}" method="POST" class="inline">
                                             @csrf
@@ -83,10 +83,20 @@
                                             </button>
                                         </form>
 
+                                        <a href="{{ url('/citas/'.$cita->id_cita.'/reprogramar') }}"
+                                           class="px-2.5 py-1 text-xs rounded border border-sky-200 bg-sky-50 hover:bg-[#0284C7] hover:text-white font-medium text-[#0284C7] transition-colors">
+                                            Reprogramar
+                                        </a>
+
+                                        <a href="{{ url('/citas/'.$cita->id_cita.'/cancelar') }}"
+                                           class="px-2.5 py-1 text-xs rounded border border-rose-200 bg-white hover:bg-rose-600 hover:text-white font-medium text-rose-700 transition-colors">
+                                            Cancelar
+                                        </a>
+
                                         <form action="{{ url('/control-atencion/citas/'.$cita->id_cita.'/inasistencia') }}" method="POST" class="inline">
                                             @csrf
                                             @method('PATCH')
-                                            <button type="submit" class="px-2.5 py-1 text-xs rounded border border-rose-200 bg-rose-50 hover:bg-rose-100 font-medium text-rose-700" onclick="return confirm('¿Marcar inasistencia del paciente?');">
+                                            <button type="submit" class="px-2.5 py-1 text-xs rounded border border-amber-200 bg-amber-50 hover:bg-amber-100 font-medium text-amber-800" onclick="return confirm('¿Marcar inasistencia del paciente?');">
                                                 Inasistió
                                             </button>
                                         </form>

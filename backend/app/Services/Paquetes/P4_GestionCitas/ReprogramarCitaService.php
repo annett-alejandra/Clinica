@@ -55,15 +55,22 @@ class ReprogramarCitaService
             $duracion = (int) $cita->duracion_minutos;
 
             // Re-verificar disponibilidad en tiempo real para evitar colisiones
-            $disponibles = $this->disponibilidadService->obtenerTurnosDisponibles(
-                idMedico: (int) $cita->id_medico,
-                fecha: $nuevaFecha,
-                idEspecialidad: (int) $cita->id_especialidad
-            );
+            try {
+                $oferta = $this->disponibilidadService->consultar(
+                    (int) $cita->id_especialidad,
+                    (int) $cita->id_medico,
+                    $nuevaFecha
+                );
+            } catch (\InvalidArgumentException $e) {
+                throw ValidationException::withMessages(['fecha_cita' => [$e->getMessage()]]);
+            }
+
+            $disponibles = collect($oferta)->flatMap(fn (array $item) => $item['cupos'] ?? []);
 
             $horaNormalizada = Carbon::parse($nuevaHora)->format('H:i');
-            $estaDisponible = collect($disponibles)->contains(function ($slot) use ($horaNormalizada) {
-                return Carbon::parse($slot['hora_inicio'])->format('H:i') === $horaNormalizada;
+            $estaDisponible = $disponibles->contains(function ($slot) use ($horaNormalizada) {
+                $inicio = is_array($slot) ? ($slot['hora_inicio'] ?? '') : (string) $slot;
+                return substr($inicio, 0, 5) === $horaNormalizada;
             });
 
             if (!$estaDisponible) {

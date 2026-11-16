@@ -580,7 +580,7 @@
                         EXPEDIENTE PERSONAL • {{ $pac ? 'PAC-' . str_pad((string) $pac->id_paciente, 4, '0', STR_PAD_LEFT) : 'PAC-1082' }}
                     </span>
                     <h3 class="font-serif text-2xl md:text-3xl mb-1">
-                        Bienvenido(a), {{ $pac ? $pac->nombres . ' ' . $pac->apellidos : ' a su espacio de salud' }}
+                        Bienvenido(a), {{ $pac ? $pac->nombre_completo : ' a su espacio de salud' }}
                     </h3>
                     <p class="text-sky-100 text-xs sm:text-sm">
                         Revise sus próximas consultas médicas, descargue resultados de laboratorio e imagenología o actualice su perfil.
@@ -614,25 +614,37 @@
 
                     <div class="space-y-3">
                         @forelse ($panel['proximas'] ?? [] as $cita)
-                            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80 flex justify-between items-center">
-                                <div>
-                                    <span class="text-xs font-bold text-[#0284C7] block">
-                                        {{ $cita->especialidad?->nombre_especialidad ?? 'Consulta Especializada' }}
-                                    </span>
-                                    <span class="font-semibold text-sm text-[#0F172A]">
-                                        Dr(a). {{ $cita->medico?->nombres }} {{ $cita->medico?->apellidos }}
-                                    </span>
-                                    <span class="text-xs text-slate-500 block mt-0.5">
-                                        {{ $cita->medico?->consultorio ?? 'Consultorio Principal' }} • {{ $cita->motivo_consulta }}
-                                    </span>
+                            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2.5">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <span class="text-xs font-bold text-[#0284C7] block">
+                                            {{ $cita->especialidad?->nombre_especialidad ?? 'Consulta Especializada' }}
+                                        </span>
+                                        <span class="font-semibold text-sm text-[#0F172A]">
+                                            Dr(a). {{ $cita->medico?->nombre_completo }}
+                                        </span>
+                                        <span class="text-xs text-slate-500 block mt-0.5">
+                                            {{ $cita->motivo ?? 'Control médico programado' }}
+                                        </span>
+                                    </div>
+                                    <div class="text-right shrink-0 ml-3">
+                                        <span class="text-xs font-bold text-slate-800 block">
+                                            {{ \Illuminate\Support\Carbon::parse($cita->fecha_cita)->format('d/m/Y') }}
+                                        </span>
+                                        <span class="text-xs text-emerald-600 font-semibold">
+                                            {{ substr((string) $cita->hora_cita, 0, 5) }} hrs
+                                        </span>
+                                    </div>
                                 </div>
-                                <div class="text-right shrink-0 ml-3">
-                                    <span class="text-xs font-bold text-slate-800 block">
-                                        {{ \Illuminate\Support\Carbon::parse($cita->fecha_cita)->format('d/m/Y') }}
-                                    </span>
-                                    <span class="text-xs text-emerald-600 font-semibold">
-                                        {{ substr((string) $cita->hora_cita, 0, 5) }} hrs
-                                    </span>
+                                <div class="pt-2 border-t border-slate-200/70 flex items-center justify-end gap-2">
+                                    <a href="{{ url('/citas/'.$cita->id_cita.'/reprogramar') }}"
+                                       class="px-2.5 py-1 rounded-lg border border-sky-200 bg-white hover:bg-[#0284C7] hover:text-white text-[#0284C7] text-[11px] font-semibold transition-colors">
+                                        Reprogramar
+                                    </a>
+                                    <a href="{{ url('/citas/'.$cita->id_cita.'/cancelar') }}"
+                                       class="px-2.5 py-1 rounded-lg border border-rose-200 bg-white hover:bg-rose-600 hover:text-white text-rose-700 text-[11px] font-semibold transition-colors">
+                                        Cancelar
+                                    </a>
                                 </div>
                             </div>
                         @empty

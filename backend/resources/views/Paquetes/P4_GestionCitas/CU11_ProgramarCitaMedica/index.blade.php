@@ -347,10 +347,22 @@ document.addEventListener('alpine:init', () => {
                                 Dr(a). {{ $cita->medico?->nombre_completo }} · <span class="text-[#0284C7] font-semibold">{{ $cita->especialidad?->nombre_especialidad }}</span>
                             </p>
                         </div>
-                        <div class="text-right shrink-0">
+                        <div class="text-right shrink-0 flex flex-col items-end gap-2">
                             <span class="font-mono text-[11px] text-sky-700 bg-sky-50 px-2.5 py-1 rounded-lg border border-sky-100 block">
                                 {{ substr($cita->codigo_unico, 0, 8) }}...
                             </span>
+                            @if(in_array((int)$cita->id_estado_cita, [1, 2]))
+                                <div class="flex items-center gap-1.5">
+                                    <a href="{{ url('/citas/'.$cita->id_cita.'/reprogramar') }}"
+                                       class="px-2 py-1 rounded-lg border border-sky-200 bg-white hover:bg-[#0284C7] hover:text-white text-[#0284C7] text-[11px] font-semibold transition-colors">
+                                        Reprogramar
+                                    </a>
+                                    <a href="{{ url('/citas/'.$cita->id_cita.'/cancelar') }}"
+                                       class="px-2 py-1 rounded-lg border border-rose-200 bg-white hover:bg-rose-600 hover:text-white text-rose-700 text-[11px] font-semibold transition-colors">
+                                        Cancelar
+                                    </a>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 @empty

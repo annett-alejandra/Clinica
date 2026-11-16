@@ -278,11 +278,19 @@
                                     {{ $cita->especialidad?->nombre_especialidad }}
                                 </span>
 
-                                @if(in_array((int)$cita->id_estado_cita, [1, 2]) && (auth()->user()?->tieneRol('Médico') || auth()->user()?->tieneRol('Administrador')))
-                                    <div class="pt-1 border-t border-slate-200/60">
-                                        <a href="{{ url('/atencion-medica?id_medico='.$cita->id_medico) }}" class="text-[10px] font-bold text-[#0284C7] hover:underline flex items-center gap-0.5">
-                                            <span>Atender consulta →</span>
-                                        </a>
+                                @if(in_array((int)$cita->id_estado_cita, [1, 2]))
+                                    <div class="pt-1 border-t border-slate-200/60 flex flex-wrap items-center justify-between gap-1">
+                                        @if(auth()->user()?->tieneRol('Médico') || auth()->user()?->tieneRol('Administrador'))
+                                            <a href="{{ url('/atencion-medica?id_medico='.$cita->id_medico) }}" class="text-[10px] font-bold text-[#0284C7] hover:underline">
+                                                Atender →
+                                            </a>
+                                        @endif
+                                        @if(auth()->user()?->tieneRol('Recepcionista') || auth()->user()?->tieneRol('Administrador'))
+                                            <div class="flex items-center gap-1.5">
+                                                <a href="{{ url('/citas/'.$cita->id_cita.'/reprogramar') }}" class="text-[10px] font-bold text-sky-700 hover:underline">Reprog.</a>
+                                                <a href="{{ url('/citas/'.$cita->id_cita.'/cancelar') }}" class="text-[10px] font-bold text-rose-600 hover:underline">Cancelar</a>
+                                            </div>
+                                        @endif
                                     </div>
                                 @endif
                             </div>
@@ -346,6 +354,12 @@
                                     <span class="inline-flex px-2.5 py-1 rounded-full text-xs font-semibold {{ $cita->id_estado_cita == 3 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : ($cita->id_estado_cita == 1 ? 'bg-sky-50 text-[#0284C7] border border-sky-200' : 'bg-slate-100 text-slate-600') }}">
                                         {{ $cita->estado?->nombre_estado ?? 'Programada' }}
                                     </span>
+                                    @if(in_array((int)$cita->id_estado_cita, [1, 2]) && (auth()->user()?->tieneRol('Recepcionista') || auth()->user()?->tieneRol('Administrador')))
+                                        <div class="mt-2 flex items-center gap-2">
+                                            <a href="{{ url('/citas/'.$cita->id_cita.'/reprogramar') }}" class="text-[11px] font-bold text-[#0284C7] hover:underline">Reprogramar</a>
+                                            <a href="{{ url('/citas/'.$cita->id_cita.'/cancelar') }}" class="text-[11px] font-bold text-rose-600 hover:underline">Cancelar</a>
+                                        </div>
+                                    @endif
                                 </td>
                             </tr>
                         @empty

@@ -42,11 +42,24 @@
                             </div>
                         </div>
 
-                        <div class="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-                            <span>Código: <strong class="font-mono text-slate-700">{{ substr($cita->codigo_unico, 0, 8) }}</strong></span>
-                            <span class="inline-flex items-center gap-1 font-medium text-amber-700">
-                                Estado: {{ $cita->estado?->nombre_estado }}
-                            </span>
+                        <div class="mt-3 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
+                            <div>
+                                <span>Código: <strong class="font-mono text-slate-700">{{ substr($cita->codigo_unico, 0, 8) }}</strong></span>
+                                <span class="mx-1.5 text-slate-300">|</span>
+                                <span class="inline-flex items-center gap-1 font-semibold text-amber-700">
+                                    {{ $cita->estado?->nombre_estado }}
+                                </span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <a href="{{ url('/citas/'.$cita->id_cita.'/reprogramar') }}"
+                                   class="px-2.5 py-1 rounded-lg border border-sky-200 bg-sky-50 hover:bg-[#0284C7] hover:text-white text-[#0284C7] font-semibold transition-colors">
+                                    Reprogramar
+                                </a>
+                                <a href="{{ url('/citas/'.$cita->id_cita.'/cancelar') }}"
+                                   class="px-2.5 py-1 rounded-lg border border-rose-200 bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-700 font-semibold transition-colors">
+                                    Cancelar
+                                </a>
+                            </div>
                         </div>
                     </div>
                 @empty
