@@ -91,6 +91,26 @@ class ReportesAdminService
             ->limit(6)
             ->get();
 
+        // 6. Detalle tabular de citas (para reportes tabulares y exportación)
+        $detalleCitas = (clone $citasQuery)
+            ->join('pacientes as p', 'c.id_paciente', '=', 'p.id_paciente')
+            ->select(
+                'c.id_cita',
+                'c.codigo_unico',
+                'c.fecha_cita',
+                'c.hora_cita',
+                'p.nombre_completo as nombre_paciente',
+                'p.ci as ci_paciente',
+                'm.nombre_completo as nombre_medico',
+                'esp.nombre_especialidad',
+                'e.nombre_estado',
+                'c.motivo'
+            )
+            ->orderBy('c.fecha_cita', 'desc')
+            ->orderBy('c.hora_cita', 'desc')
+            ->limit(50)
+            ->get();
+
         return [
             'filtros_aplicados' => [
                 'fecha_desde' => $fechaDesde,
@@ -113,6 +133,7 @@ class ReportesAdminService
             'por_especialidad' => $porEspecialidad,
             'por_medico' => $porMedico,
             'motivos_cancelacion' => $motivosCancelacion,
+            'detalle_citas' => $detalleCitas,
         ];
     }
 }

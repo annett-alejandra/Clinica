@@ -487,5 +487,70 @@ Route::get('/mis-citas', function (Request $request) {
 Route::get('/reportes-administrativos', function (Request $request) {
     $service = app(\App\Services\Paquetes\P7_ReportesEstadisticas\ReportesAdminService::class);
     $reporte = $service->generarReporte($request->all());
-    return view('Paquetes.P7_ReportesEstadisticas.CU19_GenerarReportesAdministrativos.index', compact('reporte'));
-})->middleware('rol:Administrador');
+    $especialidades = Especialidad::where('estado', true)->orderBy('nombre_especialidad')->get();
+    $medicos = Medico::where('estado', true)->orderBy('nombre_completo')->get();
+
+    // Exportación tabular a formato CSV / Excel si se solicita ?formato=csv
+    if ($request->query('formato') === 'csv') {
+        $filename = 'reporte_estadistico_' . date('Ymd_His') . '.csv';
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ];
+        $callback = function () use ($reporte) {
+            $handle = fopen('php://output', 'w');
+            fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF)); // BOM UTF-8
+            fputcsv($handle, ['CLINICA VIDA SALUD - REPORTE GERENCIAL Y ESTADISTICAS CLINICAS']);
+            fputcsv($handle, ['Fecha de Emision', date('d/m/Y H:i:s')]);
+            fputcsv($handle, []);
+            fputcsv($handle, ['--- METRICAS CLAVE (KPIS) ---']);
+            fputcsv($handle, ['Metrica', 'Valor']);
+            fputcsv($handle, ['Total de Citas', $reporte['kpis']['total_citas']]);
+            fputcsv($handle, ['Citas Atendidas', $reporte['kpis']['atendidas']]);
+            fputcsv($handle, ['Tasa de Efectividad (%)', $reporte['kpis']['tasa_efectividad_pct'] . '%']);
+            fputcsv($handle, ['Citas Canceladas', $reporte['kpis']['canceladas']]);
+            fputcsv($handle, ['Tasa de Cancelacion (%)', $reporte['kpis']['tasa_cancelacion_pct'] . '%']);
+            fputcsv($handle, ['Inasistencias', $reporte['kpis']['inasistencias']]);
+            fputcsv($handle, ['Tasa de Inasistencia (%)', $reporte['kpis']['tasa_inasistencia_pct'] . '%']);
+            fputcsv($handle, []);
+            fputcsv($handle, ['--- DISTRIBUCION POR ESTADOS ---']);
+            fputcsv($handle, ['Estado', 'Total Citas', 'Porcentaje']);
+            foreach ($reporte['distribucion_estados'] as $est) {
+                fputcsv($handle, [$est['nombre_estado'], $est['total'], $est['porcentaje'] . '%']);
+            }
+            fputcsv($handle, []);
+            fputcsv($handle, ['--- DEMANDA POR ESPECIALIDAD ---']);
+            fputcsv($handle, ['Especialidad', 'Total Citas']);
+            foreach ($reporte['por_especialidad'] as $esp) {
+                fputcsv($handle, [$esp->nombre_especialidad, $esp->total]);
+            }
+            fputcsv($handle, []);
+            fputcsv($handle, ['--- ACTIVIDAD POR MEDICO ---']);
+            fputcsv($handle, ['Medico Especialista', 'Total Citas']);
+            foreach ($reporte['por_medico'] as $m) {
+                fputcsv($handle, [$m->nombre_completo, $m->total]);
+            }
+            fputcsv($handle, []);
+            fputcsv($handle, ['--- REPORTE TABULAR DETALLADO DE CITAS ---']);
+            fputcsv($handle, ['ID', 'Codigo Unico', 'Fecha', 'Hora', 'Paciente', 'CI', 'Medico', 'Especialidad', 'Estado', 'Motivo']);
+            foreach ($reporte['detalle_citas'] as $cita) {
+                fputcsv($handle, [
+                    $cita->id_cita,
+                    $cita->codigo_unico,
+                    $cita->fecha_cita,
+                    $cita->hora_cita,
+                    $cita->nombre_paciente,
+                    $cita->ci_paciente,
+                    $cita->nombre_medico,
+                    $cita->nombre_especialidad,
+                    $cita->nombre_estado,
+                    $cita->motivo,
+                ]);
+            }
+            fclose($handle);
+        };
+        return response()->stream($callback, 200, $headers);
+    }
+
+    return view('Paquetes.P7_ReportesEstadisticas.CU19_GenerarReportesAdministrativos.index', compact('reporte', 'especialidades', 'medicos'));
+})->middleware('rol:Administrador')->name('reportes-administrativos');
