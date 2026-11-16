@@ -54,11 +54,19 @@ class UsuarioService
         ]);
 
         AuditService::registrar(
-            $operadorId,
+            $operadorId ?? auth()->id(),
             'CREAR_USUARIO',
             'usuarios',
             $usuario->id_usuario,
-            ['nombre_usuario' => $usuario->nombre_usuario, 'correo' => $usuario->correo, 'id_rol' => $usuario->id_rol]
+            [
+                'accion_ejecutada' => 'CREACION',
+                'nombre_usuario' => $usuario->nombre_usuario,
+                'correo' => $usuario->correo,
+                'id_rol' => $usuario->id_rol,
+                'estado_anterior' => null,
+                'estado_nuevo' => $usuario->estado ? 'Activo' : 'Inactivo',
+                'motivo_justificacion' => 'Alta de cuenta de usuario en sistema',
+            ]
         );
 
         return $usuario->load(['rol', 'medico', 'paciente']);
@@ -69,7 +77,9 @@ class UsuarioService
      */
     public function actualizar(int $idUsuario, array $datos, ?int $operadorId = null): User
     {
-        $usuario = User::findOrFail($idUsuario);
+        $usuario = User::with('rol')->findOrFail($idUsuario);
+        $rolAnterior = $usuario->rol?->nombre_rol ?? $usuario->id_rol;
+        $estadoAnterior = $usuario->estado ? 'Activo' : 'Inactivo';
 
         // Validar unicidad de nombre de usuario si cambia
         if (isset($datos['nombre_usuario']) && $datos['nombre_usuario'] !== $usuario->nombre_usuario) {
@@ -100,13 +110,22 @@ class UsuarioService
         }
 
         $usuario->save();
+        $usuario->load('rol');
 
         AuditService::registrar(
-            $operadorId,
+            $operadorId ?? auth()->id(),
             'ACTUALIZAR_USUARIO',
             'usuarios',
             $usuario->id_usuario,
-            ['id_rol' => $usuario->id_rol, 'estado' => $usuario->estado]
+            [
+                'accion_ejecutada' => 'MODIFICACION',
+                'nombre_usuario' => $usuario->nombre_usuario,
+                'rol_anterior' => $rolAnterior,
+                'rol_nuevo' => $usuario->rol?->nombre_rol ?? $usuario->id_rol,
+                'estado_anterior' => $estadoAnterior,
+                'estado_nuevo' => $usuario->estado ? 'Activo' : 'Inactivo',
+                'motivo_justificacion' => 'Actualización administrativa de usuario/rol',
+            ]
         );
 
         return $usuario->load(['rol', 'medico', 'paciente']);
@@ -117,16 +136,24 @@ class UsuarioService
      */
     public function toggleEstado(int $idUsuario, ?int $operadorId = null): User
     {
-        $usuario = User::findOrFail($idUsuario);
+        $usuario = User::with('rol')->findOrFail($idUsuario);
+        $estadoAnterior = $usuario->estado ? 'Activo' : 'Inactivo';
         $usuario->estado = !$usuario->estado;
         $usuario->save();
 
         AuditService::registrar(
-            $operadorId,
+            $operadorId ?? auth()->id(),
             $usuario->estado ? 'ACTIVAR_USUARIO' : 'DESACTIVAR_USUARIO',
             'usuarios',
             $usuario->id_usuario,
-            ['nuevo_estado' => $usuario->estado]
+            [
+                'accion_ejecutada' => 'MODIFICACION',
+                'nombre_usuario' => $usuario->nombre_usuario,
+                'rol' => $usuario->rol?->nombre_rol,
+                'estado_anterior' => $estadoAnterior,
+                'estado_nuevo' => $usuario->estado ? 'Activo' : 'Inactivo',
+                'motivo_justificacion' => $usuario->estado ? 'Reactivación de cuenta' : 'Suspensión de cuenta',
+            ]
         );
 
         return $usuario->load(['rol', 'medico', 'paciente']);

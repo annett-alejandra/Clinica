@@ -112,6 +112,7 @@ Route::get('/auditoria', function (Request $request) {
     $accion = $request->query('accion');
     $tabla = $request->query('tabla');
     $categoria = $request->query('categoria', 'todas');
+    $idUsuario = $request->query('id_usuario');
     $busqueda = trim($request->query('q', ''));
     $desde = $request->query('desde');
     $hasta = $request->query('hasta');
@@ -121,7 +122,7 @@ Route::get('/auditoria', function (Request $request) {
         'total' => \App\Models\Paquetes\P1_SeguridadAdministracion\Auditoria::count(),
         'logins' => \App\Models\Paquetes\P1_SeguridadAdministracion\Auditoria::where('accion', 'LOGIN')->count(),
         'logouts' => \App\Models\Paquetes\P1_SeguridadAdministracion\Auditoria::where('accion', 'LOGOUT')->count(),
-        'fallidos' => \App\Models\Paquetes\P1_SeguridadAdministracion\Auditoria::where('accion', 'INTENTO_LOGIN_FALLIDO')->count(),
+        'fallidos' => \App\Models\Paquetes\P1_SeguridadAdministracion\Auditoria::whereIn('accion', ['INTENTO_LOGIN_FALLIDO', 'ACCESO_DENEGADO'])->count(),
         'clinicos' => \App\Models\Paquetes\P1_SeguridadAdministracion\Auditoria::where(function ($q) {
             $q->where('tabla_afectada', 'like', '%cita%')
               ->orWhere('tabla_afectada', 'like', '%paciente%')
@@ -140,9 +141,12 @@ Route::get('/auditoria', function (Request $request) {
     } elseif ($categoria === 'salidas') {
         $query->where('accion', 'LOGOUT');
     } elseif ($categoria === 'fallidos') {
-        $query->where('accion', 'INTENTO_LOGIN_FALLIDO');
+        $query->whereIn('accion', ['INTENTO_LOGIN_FALLIDO', 'ACCESO_DENEGADO']);
     } elseif ($categoria === 'accesos') {
-        $query->whereIn('accion', ['LOGIN', 'LOGOUT', 'INTENTO_LOGIN_FALLIDO', 'RESTABLECER_PASSWORD', 'RECUPERAR_PASSWORD']);
+        $query->whereIn('accion', [
+            'LOGIN', 'LOGOUT', 'INTENTO_LOGIN_FALLIDO', 'ACCESO_DENEGADO',
+            'SOLICITUD_RECUPERACION_PASSWORD', 'RESTABLECIMIENTO_PASSWORD_EXITOSO'
+        ]);
     } elseif ($categoria === 'clinica') {
         $query->where(function ($q) {
             $q->where('tabla_afectada', 'like', '%cita%')
@@ -151,14 +155,19 @@ Route::get('/auditoria', function (Request $request) {
               ->orWhere('accion', 'like', '%PACIENTE%')
               ->orWhere('accion', 'like', '%ATENDIDA%')
               ->orWhere('accion', 'like', '%LLEGADA%')
-              ->orWhere('accion', 'like', '%EXPEDIENTE%');
+              ->orWhere('accion', 'like', '%EXPEDIENTE%')
+              ->orWhere('accion', 'like', '%INASISTENCIA%');
         });
     } elseif ($categoria === 'admin') {
         $query->where(function ($q) {
             $q->where('tabla_afectada', 'like', '%horario%')
               ->orWhere('tabla_afectada', 'like', '%usuario%')
               ->orWhere('tabla_afectada', 'like', '%especialidad%')
-              ->orWhere('tabla_afectada', 'like', '%medico%');
+              ->orWhere('tabla_afectada', 'like', '%medico%')
+              ->orWhere('tabla_afectada', 'seguridad_rutas')
+              ->orWhere('accion', 'like', '%PASSWORD%')
+              ->orWhere('accion', 'like', '%USUARIO%')
+              ->orWhere('accion', 'like', '%HORARIO%');
         });
     }
 
@@ -169,16 +178,19 @@ Route::get('/auditoria', function (Request $request) {
     if ($tabla && $tabla !== 'todas') {
         $query->where('tabla_afectada', $tabla);
     }
+    if ($idUsuario && $idUsuario !== 'todos') {
+        $query->where('id_usuario', (int) $idUsuario);
+    }
 
-    // Filtro por rango de fechas
+    // Filtro por rango de fechas en hora local de Bolivia (America/La_Paz)
     if ($desde) {
-        $query->whereDate('fecha_hora', '>=', $desde);
+        $query->whereRaw("(fecha_hora AT TIME ZONE 'America/La_Paz')::date >= ?", [$desde]);
     }
     if ($hasta) {
-        $query->whereDate('fecha_hora', '<=', $hasta);
+        $query->whereRaw("(fecha_hora AT TIME ZONE 'America/La_Paz')::date <= ?", [$hasta]);
     }
 
-    // Búsqueda general
+    // Búsqueda general (Operador, correo, acción, tabla, IP, CI paciente, motivo)
     if ($busqueda !== '') {
         $query->where(function ($q) use ($busqueda) {
             $q->where('accion', 'ilike', "%{$busqueda}%")
@@ -186,6 +198,40 @@ Route::get('/auditoria', function (Request $request) {
               ->orWhereRaw("detalle::text ilike ?", ["%{$busqueda}%"])
               ->orWhereHas('usuario', fn($u) => $u->where('nombre_usuario', 'ilike', "%{$busqueda}%")->orWhere('correo', 'ilike', "%{$busqueda}%"));
         });
+    }
+
+    // Exportar CSV de Auditoría si se solicita ?formato=csv
+    if ($request->query('formato') === 'csv') {
+        $rows = $query->limit(1000)->get();
+        $filename = 'bitacora_auditoria_' . date('Ymd_His') . '.csv';
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ];
+        $callback = function () use ($rows) {
+            $handle = fopen('php://output', 'w');
+            fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
+            fputcsv($handle, ['ID', 'Fecha/Hora (Bolivia)', 'Operador', 'Rol', 'Accion', 'Tabla', 'ID Registro', 'IP', 'Estado Anterior', 'Estado Nuevo', 'Paciente CI', 'Justificacion']);
+            foreach ($rows as $row) {
+                $det = $row->detalle ?? [];
+                fputcsv($handle, [
+                    $row->id_auditoria,
+                    \Carbon\Carbon::parse($row->fecha_hora)->timezone('America/La_Paz')->format('d/m/Y H:i:s'),
+                    $row->usuario?->nombre_usuario ?? ($det['identificador'] ?? 'Sistema/Anonimo'),
+                    $row->usuario?->rol?->nombre_rol ?? ($det['rol'] ?? $det['rol_actual'] ?? '-'),
+                    $row->accion,
+                    $row->tabla_afectada,
+                    $row->id_registro_afectado ?? '-',
+                    $det['ip'] ?? '-',
+                    $det['estado_anterior'] ?? '-',
+                    $det['estado_nuevo'] ?? '-',
+                    $det['paciente']['ci'] ?? '-',
+                    $det['motivo_justificacion'] ?? '-',
+                ]);
+            }
+            fclose($handle);
+        };
+        return response()->stream($callback, 200, $headers);
     }
 
     $auditorias = $query->paginate(25)->withQueryString();
@@ -200,8 +246,10 @@ Route::get('/auditoria', function (Request $request) {
         ->orderBy('tabla_afectada')
         ->pluck('tabla_afectada');
 
+    $usuariosLista = User::orderBy('nombre_usuario')->get(['id_usuario', 'nombre_usuario', 'correo']);
+
     return view('Paquetes.P1_SeguridadAdministracion.Auditoria.index', compact(
-        'auditorias', 'acciones', 'tablas', 'accion', 'tabla', 'busqueda', 'categoria', 'desde', 'hasta', 'kpis'
+        'auditorias', 'acciones', 'tablas', 'usuariosLista', 'accion', 'tabla', 'idUsuario', 'busqueda', 'categoria', 'desde', 'hasta', 'kpis'
     ));
 })->middleware('rol:Administrador')->name('auditoria');
 

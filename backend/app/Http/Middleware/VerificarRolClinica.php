@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\Paquetes\P1_SeguridadAdministracion\AuditService;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -40,6 +41,19 @@ class VerificarRolClinica
 
         // En rutas API exigimos coincidencia estricta con los roles permitidos
         if ($request->is('api/*') && !empty($roles) && !in_array($rolUsuario, $roles, true)) {
+            AuditService::registrar(
+                $usuario?->id_usuario,
+                'ACCESO_DENEGADO',
+                'seguridad_rutas',
+                $usuario?->id_usuario,
+                [
+                    'accion_ejecutada' => 'ACCESO_DENEGADO',
+                    'ruta' => $request->path(),
+                    'rol_actual' => $rolUsuario,
+                    'roles_permitidos' => $roles,
+                    'motivo_justificacion' => "Intento de acceso no autorizado por API con rol {$rolUsuario}",
+                ]
+            );
             return response()->json([
                 'success' => false,
                 'message' => 'Acceso denegado: No posee los permisos requeridos para esta operación.',
@@ -50,6 +64,19 @@ class VerificarRolClinica
 
         // En rutas web, si hay un usuario autenticado con rol restringido y no coincide, avisamos en el portal
         if ($usuario !== null && !empty($roles) && !in_array($rolUsuario, $roles, true)) {
+            AuditService::registrar(
+                $usuario->id_usuario,
+                'ACCESO_DENEGADO',
+                'seguridad_rutas',
+                $usuario->id_usuario,
+                [
+                    'accion_ejecutada' => 'ACCESO_DENEGADO',
+                    'ruta' => '/' . ltrim($request->path(), '/'),
+                    'rol_actual' => $rolUsuario,
+                    'roles_permitidos' => $roles,
+                    'motivo_justificacion' => "Rol {$rolUsuario} intentó acceder a ruta restringida",
+                ]
+            );
             if ($request->expectsJson()) {
                 return response()->json([
                     'success' => false,

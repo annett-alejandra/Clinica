@@ -72,15 +72,23 @@ class HorarioService
         ]);
 
         AuditService::registrar(
-            $operadorId,
+            $operadorId ?? auth()->id(),
             'CREAR_HORARIO_ATENCION',
             'horarios_atencion',
             $horario->id_horario,
             [
-                'medico' => $medico->nombre_completo,
+                'accion_ejecutada' => 'CREACION',
+                'estado_anterior' => null,
+                'estado_nuevo' => 'Activo',
+                'medico' => [
+                    'id_medico' => $medico->id_medico,
+                    'nombre_completo' => $medico->nombre_completo,
+                ],
                 'dia_semana' => $diaSemana,
-                'hora_inicio' => $horaInicio,
-                'hora_fin' => $horaFin
+                'hora_inicio' => substr($horaInicio, 0, 5),
+                'hora_fin' => substr($horaFin, 0, 5),
+                'duracion_cita_minutos' => $duracion,
+                'motivo_justificacion' => 'Configuración de turno semanal de atención médica',
             ]
         );
 
@@ -92,15 +100,28 @@ class HorarioService
      */
     public function eliminar(int $idHorario, ?int $operadorId = null): void
     {
-        $horario = HorarioAtencion::findOrFail($idHorario);
+        $horario = HorarioAtencion::with('medico')->findOrFail($idHorario);
+        $horarioData = [
+            'accion_ejecutada' => 'ELIMINACION',
+            'estado_anterior' => 'Activo',
+            'estado_nuevo' => 'Eliminado',
+            'medico' => [
+                'id_medico' => $horario->id_medico,
+                'nombre_completo' => $horario->medico?->nombre_completo,
+            ],
+            'dia_semana' => $horario->dia_semana,
+            'hora_inicio' => substr((string) $horario->hora_inicio, 0, 5),
+            'hora_fin' => substr((string) $horario->hora_fin, 0, 5),
+            'motivo_justificacion' => 'Eliminación de turno de atención médica',
+        ];
         $horario->delete();
 
         AuditService::registrar(
-            $operadorId,
+            $operadorId ?? auth()->id(),
             'ELIMINAR_HORARIO_ATENCION',
             'horarios_atencion',
             $idHorario,
-            ['id_medico' => $horario->id_medico, 'dia' => $horario->dia_semana]
+            $horarioData
         );
     }
 }

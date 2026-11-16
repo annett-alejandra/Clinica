@@ -51,10 +51,33 @@ class AuthService
         }
 
         if (!$usuario) {
+            AuditService::registrar(
+                null,
+                'INTENTO_LOGIN_FALLIDO',
+                'usuarios',
+                null,
+                [
+                    'accion_ejecutada' => 'INTENTO_FALLIDO',
+                    'identificador' => $identificador,
+                    'motivo_justificacion' => 'Usuario o correo no registrado en el sistema',
+                ]
+            );
             throw new InvalidArgumentException('Las credenciales proporcionadas no son válidas.');
         }
 
         if (!$usuario->estado) {
+            AuditService::registrar(
+                $usuario->id_usuario,
+                'INTENTO_LOGIN_FALLIDO',
+                'usuarios',
+                $usuario->id_usuario,
+                [
+                    'accion_ejecutada' => 'INTENTO_FALLIDO',
+                    'identificador' => $identificador,
+                    'rol' => $usuario->rol?->nombre_rol,
+                    'motivo_justificacion' => 'Intento de acceso a cuenta inactiva o suspendida',
+                ]
+            );
             throw new InvalidArgumentException('La cuenta de usuario se encuentra inactiva o suspendida.');
         }
 
@@ -68,7 +91,12 @@ class AuthService
                 'INTENTO_LOGIN_FALLIDO',
                 'usuarios',
                 $usuario->id_usuario,
-                ['ip' => request()->ip(), 'identificador' => $identificador]
+                [
+                    'accion_ejecutada' => 'INTENTO_FALLIDO',
+                    'identificador' => $identificador,
+                    'rol' => $usuario->rol?->nombre_rol,
+                    'motivo_justificacion' => 'Contraseña incorrecta',
+                ]
             );
             throw new InvalidArgumentException('Las credenciales proporcionadas no son válidas.');
         }
@@ -81,7 +109,12 @@ class AuthService
             'LOGIN',
             'usuarios',
             $usuario->id_usuario,
-            ['ip' => request()->ip(), 'rol' => $usuario->rol?->nombre_rol]
+            [
+                'accion_ejecutada' => 'LOGIN',
+                'nombre_usuario' => $usuario->nombre_usuario,
+                'rol' => $usuario->rol?->nombre_rol,
+                'motivo_justificacion' => 'Inicio de sesión exitoso',
+            ]
         );
 
         return [
@@ -108,12 +141,18 @@ class AuthService
     public function logout(?int $idUsuario): void
     {
         if ($idUsuario) {
+            $usuario = User::with('rol')->find($idUsuario);
             AuditService::registrar(
                 $idUsuario,
                 'LOGOUT',
                 'usuarios',
                 $idUsuario,
-                ['ip' => request()->ip()]
+                [
+                    'accion_ejecutada' => 'LOGOUT',
+                    'nombre_usuario' => $usuario?->nombre_usuario,
+                    'rol' => $usuario?->rol?->nombre_rol,
+                    'motivo_justificacion' => 'Cierre de sesión voluntario',
+                ]
             );
         }
     }

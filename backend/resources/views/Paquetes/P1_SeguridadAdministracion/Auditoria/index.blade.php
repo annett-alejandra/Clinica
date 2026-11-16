@@ -4,6 +4,14 @@
 
 @section('content')
 <div class="container py-8 sm:py-12" x-data="{ modalDetalle: false, detallePayload: null, detalleAccion: '', detalleFecha: '', detalleOperador: '' }">
+    <style>
+        @media print {
+            nav, header, footer, .no-print { display: none !important; }
+            body { background: #ffffff !important; font-size: 10pt !important; }
+            .container { max-width: 100% !important; padding: 0 !important; }
+        }
+    </style>
+
     <!-- Cabecera Institucional de Seguridad -->
     <div class="flex flex-col md:flex-row md:items-center justify-between pb-6 mb-8 border-b border-slate-200 gap-4">
         <div>
@@ -14,18 +22,22 @@
                     </svg>
                     ACCESO EXCLUSIVO: ADMINISTRADOR DEL SISTEMA
                 </span>
-                <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono font-medium">PostgreSQL Inmutable</span>
+                <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono font-medium">Hora Local Bolivia (UTC-4)</span>
             </div>
             <h1 class="text-3xl font-serif text-slate-900 tracking-tight">Auditoría, Accesos y Trazabilidad</h1>
             <p class="text-sm text-slate-500 mt-1">Supervisión en tiempo real de entradas (logins), salidas (logouts), intentos no autorizados y actividad clínica/administrativa.</p>
         </div>
-        <div class="flex items-center gap-2 self-start md:self-center">
-            <a href="{{ route('portal') }}" class="px-4 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-xs flex items-center gap-2 transition-colors shadow-sm bg-white">
-                <span>←</span>
-                <span>Volver al Portal</span>
+        <div class="no-print flex flex-wrap items-center gap-2 self-start md:self-center">
+            <button type="button" onclick="window.print()"
+                    class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs flex items-center gap-1.5 transition-colors shadow-sm">
+                <span>Exportar PDF</span>
+            </button>
+            <a href="{{ route('auditoria', array_merge(request()->all(), ['formato' => 'csv'])) }}"
+               class="px-3.5 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-xs flex items-center gap-1.5 transition-colors shadow-sm bg-white">
+                <span>Exportar CSV</span>
             </a>
-            <a href="{{ url('/usuarios') }}" class="btn-primary py-2 px-4 text-xs shadow-sm">
-                Gestión de Usuarios
+            <a href="{{ route('portal') }}" class="px-3.5 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-xs flex items-center gap-1.5 transition-colors shadow-sm bg-white">
+                <span>← Portal</span>
             </a>
         </div>
     </div>
@@ -127,14 +139,14 @@
     </div>
 
     <!-- FORMULARIO DE BÚSQUEDA Y FILTROS AVANZADOS -->
-    <div class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm mb-6">
+    <div class="no-print bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm mb-6">
         <form action="{{ route('auditoria') }}" method="GET" class="space-y-4">
             <input type="hidden" name="categoria" value="{{ $categoria }}">
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5 items-end">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3.5 items-end">
                 <!-- Búsqueda General -->
                 <div class="lg:col-span-2">
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Búsqueda General (Usuario, Correo, IP, Detalle)</label>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Búsqueda General (Usuario, CI, IP, Motivo)</label>
                     <div class="relative">
                         <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -143,8 +155,21 @@
                         </span>
                         <input type="text" name="q" value="{{ $busqueda }}"
                                class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm bg-slate-50 focus:bg-white focus:border-[#0284C7] focus:outline-none transition-colors"
-                               placeholder="Ej: admin_uagrm, 166.114, LOGIN, citas...">
+                               placeholder="Ej: 13730890, 190.129, LOGIN, cancelación...">
                     </div>
+                </div>
+
+                <!-- Operador / Usuario -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Operador</label>
+                    <select name="id_usuario" class="w-full text-xs font-medium border-slate-200 rounded-xl p-2.5 bg-slate-50 border focus:bg-white focus:border-[#0284C7] focus:outline-none">
+                        <option value="todos">Todos los usuarios</option>
+                        @foreach($usuariosLista ?? [] as $usr)
+                            <option value="{{ $usr->id_usuario }}" {{ ($idUsuario == $usr->id_usuario) ? 'selected' : '' }}>
+                                {{ $usr->nombre_usuario }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
 
                 <!-- Fecha Desde -->
@@ -181,7 +206,7 @@
                     Mostrando resultados filtrados: <strong class="text-slate-900 font-bold">{{ $auditorias->total() }} registros</strong>
                 </span>
                 <div class="flex items-center gap-2">
-                    @if($busqueda || ($accion && $accion !== 'todas') || ($tabla && $tabla !== 'todas') || $desde || $hasta || $categoria !== 'todas')
+                    @if($busqueda || ($accion && $accion !== 'todas') || ($tabla && $tabla !== 'todas') || ($idUsuario && $idUsuario !== 'todos') || $desde || $hasta || $categoria !== 'todas')
                         <a href="{{ route('auditoria') }}" class="px-3.5 py-1.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 text-xs font-semibold transition-colors">
                             Limpiar Filtros
                         </a>
@@ -213,14 +238,16 @@
                         @php
                             $detalle = $aud->detalle ?? [];
                             $ip = $detalle['ip'] ?? null;
+                            $ua = $detalle['user_agent'] ?? null;
                             $accion = $aud->accion;
+                            $fechaLocal = \Carbon\Carbon::parse($aud->fecha_hora)->timezone('America/La_Paz');
 
                             // Identificar badges visuales
                             $isLogin = str_contains($accion, 'LOGIN') && !str_contains($accion, 'FALLIDO');
                             $isLogout = str_contains($accion, 'LOGOUT');
-                            $isFallido = str_contains($accion, 'FALLIDO');
+                            $isFallido = str_contains($accion, 'FALLIDO') || str_contains($accion, 'DENEGADO');
                             $isPassword = str_contains($accion, 'PASSWORD');
-                            $isClinica = str_contains($accion, 'CITA') || str_contains($accion, 'PACIENTE') || str_contains($accion, 'ATENDIDA') || str_contains($accion, 'EXPEDIENTE');
+                            $isClinica = str_contains($accion, 'CITA') || str_contains($accion, 'PACIENTE') || str_contains($accion, 'ATENDIDA') || str_contains($accion, 'EXPEDIENTE') || str_contains($accion, 'INASISTENCIA');
 
                             $colorBadge = match(true) {
                                 $isLogin => 'bg-emerald-50 text-emerald-800 border-emerald-300 font-bold',
@@ -230,16 +257,26 @@
                                 $isClinica => 'bg-sky-50 text-sky-800 border-sky-200 font-semibold',
                                 default => 'bg-slate-100 text-slate-700 border-slate-200 font-medium',
                             };
+
+                            $dispResumen = null;
+                            if ($ua) {
+                                if (str_contains($ua, 'Edg')) $dispResumen = 'Edge';
+                                elseif (str_contains($ua, 'Chrome')) $dispResumen = 'Chrome/Brave';
+                                elseif (str_contains($ua, 'Firefox')) $dispResumen = 'Firefox';
+                                elseif (str_contains($ua, 'Safari')) $dispResumen = 'Safari';
+                                elseif (str_contains($ua, 'curl')) $dispResumen = 'API / cURL';
+                                else $dispResumen = substr($ua, 0, 18);
+                            }
                         @endphp
                         <tr class="hover:bg-slate-50/70 transition-colors {{ $isFallido ? 'bg-rose-50/20' : '' }}">
                             <!-- ID y Fecha -->
                             <td class="px-5 py-3.5 whitespace-nowrap">
                                 <span class="font-mono text-[10px] text-slate-400 block font-semibold">#{{ $aud->id_auditoria }}</span>
                                 <strong class="text-slate-800 font-bold">
-                                    {{ \Carbon\Carbon::parse($aud->fecha_hora)->format('d/m/Y') }}
+                                    {{ $fechaLocal->format('d/m/Y') }}
                                 </strong>
                                 <span class="text-slate-500 font-mono text-[11px] block">
-                                    {{ \Carbon\Carbon::parse($aud->fecha_hora)->format('H:i:s') }}
+                                    {{ $fechaLocal->format('H:i:s') }}
                                 </span>
                             </td>
 
@@ -256,10 +293,13 @@
                                     </div>
                                     <span class="text-[11px] text-slate-500 block truncate max-w-[180px]">{{ $aud->usuario->correo }}</span>
                                 @else
-                                    <span class="inline-flex items-center gap-1 text-slate-400 italic">
+                                    <span class="inline-flex items-center gap-1 text-slate-600 font-semibold">
                                         <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                                        Sistema / Anónimo
+                                        {{ $detalle['identificador'] ?? 'Sistema / Anónimo' }}
                                     </span>
+                                    @if(!empty($detalle['identificador']))
+                                        <span class="text-[10px] text-rose-600 block">Credencial no registrada</span>
+                                    @endif
                                 @endif
                             </td>
 
@@ -277,6 +317,9 @@
                                         {{ $accion }}
                                     </span>
                                 </div>
+                                @if(!empty($detalle['accion_ejecutada']))
+                                    <span class="text-[10px] text-slate-400 font-mono block mt-0.5">Tipo: {{ $detalle['accion_ejecutada'] }}</span>
+                                @endif
                             </td>
 
                             <!-- IP y Red -->
@@ -286,6 +329,9 @@
                                         <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
                                         {{ $ip }}
                                     </span>
+                                    @if($dispResumen)
+                                        <span class="text-[10px] text-slate-400 block mt-0.5">{{ $dispResumen }}</span>
+                                    @endif
                                 @else
                                     <span class="text-slate-300">—</span>
                                 @endif
@@ -317,17 +363,18 @@
                             </td>
 
                             <!-- Detalle / JSON Inspector -->
-                            <td class="px-5 py-3.5 text-right whitespace-nowrap">
+                            <td class="no-print px-5 py-3.5 text-right whitespace-nowrap">
                                 @if($aud->detalle)
                                     <button type="button"
+                                            data-payload="{{ json_encode($aud->detalle, JSON_UNESCAPED_UNICODE) }}"
                                             @click="
                                                 modalDetalle = true;
-                                                detallePayload = {{ json_encode($aud->detalle) }};
-                                                detalleAccion = '{{ $aud->accion }}';
-                                                detalleFecha = '{{ \Carbon\Carbon::parse($aud->fecha_hora)->format('d/m/Y H:i:s') }}';
-                                                detalleOperador = '{{ $aud->usuario?->nombre_usuario ?? 'Sistema / Anónimo' }}';
+                                                detallePayload = JSON.parse($el.dataset.payload);
+                                                detalleAccion = @js($aud->accion);
+                                                detalleFecha = @js($fechaLocal->format('d/m/Y H:i:s'));
+                                                detalleOperador = @js($aud->usuario?->nombre_usuario ?? ($detalle['identificador'] ?? 'Sistema / Anónimo'));
                                             "
-                                            class="px-2.5 py-1 rounded-lg border border-slate-200 hover:border-[#0284C7] hover:text-[#0284C7] bg-white text-slate-600 text-[11px] font-semibold transition-colors shadow-2xl">
+                                            class="px-2.5 py-1 rounded-lg border border-slate-200 hover:border-[#0284C7] hover:text-[#0284C7] bg-white text-slate-600 text-[11px] font-semibold transition-colors">
                                         Ver JSON
                                     </button>
                                 @else

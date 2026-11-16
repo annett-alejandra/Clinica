@@ -26,14 +26,17 @@ class AuditService
         ?array $detalle = null
     ): ?Auditoria {
         try {
-            // Filtrar contraseñas y datos sensibles del detalle de auditoría
-            if ($detalle !== null) {
-                unset($detalle['password'], $detalle['password_hash'], $detalle['token']);
-                if (!isset($detalle['ip']) && app()->bound('request')) {
-                    $detalle['ip'] = request()?->ip();
+            // Filtrar contraseñas y datos sensibles del detalle de auditoría y enriquecer con IP/dispositivo
+            $detalle = $detalle ?? [];
+            unset($detalle['password'], $detalle['password_hash'], $detalle['token']);
+            if (app()->bound('request')) {
+                $req = request();
+                if (!isset($detalle['ip'])) {
+                    $detalle['ip'] = $req?->ip();
                 }
-            } else {
-                $detalle = app()->bound('request') ? ['ip' => request()?->ip()] : null;
+                if (!isset($detalle['user_agent']) && $req?->userAgent()) {
+                    $detalle['user_agent'] = substr((string) $req->userAgent(), 0, 180);
+                }
             }
 
             return Auditoria::create([

@@ -793,7 +793,7 @@
                                 @php
                                     $isLogin = str_contains($log->accion, 'LOGIN') && !str_contains($log->accion, 'FALLIDO');
                                     $isLogout = str_contains($log->accion, 'LOGOUT');
-                                    $isFallido = str_contains($log->accion, 'FALLIDO');
+                                    $isFallido = str_contains($log->accion, 'FALLIDO') || str_contains($log->accion, 'DENEGADO');
                                     $badge = match(true) {
                                         $isLogin => 'bg-emerald-50 text-emerald-800 border-emerald-300 font-bold',
                                         $isLogout => 'bg-blue-50 text-blue-800 border-blue-200 font-bold',
@@ -804,7 +804,7 @@
                                 <tr class="hover:bg-slate-50">
                                     <td class="py-3 px-6 font-bold text-[#0284C7] font-mono">#{{ $log->id_auditoria }}</td>
                                     <td class="py-3 px-6 font-semibold text-slate-800">
-                                        {{ $log->usuario?->nombre_usuario ?? 'Sistema / Anónimo' }}
+                                        {{ $log->usuario?->nombre_usuario ?? ($log->detalle['identificador'] ?? 'Sistema / Anónimo') }}
                                     </td>
                                     <td class="py-3 px-6">
                                         <span class="inline-flex px-2 py-0.5 rounded text-[10px] uppercase tracking-wider border {{ $badge }}">
@@ -813,7 +813,7 @@
                                     </td>
                                     <td class="py-3 px-6 font-mono text-slate-600">{{ $log->tabla_afectada }}</td>
                                     <td class="py-3 px-6 text-slate-500 font-mono text-[11px]">
-                                        {{ \Carbon\Carbon::parse($log->fecha_hora)->format('d/m/Y H:i:s') }}
+                                        {{ \Carbon\Carbon::parse($log->fecha_hora)->timezone('America/La_Paz')->format('d/m/Y H:i:s') }}
                                     </td>
                                 </tr>
                             @empty

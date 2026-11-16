@@ -73,11 +73,21 @@ class PacienteService
         ]);
 
         AuditService::registrar(
-            $operadorId,
+            $operadorId ?? auth()->id(),
             'CREAR_PACIENTE',
             'pacientes',
             $paciente->id_paciente,
-            ['ci' => $paciente->ci, 'nombre' => $paciente->nombre_completo]
+            [
+                'accion_ejecutada' => 'CREACION',
+                'estado_anterior' => null,
+                'estado_nuevo' => $paciente->estado ? 'Activo' : 'Inactivo',
+                'paciente' => [
+                    'id_paciente' => $paciente->id_paciente,
+                    'ci' => $paciente->ci,
+                    'nombre_completo' => $paciente->nombre_completo,
+                ],
+                'motivo_justificacion' => 'Registro de ficha clínica de paciente',
+            ]
         );
 
         return $paciente->makeVisible(['ci', 'fecha_nacimiento']);
@@ -89,6 +99,7 @@ class PacienteService
     public function actualizar(int $idPaciente, array $datos, ?int $operadorId = null): Paciente
     {
         $paciente = Paciente::findOrFail($idPaciente);
+        $estadoAnterior = $paciente->estado ? 'Activo' : 'Inactivo';
 
         if (isset($datos['ci']) && trim($datos['ci']) !== $paciente->ci) {
             $ci = trim($datos['ci']);
@@ -122,11 +133,21 @@ class PacienteService
         $paciente->save();
 
         AuditService::registrar(
-            $operadorId,
+            $operadorId ?? auth()->id(),
             'ACTUALIZAR_PACIENTE',
             'pacientes',
             $paciente->id_paciente,
-            ['ci' => $paciente->ci, 'nombre' => $paciente->nombre_completo, 'estado' => $paciente->estado]
+            [
+                'accion_ejecutada' => 'MODIFICACION',
+                'estado_anterior' => $estadoAnterior,
+                'estado_nuevo' => $paciente->estado ? 'Activo' : 'Inactivo',
+                'paciente' => [
+                    'id_paciente' => $paciente->id_paciente,
+                    'ci' => $paciente->ci,
+                    'nombre_completo' => $paciente->nombre_completo,
+                ],
+                'motivo_justificacion' => 'Actualización de datos del paciente',
+            ]
         );
 
         return $paciente->makeVisible(['ci', 'fecha_nacimiento']);
@@ -138,15 +159,26 @@ class PacienteService
     public function toggleEstado(int $idPaciente, ?int $operadorId = null): Paciente
     {
         $paciente = Paciente::findOrFail($idPaciente);
+        $estadoAnterior = $paciente->estado ? 'Activo' : 'Inactivo';
         $paciente->estado = !$paciente->estado;
         $paciente->save();
 
         AuditService::registrar(
-            $operadorId,
+            $operadorId ?? auth()->id(),
             $paciente->estado ? 'ACTIVAR_PACIENTE' : 'DESACTIVAR_PACIENTE',
             'pacientes',
             $paciente->id_paciente,
-            ['nuevo_estado' => $paciente->estado]
+            [
+                'accion_ejecutada' => 'MODIFICACION',
+                'estado_anterior' => $estadoAnterior,
+                'estado_nuevo' => $paciente->estado ? 'Activo' : 'Inactivo',
+                'paciente' => [
+                    'id_paciente' => $paciente->id_paciente,
+                    'ci' => $paciente->ci,
+                    'nombre_completo' => $paciente->nombre_completo,
+                ],
+                'motivo_justificacion' => $paciente->estado ? 'Reactivación de ficha médica' : 'Baja lógica de ficha médica',
+            ]
         );
 
         return $paciente;
