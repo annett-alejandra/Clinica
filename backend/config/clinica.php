@@ -18,9 +18,11 @@ return [
 
     // Módulos (casos de uso) y roles con acceso. Roles vacíos = público.
     'modulos' => [
+        ['cu' => 'IA-TRIAGE', 'grupo' => 'Citas', 'titulo' => 'Triage Inteligente IA', 'desc' => 'Asignación inteligente por síntomas (NLP)', 'url' => '/triage-inteligente', 'roles' => []],
         ['cu' => 'CU11', 'grupo' => 'Citas', 'titulo' => 'Programar cita', 'desc' => 'Reserva de consultas médicas', 'url' => '/citas', 'roles' => ['Administrador', 'Recepcionista', 'Paciente']],
         ['cu' => 'CU18', 'grupo' => 'Citas', 'titulo' => 'Mis citas', 'desc' => 'Próximas visitas e historial', 'url' => '/mis-citas', 'roles' => ['Paciente', 'Administrador']],
         ['cu' => 'CU10', 'grupo' => 'Citas', 'titulo' => 'Disponibilidad', 'desc' => 'Turnos libres en tiempo real', 'url' => '/disponibilidad', 'roles' => []],
+        ['cu' => 'IA-ALERTAS', 'grupo' => 'Atención', 'titulo' => 'Alertas Rojas Triage', 'desc' => 'Monitor de emergencias y base vectorial', 'url' => '/triage-inteligente/alertas', 'roles' => ['Administrador', 'Recepcionista']],
         ['cu' => 'CU14', 'grupo' => 'Atención', 'titulo' => 'Control de llegadas', 'desc' => 'Confirmación y asistencia', 'url' => '/control-atencion', 'roles' => ['Administrador', 'Recepcionista']],
         ['cu' => 'CU15', 'grupo' => 'Atención', 'titulo' => 'Atención médica', 'desc' => 'Registrar cita atendida', 'url' => '/atencion-medica', 'roles' => ['Médico', 'Administrador']],
         ['cu' => 'CU16', 'grupo' => 'Atención', 'titulo' => 'Agenda médica', 'desc' => 'Agenda por fecha y médico', 'url' => '/agenda-medica', 'roles' => ['Administrador', 'Recepcionista', 'Médico']],
@@ -33,6 +35,7 @@ return [
         ['cu' => 'AUDIT', 'grupo' => 'Administración', 'titulo' => 'Auditoría y Seguridad', 'desc' => 'Trazabilidad y logs de seguridad', 'url' => '/auditoria', 'roles' => ['Administrador']],
         ['cu' => 'CU19', 'grupo' => 'Administración', 'titulo' => 'Reportes', 'desc' => 'Métricas administrativas', 'url' => '/reportes-administrativos', 'roles' => ['Administrador']],
         ['cu' => 'CU08', 'grupo' => 'Mi cuenta', 'titulo' => 'Mi perfil', 'desc' => 'Datos personales y contacto', 'url' => '/perfil-paciente', 'roles' => ['Paciente', 'Administrador']],
+        ['cu' => 'CU20', 'grupo' => 'Asistencia IA', 'titulo' => 'Asistente Virtual IA', 'desc' => 'Chatbot con IA para consultas de la clínica', 'url' => '/asistente-ia', 'roles' => []],
     ],
 
     // Presentación visual de los estados de cita (id_estado_cita => tipo de badge).

@@ -47,4 +47,9 @@ class Medico extends Model
     {
         return $this->hasMany(CitaMedica::class, 'id_medico', 'id_medico');
     }
+
+    public function perfilesClinicos(): HasMany
+    {
+        return $this->hasMany(PerfilClinicoMedico::class, 'id_medico', 'id_medico');
+    }
 }

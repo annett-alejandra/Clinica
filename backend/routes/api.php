@@ -19,6 +19,8 @@ use App\Http\Controllers\Paquetes\P6_ConsultasHistoriales\CU16_ConsultarAgendaMe
 use App\Http\Controllers\Paquetes\P6_ConsultasHistoriales\CU17_ConsultarHistorialCitasPaciente\HistorialCitasPacienteController;
 use App\Http\Controllers\Paquetes\P6_ConsultasHistoriales\CU18_ConsultarMisCitas\MisCitasController;
 use App\Http\Controllers\Paquetes\P7_ReportesEstadisticas\CU19_GenerarReportesAdministrativos\ReportesAdminController;
+use App\Http\Controllers\Paquetes\P8_AsistenciaInteligente\CU20_AsistenteVirtualIA\ChatbotController;
+use App\Http\Controllers\Triage\TriageInteligenteController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -140,3 +142,20 @@ Route::get('/mis-citas', MisCitasController::class);
 // ==========================================
 // CU19: Generar Reportes Administrativos
 Route::get('/reportes-administrativos', ReportesAdminController::class);
+
+// ==========================================
+// PAQUETE 8: ASISTENCIA INTELIGENTE CON IA
+// ==========================================
+// CU20: Asistente Virtual Clínico con IA
+Route::get('/chatbot/estado', [ChatbotController::class, 'estado']);
+Route::post('/chatbot/mensaje', [ChatbotController::class, 'mensaje'])
+    ->middleware('throttle:20,1');
+
+// Motor de Triage Clínico Inteligente (NLP Vectorial + Matching de Criterios)
+Route::prefix('triage')->group(function () {
+    Route::post('/analizar', [TriageInteligenteController::class, 'analizar'])
+        ->middleware('throttle:25,1');
+    Route::get('/alertas-activas', [TriageInteligenteController::class, 'alertasActivas']);
+    Route::patch('/alertas/{id}/atender', [TriageInteligenteController::class, 'atenderAlerta']);
+    Route::post('/reindexar', [TriageInteligenteController::class, 'reindexar']);
+});

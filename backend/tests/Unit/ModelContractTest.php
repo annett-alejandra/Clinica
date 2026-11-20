@@ -7,8 +7,10 @@ use App\Models\Paquetes\P1_SeguridadAdministracion\Especialidad;
 use App\Models\Paquetes\P1_SeguridadAdministracion\Rol;
 use App\Models\Paquetes\P2_PersonalMedico\HorarioAtencion;
 use App\Models\Paquetes\P2_PersonalMedico\Medico;
+use App\Models\Paquetes\P2_PersonalMedico\PerfilClinicoMedico;
 use App\Models\Paquetes\P3_GestionPacientes\Paciente;
 use App\Models\Paquetes\P4_GestionCitas\CitaMedica;
+use App\Models\Paquetes\P4_GestionCitas\ConsultaTriage;
 use App\Models\Paquetes\P4_GestionCitas\EstadoCita;
 use App\Models\Paquetes\P4_GestionCitas\HistorialCambioCita;
 use App\Models\User;
@@ -82,6 +84,8 @@ class ModelContractTest extends TestCase
         $this->assertFalse((new CitaMedica)->isFillable('fecha_creacion'));
         $this->assertFalse((new Auditoria)->isFillable('fecha_hora'));
         $this->assertFalse((new HistorialCambioCita)->isFillable('fecha_modificacion'));
+        $this->assertFalse((new PerfilClinicoMedico)->isFillable('actualizado_en'));
+        $this->assertFalse((new ConsultaTriage)->isFillable('fecha_registro'));
         $this->assertTrue((new EstadoCita)->isFillable('id_estado_cita'));
     }
 
@@ -96,8 +100,8 @@ class ModelContractTest extends TestCase
             }
         }
 
-        $this->assertCount(10, $modelFiles);
-        $this->assertCount(10, array_unique($modelFiles));
+        $this->assertCount(12, $modelFiles);
+        $this->assertCount(12, array_unique($modelFiles));
         $this->assertSame(1, count(array_filter($modelFiles, fn ($name) => $name === 'User')));
 
         foreach ($this->modelClasses() as $class) {
@@ -257,7 +261,7 @@ class ModelContractTest extends TestCase
 
     private function modelClasses(): array
     {
-        return [User::class, Rol::class, Auditoria::class, Especialidad::class, Medico::class, HorarioAtencion::class, Paciente::class, EstadoCita::class, CitaMedica::class, HistorialCambioCita::class];
+        return [User::class, Rol::class, Auditoria::class, Especialidad::class, Medico::class, HorarioAtencion::class, PerfilClinicoMedico::class, Paciente::class, EstadoCita::class, CitaMedica::class, ConsultaTriage::class, HistorialCambioCita::class];
     }
 
     private function migrationSchema(): array
@@ -287,7 +291,7 @@ class ModelContractTest extends TestCase
             }
         }
 
-        $this->assertCount(11, $schema);
+        $this->assertCount(13, $schema);
 
         return $schema;
     }

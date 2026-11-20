@@ -369,5 +369,10 @@ class ClinicaDemoSeeder extends Seeder
                 'citas_creadas' => count($citasDemo),
             ],
         ]);
+
+        // 9. Vectorización de Base de Conocimientos Clínica para Triage Inteligente IA
+        if (\Illuminate\Support\Facades\Schema::hasTable('perfiles_clinicos_medicos')) {
+            app(\App\Services\Triage\KnowledgeBaseSyncService::class)->sincronizarPerfiles(false);
+        }
     }
 }

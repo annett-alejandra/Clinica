@@ -295,4 +295,213 @@ document.addEventListener('alpine:init', () => {
             this.abierto = false;
         },
     }));
+
+    // Paquete 8 / CU20: Asistente Virtual Clínico con IA (página dedicada y widget flotante).
+    Alpine.data('chatbotClinica', () => ({
+        abierto: false,
+        cargando: false,
+        estadoSincronizado: false,
+        entrada: '',
+        error: '',
+        endpointMensaje: '/asistente-ia/mensaje',
+        endpointEstado: '/asistente-ia/estado',
+        storageKey: 'clinica_chatbot_historial',
+        motor: {
+            configurado: false,
+            proveedor: 'asistente_clinico_local',
+            modelo: 'Base de Conocimiento Clínica',
+            modo: 'local_fallback',
+        },
+        mensajes: [],
+
+        init() {
+            const ds = this.$el?.dataset || {};
+            if (ds.endpointMensaje) this.endpointMensaje = ds.endpointMensaje;
+            if (ds.endpointEstado) this.endpointEstado = ds.endpointEstado;
+            if (ds.proveedor) {
+                this.motor = {
+                    configurado: ds.configurado === '1',
+                    proveedor: ds.proveedor,
+                    modelo: ds.modelo || 'Base de Conocimiento Clínica',
+                    modo: ds.modo || 'local_fallback',
+                };
+                this.estadoSincronizado = true;
+            }
+
+            this.cargarHistorial();
+            if (ds.sincronizarAlIniciar === '1') {
+                this.consultarEstado();
+            }
+            this.$nextTick(() => this.scrollAlFinal());
+        },
+
+        mensajeBienvenida() {
+            return {
+                id: 'bienvenida',
+                rol: 'assistant',
+                contenido: 'Hola, soy el Asistente Virtual de Clínica Vida Salud. Puedo orientarte sobre especialidades médicas, médicos y horarios de atención, cómo agendar, reprogramar o cancelar citas, ubicación y teléfonos de urgencias.\n\nAviso clínico: Este asistente no emite diagnósticos médicos ni prescribe medicamentos.',
+                enlaces: [
+                    { titulo: 'Consultar disponibilidad', url: '/disponibilidad' },
+                    { titulo: 'Reservar cita médica', url: '/citas' },
+                ],
+                modo: this.motor.modo,
+                proveedor: this.motor.proveedor,
+                hora: this.horaActual(),
+            };
+        },
+
+        cargarHistorial() {
+            try {
+                const guardado = sessionStorage.getItem(this.storageKey);
+                if (guardado) {
+                    const parsed = JSON.parse(guardado);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        this.mensajes = parsed.slice(-20);
+                        return;
+                    }
+                }
+            } catch (e) {
+                // Ignorar errores de sessionStorage en navegación privada
+            }
+            this.mensajes = [this.mensajeBienvenida()];
+        },
+
+        guardarHistorial() {
+            try {
+                sessionStorage.setItem(this.storageKey, JSON.stringify(this.mensajes.slice(-20)));
+            } catch (e) {
+                // Ignorar si sessionStorage no está disponible
+            }
+        },
+
+        horaActual() {
+            try {
+                return new Date().toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit' });
+            } catch (e) {
+                return '';
+            }
+        },
+
+        async consultarEstado() {
+            try {
+                const res = await fetch(this.endpointEstado, {
+                    headers: { 'Accept': 'application/json' },
+                });
+                if (!res.ok) return;
+                const json = await res.json();
+                if (json.success && json.data) {
+                    this.motor = json.data;
+                    this.estadoSincronizado = true;
+                }
+            } catch (e) {
+                // Conservar estado inicial
+            }
+        },
+
+        toggle() {
+            this.abierto = !this.abierto;
+            if (this.abierto) {
+                if (!this.estadoSincronizado) {
+                    this.consultarEstado();
+                }
+                this.$nextTick(() => this.scrollAlFinal());
+            }
+        },
+
+        preguntar(texto) {
+            this.entrada = texto;
+            this.enviar();
+        },
+
+        async enviar() {
+            const texto = (this.entrada || '').trim();
+            if (!texto || this.cargando) return;
+
+            this.error = '';
+            this.entrada = '';
+
+            const historialPrevio = this.mensajes
+                .filter((m) => m.id !== 'bienvenida' && (m.rol === 'user' || m.rol === 'assistant'))
+                .slice(-8)
+                .map((m) => ({ rol: m.rol, contenido: m.contenido }));
+
+            this.mensajes.push({
+                id: 'u-' + Date.now(),
+                rol: 'user',
+                contenido: texto,
+                enlaces: [],
+                hora: this.horaActual(),
+            });
+            this.guardarHistorial();
+            this.cargando = true;
+            this.$nextTick(() => this.scrollAlFinal());
+
+            try {
+                const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+                const res = await fetch(this.endpointMensaje, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': token,
+                    },
+                    body: JSON.stringify({
+                        mensaje: texto,
+                        historial: historialPrevio,
+                    }),
+                });
+
+                const json = await res.json().catch(() => ({}));
+
+                if (!res.ok || !json.success || !json.data) {
+                    this.error = json.message || 'No se pudo procesar tu consulta en este momento.';
+                    return;
+                }
+
+                const d = json.data;
+                this.motor = {
+                    configurado: d.modo === 'ia_api',
+                    proveedor: d.proveedor || this.motor.proveedor,
+                    modelo: d.modelo || this.motor.modelo,
+                    modo: d.modo || 'local_fallback',
+                };
+                this.estadoSincronizado = true;
+
+                this.mensajes.push({
+                    id: 'a-' + Date.now(),
+                    rol: 'assistant',
+                    contenido: d.respuesta || 'Sin respuesta generada.',
+                    enlaces: Array.isArray(d.enlaces) ? d.enlaces : [],
+                    modo: d.modo,
+                    proveedor: d.proveedor,
+                    fallback_activado: Boolean(d.fallback_activado),
+                    hora: this.horaActual(),
+                });
+                this.guardarHistorial();
+            } catch (e) {
+                this.error = 'Error de conexión con el servicio del asistente. Intenta nuevamente.';
+            } finally {
+                this.cargando = false;
+                this.$nextTick(() => this.scrollAlFinal());
+            }
+        },
+
+        limpiar() {
+            this.error = '';
+            this.mensajes = [this.mensajeBienvenida()];
+            try {
+                sessionStorage.removeItem(this.storageKey);
+            } catch (e) {
+                // Ignorar
+            }
+            this.$nextTick(() => this.scrollAlFinal());
+        },
+
+        scrollAlFinal() {
+            const box = this.$refs.chatMensajes;
+            if (box) {
+                box.scrollTop = box.scrollHeight;
+            }
+        },
+    }));
 });

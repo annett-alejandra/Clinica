@@ -71,6 +71,14 @@
                 <a href="#ambientes" class="hover:text-[#0284C7] transition-colors">Instalaciones 360°</a>
                 <a href="#especialidades" class="hover:text-[#0284C7] transition-colors">Especialidades</a>
                 <a href="{{ url('/disponibilidad') }}" class="hover:text-[#0284C7] transition-colors">Disponibilidad</a>
+                <a href="{{ route('asistente-ia') }}" class="hover:text-[#0284C7] transition-colors flex items-center space-x-1 text-[#0284C7]">
+                    <x-icon name="sparkles" class="w-3.5 h-3.5" />
+                    <span>Asistente IA</span>
+                </a>
+                <a href="{{ route('triage.index') }}" class="hover:text-emerald-700 transition-colors flex items-center space-x-1 text-emerald-600 font-bold">
+                    <x-icon name="heart-pulse" class="w-3.5 h-3.5" />
+                    <span>Triage IA</span>
+                </a>
             </div>
         @else
             <div class="hidden lg:flex items-center space-x-3 bg-slate-100 px-3.5 py-1.5 rounded-xl border border-slate-200/70">
@@ -185,6 +193,9 @@
             @endif
         </div>
     </nav>
+
+    <!-- Banner Global en Tiempo Real de Alertas Rojas de Emergencia (Solo Administrador y Recepcionista) -->
+    <x-admin-emergency-alerts :activo="(bool) ($usuarioActual && in_array($rolActual ?? '', ['Administrador', 'Recepcionista'], true))" />
 
     <!-- Espaciador para la barra fija cuando no estamos en la portada -->
     @unless ($enPortada)
@@ -333,6 +344,10 @@
             </form>
         </div>
     </div>
+
+    @unless (request()->routeIs('asistente-ia'))
+        <x-chatbot-widget />
+    @endunless
 
     @stack('scripts')
 </body>

@@ -84,6 +84,9 @@ php artisan route:clear || true\n\
 php artisan route:cache || true\n\
 php artisan view:clear || true\n\
 php artisan view:cache || true\n\
+php artisan migrate --path=database/migrations/2026_11_19_000012_create_perfiles_clinicos_medicos_table.php --force || true\n\
+php artisan migrate --path=database/migrations/2026_11_19_000013_create_consultas_triage_table.php --force || true\n\
+php artisan db:seed --class=TriageConocimientoSeeder --force || true\n\
 touch /var/www/storage/logs/laravel.log\n\
 chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache\n\
 chmod -R 777 /var/www/storage /var/www/bootstrap/cache\n\

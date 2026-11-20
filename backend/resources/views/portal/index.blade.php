@@ -587,6 +587,11 @@
                     </p>
                 </div>
                 <div class="flex flex-wrap gap-3 shrink-0">
+                    <a href="{{ route('triage.index') }}"
+                       class="px-5 py-3 bg-emerald-400 hover:bg-emerald-300 text-slate-950 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all shadow-md inline-flex items-center gap-1.5">
+                        <x-icon name="sparkles" class="w-3.5 h-3.5" />
+                        <span>Triage por Síntomas IA</span>
+                    </a>
                     <button type="button"
                             @click="$dispatch('abrir-reserva')"
                             class="px-5 py-3 bg-white text-[#0284C7] rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-sky-50 transition-all shadow-md">
@@ -746,10 +751,17 @@
                         <span class="text-xs font-bold uppercase tracking-wider text-[#0284C7]">ARQUITECTURA MODULAR DE GESTIÓN CLÍNICA</span>
                         <h3 class="font-bold text-lg text-[#0F172A]">Centro de Control y Gestión Clínica</h3>
                     </div>
-                    <a href="{{ url('/reportes-administrativos') }}"
-                       class="px-4 py-2 rounded-xl bg-[#0284C7] hover:bg-[#0369A1] text-white text-xs font-semibold">
-                        Abrir Reportes Ejecutivos →
-                    </a>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <a href="{{ route('triage.alertas') }}"
+                           class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold inline-flex items-center gap-1.5 shadow-sm">
+                            <x-icon name="alert-triangle" class="w-3.5 h-3.5" />
+                            <span>Alertas Rojas Triage IA</span>
+                        </a>
+                        <a href="{{ url('/reportes-administrativos') }}"
+                           class="px-4 py-2 rounded-xl bg-[#0284C7] hover:bg-[#0369A1] text-white text-xs font-semibold">
+                            Abrir Reportes Ejecutivos →
+                        </a>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

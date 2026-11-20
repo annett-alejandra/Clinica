@@ -35,4 +35,17 @@ return [
         ],
     ],
 
+    'ia_chatbot' => [
+        'provider' => env('IA_PROVIDER', 'auto'),
+        'gemini_key' => env('GEMINI_API_KEY'),
+        'gemini_model' => env('GEMINI_MODEL', 'gemini-2.5-flash'),
+        'groq_key' => env('GROQ_API_KEY'),
+        'groq_model' => env('GROQ_MODEL', 'openai/gpt-oss-120b'),
+        'openai_key' => env('OPENAI_API_KEY'),
+        'openai_model' => env('OPENAI_MODEL', 'gpt-4o-mini'),
+        'openrouter_key' => env('OPENROUTER_API_KEY'),
+        'openrouter_model' => env('OPENROUTER_MODEL', 'meta-llama/llama-3.3-70b-instruct:free'),
+        'timeout' => (int) env('IA_TIMEOUT', 20),
+    ],
+
 ];

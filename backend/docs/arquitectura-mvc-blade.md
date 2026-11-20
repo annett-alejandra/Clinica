@@ -17,11 +17,11 @@ clinica-vida-salud/
     ├── app/
     │   ├── Http/Controllers/
     │   │   ├── Controller.php
-    │   │   └── Paquetes/                 # Siete paquetes y 19 casos existentes
+    │   │   └── Paquetes/                 # Ocho paquetes y 20 casos existentes
     │   ├── Models/
     │   │   ├── User.php                  # Único modelo de autenticación
     │   │   └── Paquetes/                 # Modelos Eloquent existentes
-    │   └── Services/Paquetes/            # Siete paquetes existentes
+    │   └── Services/Paquetes/            # Ocho paquetes existentes
     ├── routes/web.php
     ├── public/
     │   ├── index.php
@@ -61,8 +61,10 @@ clinica-vida-salud/
     │           │   ├── CU16_ConsultarAgendaMedica/
     │           │   ├── CU17_ConsultarHistorialCitasPaciente/
     │           │   └── CU18_ConsultarMisCitas/
-    │           └── P7_ReportesEstadisticas/
-    │               └── CU19_GenerarReportesAdministrativos/
+    │           ├── P7_ReportesEstadisticas/
+    │           │   └── CU19_GenerarReportesAdministrativos/
+    │           └── P8_AsistenciaInteligente/
+    │               └── CU20_AsistenteVirtualIA/
     └── tests/
         ├── Feature/BladeArchitectureTest.php
         └── Unit/                         # Pruebas existentes

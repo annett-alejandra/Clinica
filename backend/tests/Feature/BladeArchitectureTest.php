@@ -57,7 +57,7 @@ class BladeArchitectureTest extends TestCase
         $this->assertFileExists(public_path('js/app.js'));
     }
 
-    public function test_view_packages_match_the_existing_nineteen_use_case_directories(): void
+    public function test_view_packages_match_the_existing_twenty_use_case_directories(): void
     {
         $controllerRoot = app_path('Http/Controllers/Paquetes');
         $viewRoot = resource_path('views/Paquetes');
@@ -65,7 +65,7 @@ class BladeArchitectureTest extends TestCase
         $viewPackages = glob($viewRoot.'/*', GLOB_ONLYDIR);
         $caseCount = 0;
 
-        $this->assertCount(7, $controllerPackages);
+        $this->assertCount(8, $controllerPackages);
         $this->assertSame(array_map('basename', $controllerPackages), array_map('basename', $viewPackages));
 
         foreach ($controllerPackages as $package) {
@@ -80,7 +80,7 @@ class BladeArchitectureTest extends TestCase
             $caseCount += count($viewCases);
         }
 
-        $this->assertSame(19, $caseCount);
+        $this->assertSame(20, $caseCount);
         $this->assertDirectoryDoesNotExist(base_path('../frontend'));
     }
 

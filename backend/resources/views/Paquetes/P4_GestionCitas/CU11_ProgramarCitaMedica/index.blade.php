@@ -218,6 +218,18 @@ document.addEventListener('alpine:init', () => {
                     </select>
                 </div>
 
+                <!-- Asistente Inteligente de Triage por Síntomas -->
+                <div class="p-3 rounded-xl bg-gradient-to-r from-sky-50 to-emerald-50 border border-sky-200/80 flex items-center justify-between gap-3">
+                    <div class="text-xs">
+                        <p class="font-bold text-[#0F172A]">¿No sabes qué especialista elegir?</p>
+                        <p class="text-[11px] text-slate-600">Describe tus síntomas y nuestra IA te recomendará al médico ideal.</p>
+                    </div>
+                    <a href="{{ route('triage.index') }}"
+                       class="px-3 py-1.5 rounded-lg bg-[#0284C7] hover:bg-[#0369A1] text-white text-[11px] font-bold shrink-0 transition-colors">
+                        Triage IA →
+                    </a>
+                </div>
+
                 <!-- Especialidad Médica -->
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Especialidad Médica *</label>
@@ -314,7 +326,7 @@ document.addEventListener('alpine:init', () => {
                 <!-- Motivo de Consulta -->
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Motivo Clínico (Opcional)</label>
-                    <textarea name="motivo" rows="2" class="w-full text-sm border-slate-200 rounded-lg p-2.5 bg-slate-50 border focus:bg-white focus:border-[#0284C7] focus:outline-none" placeholder="Síntomas o control preventivo..."></textarea>
+                    <textarea name="motivo" rows="2" class="w-full text-sm border-slate-200 rounded-lg p-2.5 bg-slate-50 border focus:bg-white focus:border-[#0284C7] focus:outline-none" placeholder="Síntomas o control preventivo...">{{ old('motivo', request('motivo', '')) }}</textarea>
                 </div>
 
                 <button type="submit" class="btn-primary w-full justify-center shadow-md shadow-[#0284C7]/20 py-3 text-sm">

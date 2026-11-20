@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\InicioController;
 use App\Http\Controllers\PortalController;
+use App\Http\Controllers\Triage\TriageInteligenteController;
 use App\Http\Controllers\Paquetes\P1_SeguridadAdministracion\CU01_IniciarSesion\LoginWebController;
 use App\Http\Controllers\Paquetes\P1_SeguridadAdministracion\CU01_IniciarSesion\RecuperarPasswordController;
 use App\Http\Controllers\Paquetes\P1_SeguridadAdministracion\CU02_CerrarSesion\LogoutWebController;
@@ -22,6 +23,7 @@ use App\Http\Controllers\Paquetes\P6_ConsultasHistoriales\CU16_ConsultarAgendaMe
 use App\Http\Controllers\Paquetes\P6_ConsultasHistoriales\CU17_ConsultarHistorialCitasPaciente\HistorialCitasPacienteController;
 use App\Http\Controllers\Paquetes\P6_ConsultasHistoriales\CU18_ConsultarMisCitas\MisCitasController;
 use App\Http\Controllers\Paquetes\P7_ReportesEstadisticas\CU19_GenerarReportesAdministrativos\ReportesAdminController;
+use App\Http\Controllers\Paquetes\P8_AsistenciaInteligente\CU20_AsistenteVirtualIA\ChatbotController;
 use App\Models\Paquetes\P1_SeguridadAdministracion\Especialidad;
 use App\Models\Paquetes\P2_PersonalMedico\HorarioAtencion;
 use App\Models\Paquetes\P2_PersonalMedico\Medico;
@@ -649,3 +651,32 @@ Route::get('/reportes-administrativos', function (Request $request) {
 
     return view('Paquetes.P7_ReportesEstadisticas.CU19_GenerarReportesAdministrativos.index', compact('reporte', 'especialidades', 'medicos'));
 })->middleware('rol:Administrador')->name('reportes-administrativos');
+
+// ==========================================
+// PAQUETE 8: ASISTENCIA INTELIGENTE CON IA
+// ==========================================
+// CU20: Asistente Virtual Clínico con IA
+Route::get('/asistente-ia', [ChatbotController::class, 'index'])->name('asistente-ia');
+Route::get('/asistente-ia/estado', [ChatbotController::class, 'estado'])->name('asistente-ia.estado');
+Route::post('/asistente-ia/mensaje', [ChatbotController::class, 'mensaje'])
+    ->middleware('throttle:20,1')
+    ->name('asistente-ia.mensaje');
+
+// Triage Clínico Inteligente (NLP Vectorial + Matching de Criterios + Alertas Rojas)
+Route::get('/triage-inteligente', [TriageInteligenteController::class, 'index'])
+    ->name('triage.index');
+Route::post('/triage-inteligente/analizar', [TriageInteligenteController::class, 'analizar'])
+    ->middleware('throttle:25,1')
+    ->name('triage.analizar');
+Route::get('/triage-inteligente/alertas-activas', [TriageInteligenteController::class, 'alertasActivas'])
+    ->middleware('auth')
+    ->name('triage.alertas.activas');
+Route::get('/triage-inteligente/alertas', [TriageInteligenteController::class, 'panelAlertas'])
+    ->middleware('rol:Administrador,Recepcionista')
+    ->name('triage.alertas');
+Route::patch('/triage-inteligente/alertas/{id}/atender', [TriageInteligenteController::class, 'atenderAlerta'])
+    ->middleware('rol:Administrador,Recepcionista')
+    ->name('triage.alertas.atender');
+Route::post('/triage-inteligente/reindexar', [TriageInteligenteController::class, 'reindexar'])
+    ->middleware('rol:Administrador')
+    ->name('triage.reindexar');
