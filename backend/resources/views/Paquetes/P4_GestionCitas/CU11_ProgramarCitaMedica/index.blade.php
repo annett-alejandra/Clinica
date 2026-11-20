@@ -3,10 +3,15 @@
 @section('title', 'Programación y Reserva de Citas — Clínica Vida Salud')
 
 @section('content')
+@php
+    $pacienteDefaultId = auth()->user()?->tieneRol('Paciente') && auth()->user()?->id_paciente
+        ? (string) auth()->user()->id_paciente
+        : '';
+@endphp
 <script>
 document.addEventListener('alpine:init', () => {
     Alpine.data('reservaCitas', () => ({
-        pacienteId: '{{ old('id_paciente', request('id_paciente', '')) }}',
+        pacienteId: '{{ old('id_paciente', request('id_paciente', $pacienteDefaultId)) }}',
         especialidadId: '{{ old('id_especialidad', request('id_especialidad', '')) }}',
         medicoId: '{{ old('id_medico', request('id_medico', '')) }}',
         fecha: '{{ old('fecha_cita', request('fecha_cita', date('Y-m-d'))) }}',
@@ -346,10 +351,15 @@ document.addEventListener('alpine:init', () => {
                 @forelse($citas ?? [] as $cita)
                     <div class="p-4 rounded-xl border border-slate-100 bg-slate-50/70 hover:bg-white hover:border-slate-200 hover:shadow-sm transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div>
-                            <div class="flex items-center gap-2 mb-1.5">
+                            <div class="flex flex-wrap items-center gap-2 mb-1.5">
                                 <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-800 border border-emerald-200">
                                     {{ $cita->estado?->nombre_estado ?? $cita->estadoCita?->nombre_estado ?? 'Programada' }}
                                 </span>
+                                @if ($cita->fecha_creacion && \Illuminate\Support\Carbon::parse($cita->fecha_creacion)->greaterThanOrEqualTo(now()->subMinutes(15)))
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-sky-100 text-[#0284C7] border border-sky-200">
+                                        Recién agregada
+                                    </span>
+                                @endif
                                 <span class="text-xs font-bold text-slate-700">
                                     {{ \Carbon\Carbon::parse($cita->fecha_cita)->format('d/m/Y') }} a las {{ substr($cita->hora_cita, 0, 5) }}
                                 </span>
@@ -358,6 +368,9 @@ document.addEventListener('alpine:init', () => {
                             <p class="text-xs text-slate-500 mt-0.5">
                                 Dr(a). {{ $cita->medico?->nombre_completo }} · <span class="text-[#0284C7] font-semibold">{{ $cita->especialidad?->nombre_especialidad }}</span>
                             </p>
+                            @if (!empty($cita->motivo))
+                                <p class="text-[11px] text-slate-600 mt-1 italic line-clamp-1">"{{ $cita->motivo }}"</p>
+                            @endif
                         </div>
                         <div class="text-right shrink-0 flex flex-col items-end gap-2">
                             <span class="font-mono text-[11px] text-sky-700 bg-sky-50 px-2.5 py-1 rounded-lg border border-sky-100 block">

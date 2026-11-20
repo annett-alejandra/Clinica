@@ -352,8 +352,7 @@ Route::get('/citas', function (Request $request) {
 
     $citas = CitaMedica::with(['paciente', 'medico', 'especialidad', 'estado'])
         ->when($esPaciente && $idPaciente > 0, fn ($q) => $q->where('id_paciente', $idPaciente))
-        ->orderBy('fecha_cita', 'desc')
-        ->orderBy('hora_cita', 'desc')
+        ->orderBy('id_cita', 'desc')
         ->take(20)
         ->get();
 
