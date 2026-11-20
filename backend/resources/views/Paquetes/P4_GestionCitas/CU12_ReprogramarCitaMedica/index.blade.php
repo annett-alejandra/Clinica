@@ -12,32 +12,60 @@ document.addEventListener('alpine:init', () => {
         fecha: @js(old('fecha_cita', \Carbon\Carbon::parse($cita->fecha_cita)->format('Y-m-d'))),
         hora: @js(old('hora_cita', '')),
         cargandoCupos: false,
+        bloquesHorario: [],
         cuposDisponibles: [],
         mensajeDisponibilidad: '',
 
+        get totalLibres() {
+            return this.bloquesHorario.filter(b => b.estado === 'disponible').length;
+        },
+
+        get totalOcupados() {
+            return this.bloquesHorario.filter(b => b.estado === 'ocupado').length;
+        },
+
         async consultarCupos() {
             if (!this.fecha) {
+                this.bloquesHorario = [];
                 this.cuposDisponibles = [];
                 return;
             }
             this.cargandoCupos = true;
             this.mensajeDisponibilidad = '';
+            this.bloquesHorario = [];
             this.cuposDisponibles = [];
 
             try {
-                const url = `{{ url('/api/disponibilidad') }}?id_especialidad=${this.especialidadId}&id_medico=${this.medicoId}&fecha=${this.fecha}`;
-                const res = await fetch(url);
+                const url = `/api/disponibilidad?id_especialidad=${this.especialidadId}&id_medico=${this.medicoId}&fecha=${this.fecha}`;
+                const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
                 const json = await res.json();
 
-                if (json.success && Array.isArray(json.data) && json.data.length > 0 && json.data[0].cupos) {
-                    this.cuposDisponibles = json.data[0].cupos.map(c => (typeof c === 'string' ? c : c.hora_inicio).substring(0, 5));
+                if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+                    const item = json.data[0];
+                    const origen = Array.isArray(item.todos_bloques) && item.todos_bloques.length > 0
+                        ? item.todos_bloques
+                        : (item.cupos || []).map(c => ({
+                            hora_inicio: typeof c === 'string' ? c : c.hora_inicio,
+                            estado: 'disponible',
+                            disponible: true,
+                        }));
+
+                    this.bloquesHorario = origen.map(b => ({
+                        hora: String(b.hora_inicio || '').substring(0, 5),
+                        estado: b.estado || (b.ocupado ? 'ocupado' : 'disponible'),
+                        disponible: b.estado ? b.estado === 'disponible' : !b.ocupado,
+                    }));
+                    this.cuposDisponibles = this.bloquesHorario.filter(b => b.disponible).map(b => b.hora);
+
                     if (this.cuposDisponibles.length === 0) {
-                        this.mensajeDisponibilidad = 'No hay cupos libres en esta fecha para este especialista.';
-                    } else if (!this.hora || !this.cuposDisponibles.includes(this.hora)) {
-                        this.hora = this.cuposDisponibles[0];
+                        this.mensajeDisponibilidad = 'No hay cupos libres en esta fecha para este especialista (todos ocupados o pasados).';
+                        this.hora = '';
+                    } else if (this.hora && !this.cuposDisponibles.includes(this.hora.substring(0, 5))) {
+                        this.hora = '';
                     }
                 } else {
-                    this.mensajeDisponibilidad = json.message || 'El médico no atiende este día o todos los turnos están ocupados.';
+                    this.hora = '';
+                    this.mensajeDisponibilidad = json.message || 'El médico no atiende este día.';
                 }
             } catch (e) {
                 this.mensajeDisponibilidad = 'No se pudo consultar la disponibilidad en tiempo real.';
@@ -46,8 +74,9 @@ document.addEventListener('alpine:init', () => {
             }
         },
 
-        seleccionarCupo(h) {
-            this.hora = h;
+        seleccionarCupo(bloque) {
+            if (!bloque || !bloque.disponible) return;
+            this.hora = bloque.hora;
         },
 
         init() {
@@ -115,29 +144,54 @@ document.addEventListener('alpine:init', () => {
                     </div>
                 </div>
 
-                <!-- Turnos Libres Reales del Especialista -->
-                <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Turnos Libres del Médico</span>
+                <!-- Turnos del Especialista (Disponibles sin color, Seleccionado verde, Ocupados rojo) -->
+                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <span class="text-xs font-bold text-slate-800 uppercase tracking-wider">Horarios del Médico</span>
                         <template x-if="cargandoCupos">
                             <span class="text-[11px] text-[#0284C7] font-semibold">Consultando horarios...</span>
                         </template>
+                        <template x-if="!cargandoCupos && bloquesHorario.length > 0">
+                            <div class="flex items-center gap-1.5 text-[11px] font-bold">
+                                <span class="px-2 py-0.5 rounded-full bg-white text-slate-700 border border-slate-200"><span x-text="totalLibres"></span> libres</span>
+                                <span class="px-2 py-0.5 rounded-full bg-rose-50 text-rose-600 border border-rose-200" x-show="totalOcupados > 0"><span x-text="totalOcupados"></span> ocupados</span>
+                            </div>
+                        </template>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-3 pb-2 border-b border-slate-200/70 text-[11px] text-slate-600">
+                        <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-white border border-slate-300"></span> Disponible</span>
+                        <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-emerald-600"></span> <span class="font-semibold text-emerald-700">Seleccionado</span></span>
+                        <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-rose-100 border border-rose-400"></span> <span class="font-semibold text-rose-600">Ocupado</span></span>
                     </div>
 
                     <template x-if="mensajeDisponibilidad && !cargandoCupos">
-                        <div class="p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-xs" x-text="mensajeDisponibilidad"></div>
+                        <div class="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs" x-text="mensajeDisponibilidad"></div>
                     </template>
 
-                    <template x-if="cuposDisponibles.length > 0 && !cargandoCupos">
-                        <div class="grid grid-cols-4 sm:grid-cols-6 gap-1.5 max-h-40 overflow-y-auto p-0.5">
-                            <template x-for="cupo in cuposDisponibles" :key="cupo">
+                    <template x-if="bloquesHorario.length > 0 && !cargandoCupos">
+                        <div class="grid grid-cols-3 sm:grid-cols-5 gap-2 max-h-52 overflow-y-auto p-0.5">
+                            <template x-for="b in bloquesHorario" :key="b.hora">
                                 <button type="button"
-                                        @click="seleccionarCupo(cupo)"
-                                        :class="hora === cupo
-                                            ? 'bg-[#0284C7] text-white border-[#0284C7] font-bold shadow-sm'
-                                            : 'bg-white text-slate-700 border-slate-200 hover:border-[#0284C7] hover:bg-sky-50 font-medium'"
-                                        class="py-1.5 px-2 rounded-lg text-xs border text-center transition-all cursor-pointer">
-                                    <span x-text="cupo"></span>
+                                        @click="seleccionarCupo(b)"
+                                        :disabled="!b.disponible"
+                                        :title="b.estado === 'ocupado' ? 'Horario ocupado' : (b.estado === 'pasado' ? 'Horario pasado' : 'Seleccionar ' + b.hora)"
+                                        :class="b.estado === 'ocupado'
+                                            ? 'bg-rose-50 text-rose-600 border-rose-300 cursor-not-allowed'
+                                            : (b.estado === 'pasado'
+                                                ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed line-through'
+                                                : (hora && hora.substring(0, 5) === b.hora
+                                                    ? 'bg-emerald-600 text-white border-emerald-600 font-bold shadow-md shadow-emerald-600/25 ring-2 ring-emerald-200'
+                                                    : 'bg-white text-slate-700 border-slate-200 hover:border-emerald-400 hover:bg-emerald-50/40 font-semibold cursor-pointer'))"
+                                        class="py-2 px-1.5 rounded-xl text-xs border text-center transition-all flex flex-col items-center justify-center leading-tight">
+                                    <span class="font-mono font-bold flex items-center gap-1">
+                                        <span x-show="b.estado === 'ocupado'" class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                                        <span x-show="b.disponible && hora && hora.substring(0, 5) === b.hora">✓</span>
+                                        <span x-text="b.hora"></span>
+                                    </span>
+                                    <span class="text-[9px] uppercase mt-0.5"
+                                          :class="b.estado === 'ocupado' ? 'text-rose-500' : (b.disponible && hora && hora.substring(0, 5) === b.hora ? 'text-emerald-100' : 'text-slate-400')"
+                                          x-text="b.estado === 'ocupado' ? 'Ocupado' : (b.estado === 'pasado' ? 'Pasado' : (hora && hora.substring(0, 5) === b.hora ? 'Elegido' : 'Libre'))"></span>
                                 </button>
                             </template>
                         </div>

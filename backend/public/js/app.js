@@ -252,6 +252,9 @@ document.addEventListener('alpine:init', () => {
         },
 
         elegir(bloque, cupo) {
+            if (typeof cupo === 'object' && cupo !== null && cupo.estado && cupo.estado !== 'disponible') {
+                return;
+            }
             this.medico = bloque.medico || bloque;
             this.idMedico = String(bloque.medico ? bloque.medico.id_medico : (bloque.id_medico || ''));
             const horaStr = typeof cupo === 'string' ? cupo : (cupo.hora_inicio || '');

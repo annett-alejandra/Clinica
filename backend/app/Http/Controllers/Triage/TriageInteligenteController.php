@@ -135,6 +135,7 @@ class TriageInteligenteController extends Controller
     {
         $alertasActivas = $this->triageService->obtenerAlertasActivas(30);
         $consultas = collect();
+        $medicosGuardia = collect();
         $totalPerfilesVectorizados = 0;
         $kpis = [
             'total_consultas' => 0,
@@ -144,6 +145,11 @@ class TriageInteligenteController extends Controller
         ];
 
         try {
+            $medicosGuardia = Medico::where('estado', true)
+                ->with('especialidades')
+                ->orderBy('nombre_completo')
+                ->get();
+
             if (Schema::hasTable('consultas_triage')) {
                 $consultas = ConsultaTriage::with(['usuario', 'paciente', 'especialidadRecomendada', 'medicoRecomendado', 'usuarioAtendio'])
                     ->orderByDesc('fecha_registro')
@@ -167,23 +173,40 @@ class TriageInteligenteController extends Controller
             'kpis' => $kpis,
             'proveedorActivo' => $this->embeddingProvider->proveedorActivo(),
             'totalPerfilesVectorizados' => $totalPerfilesVectorizados,
+            'medicosGuardia' => $medicosGuardia,
+            'accionesDerivacion' => ConsultaTriage::ACCIONES_DERIVACION,
         ]);
     }
 
     /**
-     * Marca una alerta roja de emergencia como atendida/despachada.
+     * Marca una alerta roja de emergencia como atendida/despachada con derivación manual.
      */
     public function atenderAlerta(Request $request, int $id): JsonResponse
     {
+        $datos = $request->validate([
+            'tipo_derivacion' => ['nullable', 'string', 'in:' . implode(',', array_keys(ConsultaTriage::ACCIONES_DERIVACION))],
+            'id_medico_asignado' => ['nullable', 'integer'],
+            'observacion' => ['nullable', 'string', 'max:500'],
+        ]);
+
         $idUsuario = (int) ($request->user()?->id_usuario ?? 1);
-        $consulta = $this->triageService->marcarAlertaAtendida($id, $idUsuario);
+        $consulta = $this->triageService->marcarAlertaAtendida(
+            $id,
+            $idUsuario,
+            $datos['tipo_derivacion'] ?? null,
+            isset($datos['id_medico_asignado']) ? (int) $datos['id_medico_asignado'] : null,
+            $datos['observacion'] ?? null
+        );
+        $resolucion = $consulta?->resolucionManual();
+        $etiqueta = $resolucion['etiqueta_derivacion'] ?? 'Alerta atendida';
 
         return response()->json([
             'success' => true,
-            'message' => "Alerta Roja #{$id} marcada como atendida y registrada en auditoría.",
+            'message' => "Alerta Roja #{$id} resuelta: {$etiqueta}.",
             'data' => [
                 'id_triage' => $consulta?->id_triage ?? $id,
                 'alerta_atendida' => true,
+                'resolucion_manual' => $resolucion,
             ],
         ]);
     }

@@ -5,6 +5,7 @@
 @section('content')
 <div class="container py-12"
      x-data="{
+        tabActiva: 'todo',
         filtroEspecialidad: 'todas',
         filtroEstado: 'todos',
         busqueda: '{{ $busqueda ?? '' }}',
@@ -100,19 +101,25 @@
                     </div>
                 </div>
 
-                <div class="flex gap-4 text-center">
-                    <div class="p-3 rounded-xl bg-slate-50 border border-slate-100 min-w-[90px]">
+                <div class="flex flex-wrap gap-3 text-center">
+                    <div class="p-3 rounded-xl bg-slate-50 border border-slate-100 min-w-[85px]">
                         <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Total Citas</span>
                         <strong class="text-lg font-bold text-slate-800">{{ count($citas ?? []) }}</strong>
                     </div>
-                    <div class="p-3 rounded-xl bg-emerald-50/70 border border-emerald-100 min-w-[90px]">
+                    <div class="p-3 rounded-xl bg-emerald-50/70 border border-emerald-100 min-w-[85px]">
                         <span class="text-[10px] font-bold text-emerald-700 uppercase tracking-wider block">Atendidas</span>
                         <strong class="text-lg font-bold text-emerald-800">{{ $citas->where('id_estado_cita', 3)->count() }}</strong>
                     </div>
-                    <div class="p-3 rounded-xl bg-sky-50/70 border border-sky-100 min-w-[90px]">
+                    <div class="p-3 rounded-xl bg-sky-50/70 border border-sky-100 min-w-[85px]">
                         <span class="text-[10px] font-bold text-sky-700 uppercase tracking-wider block">Programadas</span>
                         <strong class="text-lg font-bold text-[#0284C7]">{{ $citas->whereIn('id_estado_cita', [1, 2])->count() }}</strong>
                     </div>
+                    <button type="button"
+                            @click="tabActiva = 'analisis'"
+                            class="p-3 rounded-xl bg-indigo-50/70 hover:bg-indigo-100/70 border border-indigo-200/80 min-w-[85px] transition-colors cursor-pointer">
+                        <span class="text-[10px] font-bold text-indigo-700 uppercase tracking-wider block">Análisis</span>
+                        <strong class="text-lg font-bold text-indigo-800">{{ count($analisis ?? []) }}</strong>
+                    </button>
                 </div>
             </div>
 
@@ -172,8 +179,37 @@
             @endif
         </div>
 
+        <!-- Selector de Secciones del Expediente -->
+        <div class="flex flex-wrap items-center gap-2 mb-6 print:hidden">
+            <button type="button"
+                    @click="tabActiva = 'todo'"
+                    :class="tabActiva === 'todo' ? 'bg-slate-900 text-white border-slate-900 shadow-sm' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'"
+                    class="px-4 py-2 rounded-xl border text-xs font-bold transition-all">
+                Expediente Completo
+            </button>
+            <button type="button"
+                    @click="tabActiva = 'analisis'"
+                    :class="tabActiva === 'analisis' ? 'bg-[#0284C7] text-white border-[#0284C7] shadow-sm' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'"
+                    class="px-4 py-2 rounded-xl border text-xs font-bold transition-all flex items-center gap-1.5">
+                <x-icon name="activity" class="w-3.5 h-3.5" />
+                <span>Análisis Clínicos y Laboratorio ({{ count($analisis ?? []) }})</span>
+            </button>
+            <button type="button"
+                    @click="tabActiva = 'consultas'"
+                    :class="tabActiva === 'consultas' ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'"
+                    class="px-4 py-2 rounded-xl border text-xs font-bold transition-all flex items-center gap-1.5">
+                <x-icon name="file-text" class="w-3.5 h-3.5" />
+                <span>Consultas y Evolución ({{ count($citas ?? []) }})</span>
+            </button>
+        </div>
+
+        <!-- Sección de Análisis Clínicos y Estudios Diagnósticos -->
+        <div x-show="tabActiva === 'todo' || tabActiva === 'analisis'" class="mb-10">
+            <x-analisis-clinicos :analisis="$analisis ?? []" :paciente="$paciente" />
+        </div>
+
         <!-- Cronología de Consultas y Atenciones Médicas (Historial) -->
-        <div class="space-y-6">
+        <div x-show="tabActiva === 'todo' || tabActiva === 'consultas'" class="space-y-6">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <h3 class="text-xl font-bold text-slate-900 flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-[#0284C7]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

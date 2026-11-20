@@ -57,10 +57,42 @@ class ControlAsistenciaService
     }
 
     /**
+     * Resuelve la fecha/hora de llegada en hora local de Bolivia (America/La_Paz).
+     * Si se proporciona hora explícita, la alinea con la fecha de la cita.
+     * Si no se proporciona, usa la hora actual solo cuando coincide con el día de la cita
+     * dentro de una ventana de ±2 horas; en otro caso la alinea al horario del turno.
+     */
+    public function resolverFechaHoraLlegada(
+        string $fechaCita,
+        string $horaCita,
+        ?string $horaLlegada = null,
+        ?Carbon $ahoraReferencia = null
+    ): Carbon {
+        $tz = 'America/La_Paz';
+        $ahora = $ahoraReferencia ? $ahoraReferencia->copy()->setTimezone($tz) : Carbon::now($tz);
+        $fechaNorm = Carbon::parse($fechaCita, $tz)->format('Y-m-d');
+        $horaTurnoNorm = substr(trim($horaCita), 0, 5);
+        $turno = Carbon::createFromFormat('Y-m-d H:i', "{$fechaNorm} {$horaTurnoNorm}", $tz)->startOfMinute();
+
+        if ($horaLlegada !== null) {
+            $horaLimpia = trim($horaLlegada);
+            if (preg_match('/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/', $horaLimpia) === 1) {
+                return Carbon::createFromFormat('Y-m-d H:i', "{$fechaNorm} ".substr($horaLimpia, 0, 5), $tz)->startOfMinute();
+            }
+        }
+
+        if ($fechaNorm === $ahora->format('Y-m-d') && abs($ahora->diffInMinutes($turno, false)) <= 120) {
+            return $ahora;
+        }
+
+        return $turno;
+    }
+
+    /**
      * Registrar la llegada física del paciente a la clínica.
      * Actualiza fecha_hora_llegada y asegura estado Confirmada.
      */
-    public function registrarLlegada(int $idCita, ?int $idUsuario = null): CitaMedica
+    public function registrarLlegada(int $idCita, ?int $idUsuario = null, ?string $horaLlegada = null): CitaMedica
     {
         $cita = CitaMedica::with(['paciente', 'medico', 'especialidad', 'estado'])->findOrFail($idCita);
 
@@ -70,11 +102,14 @@ class ControlAsistenciaService
             ]);
         }
 
-        return DB::transaction(function () use ($cita, $idUsuario) {
+        return DB::transaction(function () use ($cita, $idUsuario, $horaLlegada) {
             $estadoAnterior = (int) $cita->id_estado_cita;
             $estadoAnteriorNombre = $cita->estado?->nombre_estado ?? ($estadoAnterior === 2 ? 'Confirmada' : 'Programada');
+            $fechaCitaStr = Carbon::parse($cita->fecha_cita)->format('Y-m-d');
+            $llegada = $this->resolverFechaHoraLlegada($fechaCitaStr, (string) $cita->hora_cita, $horaLlegada);
+
             $cita->id_estado_cita = 2; // Asegurar confirmada
-            $cita->fecha_hora_llegada = Carbon::now();
+            $cita->fecha_hora_llegada = $llegada;
             $cita->save();
 
             HistorialCambioCita::create([
@@ -83,7 +118,7 @@ class ControlAsistenciaService
                 'tipo_cambio' => 'LLEGADA_RECEPCION',
                 'estado_anterior' => $estadoAnterior,
                 'estado_nuevo' => 2,
-                'observacion' => 'Paciente presente en sala de espera a las ' . Carbon::now()->format('H:i'),
+                'observacion' => 'Paciente presente en sala de espera a las ' . $llegada->format('H:i') . ' (hora Bolivia)',
             ]);
 
             AuditService::registrarCita(
@@ -94,7 +129,7 @@ class ControlAsistenciaService
                 estadoAnterior: $estadoAnteriorNombre,
                 estadoNuevo: 'Confirmada',
                 motivoJustificacion: 'Paciente presente en sala de espera',
-                extra: ['fecha_hora_llegada' => $cita->fecha_hora_llegada->toIso8601String()]
+                extra: ['fecha_hora_llegada' => $llegada->toIso8601String()]
             );
 
             return $cita->fresh(['paciente', 'medico', 'especialidad', 'estado']);

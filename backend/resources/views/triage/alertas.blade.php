@@ -3,6 +3,9 @@
 @section('title', 'Alertas Rojas y Monitor Triage IA — Clínica Vida Salud')
 
 @section('content')
+@php
+    $acciones = $accionesDerivacion ?? \App\Models\Paquetes\P4_GestionCitas\ConsultaTriage::ACCIONES_DERIVACION;
+@endphp
 <div class="pt-6 pb-20 px-4 sm:px-6 md:px-12 max-w-7xl mx-auto space-y-8">
 
     <!-- Encabezado -->
@@ -15,7 +18,7 @@
                 Alertas Rojas de Emergencia & Triage Vectorial IA
             </h1>
             <p class="text-xs sm:text-sm text-slate-500 mt-1">
-                Supervisión de emergencias detectadas automáticamente por lenguaje natural y administración de vectores JSONB en PostgreSQL.
+                Supervisión, derivación manual de emergencias detectadas por lenguaje natural y administración de vectores JSONB en PostgreSQL.
             </p>
         </div>
         <div class="flex flex-wrap items-center gap-2.5">
@@ -64,7 +67,7 @@
         <div class="px-6 py-4 bg-rose-600 text-white flex items-center justify-between">
             <div class="flex items-center gap-2.5">
                 <x-icon name="alert-triangle" class="w-5 h-5 animate-pulse" />
-                <h2 class="font-bold text-sm uppercase tracking-wider">Alertas Rojas Pendientes de Atención Inmediata</h2>
+                <h2 class="font-bold text-sm uppercase tracking-wider">Alertas Rojas Pendientes de Atención y Derivación Manual</h2>
             </div>
             <span class="px-2.5 py-0.5 rounded-full bg-white text-rose-700 text-xs font-extrabold">
                 {{ count($alertasActivas) }} activa(s)
@@ -73,44 +76,123 @@
 
         <div class="p-6">
             @forelse ($alertasActivas as $alerta)
-                <div class="mb-4 last:mb-0 p-5 rounded-xl border-2 border-rose-200 bg-rose-50/60 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                    <div class="space-y-1.5">
-                        <div class="flex flex-wrap items-center gap-2">
-                            <span class="px-2 py-0.5 rounded bg-rose-600 text-white text-[10px] font-extrabold uppercase">
-                                CÓDIGO ROJO #{{ $alerta['id_triage'] }}
-                            </span>
-                            <span class="font-bold text-sm text-slate-900">{{ $alerta['paciente_nombre'] }}</span>
-                            @if (!empty($alerta['paciente_ci']))
-                                <span class="text-xs text-slate-500">CI: {{ $alerta['paciente_ci'] }}</span>
-                            @endif
-                            @if (!empty($alerta['paciente_telefono']))
-                                <span class="text-xs font-semibold text-rose-700">Tel: {{ $alerta['paciente_telefono'] }}</span>
-                            @endif
-                        </div>
-                        <p class="text-sm text-slate-800 font-medium">"{{ $alerta['sintomas_texto'] }}"</p>
-                        <div class="flex flex-wrap items-center gap-1.5 pt-0.5">
-                            @foreach ($alerta['palabras_detectadas'] as $pal)
-                                <span class="px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 border border-rose-200 text-[11px] font-bold">
-                                    {{ $pal }}
+                @php
+                    $paramsCita = array_filter([
+                        'id_paciente' => $alerta['id_paciente'] ?? null,
+                        'id_especialidad' => $alerta['id_especialidad_sugerida'] ?? null,
+                        'id_medico' => $alerta['id_medico_sugerido'] ?? null,
+                        'motivo' => \Illuminate\Support\Str::limit('[URGENCIA TRIAGE #' . $alerta['id_triage'] . '] ' . ($alerta['sintomas_texto'] ?? ''), 220),
+                    ], fn ($v) => $v !== null && $v !== '');
+                    $urlCitaPrioritaria = url('/citas?' . http_build_query($paramsCita));
+                @endphp
+                <div class="mb-5 last:mb-0 p-5 rounded-xl border-2 border-rose-200 bg-rose-50/60 space-y-4">
+                    <!-- Cabecera y detalle clínico de la alerta -->
+                    <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
+                        <div class="space-y-1.5 flex-1">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="px-2 py-0.5 rounded bg-rose-600 text-white text-[10px] font-extrabold uppercase">
+                                    CÓDIGO ROJO #{{ $alerta['id_triage'] }}
                                 </span>
-                            @endforeach
-                            <span class="text-[11px] text-slate-500 ml-2">
-                                Sugerido: <strong>{{ $alerta['especialidad_sugerida'] }}</strong>
-                                @if (!empty($alerta['medico_sugerido']))
-                                    ({{ $alerta['medico_sugerido'] }})
+                                <span class="font-bold text-sm text-slate-900">{{ $alerta['paciente_nombre'] }}</span>
+                                @if (!empty($alerta['paciente_ci']))
+                                    <span class="text-xs text-slate-500">CI: {{ $alerta['paciente_ci'] }}</span>
                                 @endif
-                                · {{ $alerta['fecha_registro'] }}
-                            </span>
+                                @if (!empty($alerta['paciente_telefono']))
+                                    <a href="tel:{{ $alerta['paciente_telefono'] }}"
+                                       class="text-xs font-semibold text-rose-700 hover:underline">
+                                        Tel: {{ $alerta['paciente_telefono'] }}
+                                    </a>
+                                @endif
+                            </div>
+                            <p class="text-sm text-slate-800 font-medium">"{{ $alerta['sintomas_texto'] }}"</p>
+                            <div class="flex flex-wrap items-center gap-1.5 pt-0.5">
+                                @foreach ($alerta['palabras_detectadas'] as $pal)
+                                    <span class="px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 border border-rose-200 text-[11px] font-bold">
+                                        {{ $pal }}
+                                    </span>
+                                @endforeach
+                                <span class="text-[11px] text-slate-500 ml-1">
+                                    Sugerido IA: <strong>{{ $alerta['especialidad_sugerida'] }}</strong>
+                                    @if (!empty($alerta['medico_sugerido']))
+                                        ({{ $alerta['medico_sugerido'] }})
+                                    @endif
+                                    @if (!empty($alerta['puntaje_afinidad']))
+                                        · {{ number_format((float) $alerta['puntaje_afinidad'], 1) }}%
+                                    @endif
+                                    · {{ $alerta['fecha_registro'] }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Acciones rápidas de contacto / agendamiento prioritario -->
+                        <div class="flex flex-wrap items-center gap-2 shrink-0">
+                            @if (!empty($alerta['paciente_telefono']))
+                                <a href="tel:{{ $alerta['paciente_telefono'] }}"
+                                   class="px-3 py-2 rounded-lg bg-white hover:bg-rose-50 text-rose-700 border border-rose-200 text-xs font-bold inline-flex items-center gap-1.5 transition-colors">
+                                    <x-icon name="phone-call" class="w-3.5 h-3.5" />
+                                    <span>Llamar al paciente</span>
+                                </a>
+                            @endif
+                            <a href="{{ $urlCitaPrioritaria }}"
+                               class="px-3 py-2 rounded-lg bg-[#0284C7] hover:bg-[#0369A1] text-white text-xs font-bold inline-flex items-center gap-1.5 shadow-sm transition-colors">
+                                <x-icon name="calendar" class="w-3.5 h-3.5" />
+                                <span>Derivar a Cita Prioritaria →</span>
+                            </a>
                         </div>
                     </div>
 
-                    <form method="POST" action="{{ route('triage.alertas.atender', ['id' => $alerta['id_triage']]) }}" class="shrink-0">
+                    <!-- Formulario de Derivación y Resolución Manual -->
+                    <form method="POST"
+                          action="{{ route('triage.alertas.atender', ['id' => $alerta['id_triage']]) }}"
+                          class="pt-3.5 border-t border-rose-200/80 grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
                         @csrf
                         @method('PATCH')
-                        <button type="submit"
-                                class="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-sm transition-colors">
-                            Marcar Alerta Atendida / Despachada
-                        </button>
+
+                        <div class="md:col-span-3">
+                            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
+                                Acción / Derivación *
+                            </label>
+                            <select name="tipo_derivacion"
+                                    required
+                                    class="w-full rounded-lg border border-rose-200 bg-white px-3 py-2 text-xs text-slate-800 focus:border-rose-500 focus:outline-none">
+                                @foreach ($acciones as $codigo => $etiqueta)
+                                    <option value="{{ $codigo }}">{{ $etiqueta }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="md:col-span-3">
+                            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
+                                Médico de Guardia Asignado
+                            </label>
+                            <select name="id_medico_asignado"
+                                    class="w-full rounded-lg border border-rose-200 bg-white px-3 py-2 text-xs text-slate-800 focus:border-rose-500 focus:outline-none">
+                                <option value="">Sin asignar / Equipo de Urgencias</option>
+                                @foreach ($medicosGuardia ?? [] as $med)
+                                    <option value="{{ $med->id_medico }}" @selected((int) ($alerta['id_medico_sugerido'] ?? 0) === (int) $med->id_medico)>
+                                        {{ $med->nombre_completo }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="md:col-span-4">
+                            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">
+                                Observación / Gestión Realizada
+                            </label>
+                            <input type="text"
+                                   name="observacion"
+                                   maxlength="500"
+                                   placeholder="Ej. Trasladado a Box Shock 02, familiar notificado..."
+                                   class="w-full rounded-lg border border-rose-200 bg-white px-3 py-2 text-xs text-slate-800 placeholder:text-slate-400 focus:border-rose-500 focus:outline-none">
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <button type="submit"
+                                    class="w-full px-3.5 py-2 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-sm transition-colors">
+                                Confirmar Derivación y Cerrar Alerta
+                            </button>
+                        </div>
                     </form>
                 </div>
             @empty
@@ -140,11 +222,14 @@
                         <th class="py-3 px-5">Síntomas Reportados</th>
                         <th class="py-3 px-5">Urgencia</th>
                         <th class="py-3 px-5">Especialista Sugerido</th>
-                        <th class="py-3 px-5">Estado Alerta</th>
+                        <th class="py-3 px-5">Estado / Resolución</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-200/70 text-xs">
                     @forelse ($consultas as $c)
+                        @php
+                            $resolucion = $c->resolucionManual();
+                        @endphp
                         <tr class="hover:bg-slate-50">
                             <td class="py-3.5 px-5 font-mono text-slate-500 whitespace-nowrap">
                                 <span class="font-bold text-[#0284C7] block">#{{ $c->id_triage }}</span>
@@ -169,12 +254,30 @@
                                 <span class="font-bold text-slate-800 block">{{ $c->especialidadRecomendada?->nombre_especialidad ?? '—' }}</span>
                                 <span class="text-slate-500">{{ $c->medicoRecomendado?->nombre_completo ?? '' }} ({{ number_format((float) $c->puntaje_afinidad, 1) }}%)</span>
                             </td>
-                            <td class="py-3.5 px-5">
+                            <td class="py-3.5 px-5 max-w-xs">
                                 @if ($c->es_emergencia)
                                     @if ($c->alerta_atendida)
-                                        <span class="text-emerald-700 font-semibold">Atendida por {{ $c->usuarioAtendio?->nombre_usuario ?? 'Staff' }}</span>
+                                        <div class="space-y-1">
+                                            @if (!empty($resolucion['etiqueta_derivacion']))
+                                                <span class="inline-flex px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold text-[10px]">
+                                                    {{ $resolucion['etiqueta_derivacion'] }}
+                                                </span>
+                                            @endif
+                                            <span class="text-emerald-700 font-semibold block">
+                                                Atendida por {{ $c->usuarioAtendio?->nombre_usuario ?? 'Staff' }}
+                                                @if ($c->fecha_atencion_alerta)
+                                                    · {{ \Carbon\Carbon::parse($c->fecha_atencion_alerta)->timezone('America/La_Paz')->format('d/m H:i') }}
+                                                @endif
+                                            </span>
+                                            @if (!empty($resolucion['medico_asignado']))
+                                                <span class="text-[11px] text-slate-600 block">Médico: {{ $resolucion['medico_asignado'] }}</span>
+                                            @endif
+                                            @if (!empty($resolucion['observacion']))
+                                                <span class="text-[11px] text-slate-500 italic block">"{{ $resolucion['observacion'] }}"</span>
+                                            @endif
+                                        </div>
                                     @else
-                                        <span class="text-rose-600 font-extrabold animate-pulse">Pendiente</span>
+                                        <span class="text-rose-600 font-extrabold animate-pulse">Pendiente de derivación</span>
                                     @endif
                                 @else
                                     <span class="text-slate-400">N/A</span>

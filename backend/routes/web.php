@@ -119,31 +119,47 @@ Route::get('/auditoria', function (Request $request) {
     $desde = $request->query('desde');
     $hasta = $request->query('hasta');
 
-    // Métricas globales de seguridad para el Administrador
+    // Métricas globales de seguridad y trazabilidad clínica para el Administrador
     $kpis = [
         'total' => \App\Models\Paquetes\P1_SeguridadAdministracion\Auditoria::count(),
         'logins' => \App\Models\Paquetes\P1_SeguridadAdministracion\Auditoria::where('accion', 'LOGIN')->count(),
         'logouts' => \App\Models\Paquetes\P1_SeguridadAdministracion\Auditoria::where('accion', 'LOGOUT')->count(),
         'fallidos' => \App\Models\Paquetes\P1_SeguridadAdministracion\Auditoria::whereIn('accion', ['INTENTO_LOGIN_FALLIDO', 'ACCESO_DENEGADO'])->count(),
+        'cancelaciones' => \App\Models\Paquetes\P1_SeguridadAdministracion\Auditoria::where('accion', 'CANCELAR_CITA')->count(),
+        'reprogramaciones' => \App\Models\Paquetes\P1_SeguridadAdministracion\Auditoria::where('accion', 'REPROGRAMAR_CITA')->count(),
+        'inasistencias' => \App\Models\Paquetes\P1_SeguridadAdministracion\Auditoria::where('accion', 'MARCAR_INASISTENCIA')->count(),
         'clinicos' => \App\Models\Paquetes\P1_SeguridadAdministracion\Auditoria::where(function ($q) {
             $q->where('tabla_afectada', 'like', '%cita%')
               ->orWhere('tabla_afectada', 'like', '%paciente%')
               ->orWhere('accion', 'like', '%CITA%')
               ->orWhere('accion', 'like', '%PACIENTE%')
-              ->orWhere('accion', 'like', '%ATENDIDA%');
+              ->orWhere('accion', 'like', '%ATENDIDA%')
+              ->orWhere('accion', 'like', '%INASISTENCIA%');
         })->count(),
     ];
 
+    // Si el administrador seleccionó una acción específica en el combo, evitar conflicto con la pestaña previa
+    if ($accion && $accion !== 'todas') {
+        $categoria = 'todas';
+    }
+
     $query = \App\Models\Paquetes\P1_SeguridadAdministracion\Auditoria::with('usuario.rol')
+        ->orderBy('fecha_hora', 'desc')
         ->orderBy('id_auditoria', 'desc');
 
-    // Filtro por categorías rápidas (Quién entra, Quién sale, Alertas, etc.)
+    // Filtro por categorías rápidas (Quién entra, Quién sale, Cancelaciones, Reprogramaciones, Alertas, etc.)
     if ($categoria === 'entradas') {
         $query->where('accion', 'LOGIN');
     } elseif ($categoria === 'salidas') {
         $query->where('accion', 'LOGOUT');
     } elseif ($categoria === 'fallidos') {
         $query->whereIn('accion', ['INTENTO_LOGIN_FALLIDO', 'ACCESO_DENEGADO']);
+    } elseif ($categoria === 'cancelaciones') {
+        $query->where('accion', 'CANCELAR_CITA');
+    } elseif ($categoria === 'reprogramaciones') {
+        $query->where('accion', 'REPROGRAMAR_CITA');
+    } elseif ($categoria === 'inasistencias') {
+        $query->where('accion', 'MARCAR_INASISTENCIA');
     } elseif ($categoria === 'accesos') {
         $query->whereIn('accion', [
             'LOGIN', 'LOGOUT', 'INTENTO_LOGIN_FALLIDO', 'ACCESO_DENEGADO',
@@ -161,16 +177,19 @@ Route::get('/auditoria', function (Request $request) {
               ->orWhere('accion', 'like', '%INASISTENCIA%');
         });
     } elseif ($categoria === 'admin') {
-        $query->where(function ($q) {
-            $q->where('tabla_afectada', 'like', '%horario%')
-              ->orWhere('tabla_afectada', 'like', '%usuario%')
-              ->orWhere('tabla_afectada', 'like', '%especialidad%')
-              ->orWhere('tabla_afectada', 'like', '%medico%')
-              ->orWhere('tabla_afectada', 'seguridad_rutas')
-              ->orWhere('accion', 'like', '%PASSWORD%')
-              ->orWhere('accion', 'like', '%USUARIO%')
-              ->orWhere('accion', 'like', '%HORARIO%');
-        });
+        $query->whereNotIn('accion', ['LOGIN', 'LOGOUT'])
+            ->where(function ($q) {
+                $q->where('tabla_afectada', 'like', '%horario%')
+                  ->orWhere('tabla_afectada', 'like', '%usuario%')
+                  ->orWhere('tabla_afectada', 'like', '%especialidad%')
+                  ->orWhere('tabla_afectada', 'like', '%medico%')
+                  ->orWhere('tabla_afectada', 'seguridad_rutas')
+                  ->orWhere('accion', 'like', '%PASSWORD%')
+                  ->orWhere('accion', 'like', '%USUARIO%')
+                  ->orWhere('accion', 'like', '%HORARIO%')
+                  ->orWhere('accion', 'like', '%MEDICO%')
+                  ->orWhere('accion', 'like', '%ESPECIALIDAD%');
+            });
     }
 
     // Filtros por combos
@@ -192,13 +211,26 @@ Route::get('/auditoria', function (Request $request) {
         $query->whereRaw("(fecha_hora AT TIME ZONE 'America/La_Paz')::date <= ?", [$hasta]);
     }
 
-    // Búsqueda general (Operador, correo, acción, tabla, IP, CI paciente, motivo)
+    // Búsqueda general insensible a acentos (Operador, correo, acción, tabla, IP, CI paciente, motivo)
     if ($busqueda !== '') {
-        $query->where(function ($q) use ($busqueda) {
-            $q->where('accion', 'ilike', "%{$busqueda}%")
-              ->orWhere('tabla_afectada', 'ilike', "%{$busqueda}%")
-              ->orWhereRaw("detalle::text ilike ?", ["%{$busqueda}%"])
-              ->orWhereHas('usuario', fn($u) => $u->where('nombre_usuario', 'ilike', "%{$busqueda}%")->orWhere('correo', 'ilike', "%{$busqueda}%"));
+        $busquedaNorm = strtr(mb_strtolower($busqueda), [
+            'á' => 'a', 'é' => 'e', 'í' => 'i', 'ó' => 'o', 'ú' => 'u', 'ü' => 'u', 'ñ' => 'n',
+        ]);
+        $patron = "%{$busquedaNorm}%";
+        $query->where(function ($q) use ($patron, $busquedaNorm) {
+            $q->whereRaw("translate(lower(accion), 'áéíóúüñ', 'aeiouun') like ?", [$patron])
+              ->orWhereRaw("translate(lower(tabla_afectada), 'áéíóúüñ', 'aeiouun') like ?", [$patron])
+              ->orWhereRaw("translate(lower(COALESCE(detalle::text, '')), 'áéíóúüñ', 'aeiouun') like ?", [$patron])
+              ->orWhereHas('usuario', fn ($u) => $u
+                  ->whereRaw("translate(lower(nombre_usuario), 'áéíóúüñ', 'aeiouun') like ?", [$patron])
+                  ->orWhereRaw("translate(lower(correo), 'áéíóúüñ', 'aeiouun') like ?", [$patron]));
+
+            if (str_contains($busquedaNorm, 'cancel')) {
+                $q->orWhere('accion', 'CANCELAR_CITA');
+            }
+            if (str_contains($busquedaNorm, 'reprogram')) {
+                $q->orWhere('accion', 'REPROGRAMAR_CITA');
+            }
         });
     }
 
@@ -295,7 +327,23 @@ Route::get('/perfil-paciente', function (Request $request) {
         ? (int) $usuario->id_paciente
         : (int) $request->query('id_paciente', 1);
     $paciente = Paciente::find($idPaciente) ?? Paciente::where('estado', true)->first();
-    return view('Paquetes.P3_GestionPacientes.CU08_GestionarPerfilPaciente.index', compact('paciente'));
+
+    $analisis = [];
+    if ($paciente) {
+        $citasPaciente = CitaMedica::with(['medico', 'especialidad', 'estado'])
+            ->where('id_paciente', $paciente->id_paciente)
+            ->orderBy('fecha_cita', 'desc')
+            ->get();
+        $analisis = app(\App\Services\Paquetes\P6_ConsultasHistoriales\AnalisisClinicosService::class)
+            ->obtenerPorPaciente($paciente, $citasPaciente);
+    }
+
+    $seccionActiva = $request->query('seccion') === 'analisis' ? 'analisis' : 'datos';
+
+    return view(
+        'Paquetes.P3_GestionPacientes.CU08_GestionarPerfilPaciente.index',
+        compact('paciente', 'analisis', 'seccionActiva')
+    );
 })->middleware('rol:Paciente,Administrador');
 Route::put('/perfil-paciente', [PerfilPacienteController::class, 'update'])->middleware('rol:Paciente,Administrador');
 
@@ -309,25 +357,69 @@ Route::get('/disponibilidad', function (Request $request) {
     $medicos = Medico::where('estado', true)->with(['especialidades', 'horariosAtencion'])->orderBy('nombre_completo')->get();
     $turnos = [];
     $ofertaMedica = [];
+    $sugerenciasFechas = [];
+    $especialidadSeleccionada = null;
+    $diasAtencionResumen = [];
 
     if ($request->filled('fecha')) {
         $service = app(\App\Services\Paquetes\P4_GestionCitas\DisponibilidadService::class);
         $idMedico = $request->filled('id_medico') && (int)$request->id_medico > 0 ? (int) $request->id_medico : null;
         $idEspecialidad = $request->filled('id_especialidad')
             ? (int) $request->id_especialidad
-            : ($idMedico ? (int) Medico::find($idMedico)?->especialidades()->value('especialidades.id_especialidad') : 1);
+            : ($idMedico ? (int) Medico::find($idMedico)?->especialidades()->value('especialidades.id_especialidad') : ($especialidades->first()?->id_especialidad ?? 1));
+
+        $especialidadSeleccionada = $especialidades->firstWhere('id_especialidad', $idEspecialidad);
+
+        $medicosContexto = $medicos->filter(function ($m) use ($idMedico, $idEspecialidad) {
+            if ($idMedico) {
+                return (int) $m->id_medico === $idMedico;
+            }
+            return $m->especialidades->contains('id_especialidad', $idEspecialidad);
+        });
+
+        $diasNums = $medicosContexto
+            ->flatMap(fn ($m) => $m->horariosAtencion->pluck('dia_semana'))
+            ->map(fn ($d) => (int) $d)
+            ->unique()
+            ->sort()
+            ->values();
+
+        $diasAtencionResumen = $diasNums->map(fn (int $d) => match ($d) {
+            1 => 'Lunes',
+            2 => 'Martes',
+            3 => 'Miércoles',
+            4 => 'Jueves',
+            5 => 'Viernes',
+            6 => 'Sábado',
+            default => 'Domingo',
+        })->all();
 
         try {
             $ofertaMedica = $service->consultar($idEspecialidad, $idMedico, $request->fecha);
             $turnos = collect($ofertaMedica)->flatMap(fn (array $o) => $o['cupos'])->values()->all();
+            $sugerenciasFechas = $service->sugerirProximasFechas($idEspecialidad, $idMedico, $request->fecha, 14, 5);
         } catch (\Throwable $e) {
             session()->now('error', $e instanceof \InvalidArgumentException
                 ? $e->getMessage()
                 : 'No fue posible consultar la disponibilidad. Verifica la especialidad, el médico y la fecha.');
+            if ($e instanceof \InvalidArgumentException) {
+                try {
+                    $sugerenciasFechas = $service->sugerirProximasFechas($idEspecialidad, $idMedico, null, 14, 5);
+                } catch (\Throwable) {
+                }
+            }
         }
     }
 
-    return view('Paquetes.P4_GestionCitas.CU10_ConsultarDisponibilidadMedica.index', compact('especialidades', 'medicos', 'turnos', 'ofertaMedica'));
+    return view('Paquetes.P4_GestionCitas.CU10_ConsultarDisponibilidadMedica.index', compact(
+        'especialidades',
+        'medicos',
+        'turnos',
+        'ofertaMedica',
+        'sugerenciasFechas',
+        'especialidadSeleccionada',
+        'diasAtencionResumen'
+    ));
 });
 
 // CU11: Programar Cita Médica (Admin, Recepción, Paciente)
@@ -397,13 +489,34 @@ Route::get('/citas/{id}/cancelar', function (Request $request, int $id) {
 Route::patch('/citas/{id}/cancelar', CancelarCitaController::class)->middleware('rol:Administrador,Recepcionista,Paciente');
 
 // CU14: Registrar Confirmación, Asistencia e Inasistencia (Recepción, Admin)
-Route::get('/control-atencion', function () {
-    $citas = CitaMedica::with(['paciente', 'medico', 'especialidad', 'estado'])
-        ->whereIn('id_estado_cita', [1, 2])
-        ->orderBy('fecha_cita', 'asc')
-        ->orderBy('hora_cita', 'asc')
-        ->get();
-    return view('Paquetes.P5_ControlAtencion.CU14_RegistrarConfirmacionAsistenciaInasistencia.index', compact('citas'));
+Route::get('/control-atencion', function (Request $request) {
+    $orden = $request->query('orden', 'llegada');
+    $filtro = $request->query('filtro', 'todos');
+
+    $query = CitaMedica::with(['paciente', 'medico', 'especialidad', 'estado'])
+        ->whereIn('id_estado_cita', [1, 2]);
+
+    if ($filtro === 'sala') {
+        $query->whereNotNull('fecha_hora_llegada');
+    } elseif ($filtro === 'confirmadas') {
+        $query->where('id_estado_cita', 2)->whereNull('fecha_hora_llegada');
+    } elseif ($filtro === 'programadas') {
+        $query->where('id_estado_cita', 1);
+    }
+
+    if ($orden === 'turno') {
+        $query->orderBy('fecha_cita', 'asc')
+            ->orderBy('hora_cita', 'asc');
+    } else {
+        $query->orderByRaw('CASE WHEN fecha_hora_llegada IS NOT NULL THEN 0 ELSE 1 END ASC')
+            ->orderBy('fecha_hora_llegada', 'asc')
+            ->orderBy('fecha_cita', 'asc')
+            ->orderBy('hora_cita', 'asc');
+    }
+
+    $citas = $query->get();
+
+    return view('Paquetes.P5_ControlAtencion.CU14_RegistrarConfirmacionAsistenciaInasistencia.index', compact('citas', 'orden', 'filtro'));
 })->middleware('rol:Administrador,Recepcionista');
 Route::patch('/control-atencion/citas/{id}/confirmar', [ControlAsistenciaController::class, 'confirmar'])->middleware('rol:Administrador,Recepcionista');
 Route::patch('/control-atencion/citas/{id}/llegada', [ControlAsistenciaController::class, 'registrarLlegada'])->middleware('rol:Administrador,Recepcionista');
@@ -545,15 +658,19 @@ Route::get('/historial-paciente', function (Request $request) {
         $paciente = Paciente::where('ci', '13730890')->first() ?? $pacientesSugeridos->first();
     }
 
+    $analisis = [];
     if ($paciente) {
         $citas = CitaMedica::with(['medico', 'especialidad', 'estado'])
             ->where('id_paciente', $paciente->id_paciente)
             ->orderBy('fecha_cita', 'desc')
             ->orderBy('hora_cita', 'desc')
             ->get();
+
+        $analisis = app(\App\Services\Paquetes\P6_ConsultasHistoriales\AnalisisClinicosService::class)
+            ->obtenerPorPaciente($paciente, $citas);
     }
 
-    return view('Paquetes.P6_ConsultasHistoriales.CU17_ConsultarHistorialCitasPaciente.index', compact('paciente', 'citas', 'pacientesSugeridos', 'busqueda'));
+    return view('Paquetes.P6_ConsultasHistoriales.CU17_ConsultarHistorialCitasPaciente.index', compact('paciente', 'citas', 'analisis', 'pacientesSugeridos', 'busqueda'));
 })->middleware('rol:Administrador,Recepcionista,Médico');
 
 // CU18: Consultar Mis Citas (Paciente)

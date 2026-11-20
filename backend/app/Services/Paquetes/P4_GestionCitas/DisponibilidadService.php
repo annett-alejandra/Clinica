@@ -21,8 +21,9 @@ class DisponibilidadService
      */
     public function consultar(int $idEspecialidad, ?int $idMedico, string $fecha): array
     {
-        $fechaConsulta = Carbon::parse($fecha)->startOfDay();
-        $hoy = Carbon::now()->startOfDay();
+        $tz = 'America/La_Paz';
+        $fechaConsulta = Carbon::parse($fecha, $tz)->startOfDay();
+        $hoy = Carbon::now($tz)->startOfDay();
 
         if ($fechaConsulta->lt($hoy)) {
             throw new InvalidArgumentException('No se puede consultar disponibilidad médica para fechas anteriores a hoy.');
@@ -48,45 +49,47 @@ class DisponibilidadService
         $ofertaDisponible = [];
 
         foreach ($medicos as $medico) {
-            // Buscar horarios del médico en el día de la semana consultado
+            // Buscar horarios del médico en el día de la semana consultado (ordenados cronológicamente)
             $horarios = HorarioAtencion::where('id_medico', $medico->id_medico)
                 ->where('dia_semana', $diaSemana)
+                ->orderBy('hora_inicio')
                 ->get();
 
             if ($horarios->isEmpty()) {
                 continue;
             }
 
-            // Obtener citas ya ocupadas para este médico y fecha (Programadas=1 o Confirmadas=2)
+            // Obtener citas ya ocupadas para este médico y fecha (Programadas=1, Confirmadas=2 o Atendidas=3)
             $citasOcupadas = CitaMedica::where('id_medico', $medico->id_medico)
                 ->where('fecha_cita', $fechaConsulta->format('Y-m-d'))
-                ->whereIn('id_estado_cita', [1, 2])
+                ->whereIn('id_estado_cita', [1, 2, 3])
                 ->get(['hora_cita', 'duracion_minutos'])
                 ->map(function ($cita) {
                     $inicio = Carbon::parse($cita->hora_cita);
-                    $fin = (clone $inicio)->addMinutes($cita->duracion_minutos);
+                    $fin = (clone $inicio)->addMinutes($cita->duracion_minutos ?: 30);
                     return ['inicio' => $inicio->format('H:i:s'), 'fin' => $fin->format('H:i:s')];
                 })
                 ->toArray();
 
-            $slotsLibres = [];
-            $ahora = Carbon::now();
+            $bloquesPorHora = [];
+            $ahora = Carbon::now('America/La_Paz');
 
             foreach ($horarios as $horario) {
                 $inicioTurno = Carbon::parse($horario->hora_inicio);
                 $finTurno = Carbon::parse($horario->hora_fin);
-                $duracion = $horario->duracion_cita_minutos;
+                $duracion = (int) ($horario->duracion_cita_minutos ?: 30);
 
                 $slotActual = clone $inicioTurno;
 
                 while ((clone $slotActual)->addMinutes($duracion)->lte($finTurno)) {
                     $slotInicio = $slotActual->format('H:i:s');
                     $slotFin = (clone $slotActual)->addMinutes($duracion)->format('H:i:s');
+                    $horaCorta = substr($slotInicio, 0, 5);
 
-                    // Si la fecha es hoy, omitir turnos que ya hayan pasado la hora actual
+                    // Si la fecha es hoy, detectar turnos que ya pasaron la hora actual
                     $slotEsPasado = false;
                     if ($fechaConsulta->isToday()) {
-                        $horaSlotTimestamp = Carbon::parse($fechaConsulta->format('Y-m-d') . ' ' . $slotInicio);
+                        $horaSlotTimestamp = Carbon::parse($fechaConsulta->format('Y-m-d') . ' ' . $slotInicio, 'America/La_Paz');
                         if ($horaSlotTimestamp->lte($ahora)) {
                             $slotEsPasado = true;
                         }
@@ -101,19 +104,38 @@ class DisponibilidadService
                         }
                     }
 
-                    if (!$slotEsPasado && !$ocupado) {
-                        $slotsLibres[] = [
-                            'hora_inicio' => substr($slotInicio, 0, 5),
-                            'hora_fin' => substr($slotFin, 0, 5),
-                            'duracion_minutos' => $duracion,
-                        ];
+                    $estadoBloque = $ocupado ? 'ocupado' : ($slotEsPasado ? 'pasado' : 'disponible');
+                    $nuevoBloque = [
+                        'hora_inicio' => $horaCorta,
+                        'hora_fin' => substr($slotFin, 0, 5),
+                        'duracion_minutos' => $duracion,
+                        'estado' => $estadoBloque,
+                        'disponible' => $estadoBloque === 'disponible',
+                        'ocupado' => $ocupado,
+                    ];
+
+                    // Si existen filas solapadas para la misma hora, priorizar estado ocupado
+                    if (!isset($bloquesPorHora[$horaCorta]) || $ocupado) {
+                        $bloquesPorHora[$horaCorta] = $nuevoBloque;
                     }
 
                     $slotActual->addMinutes($duracion);
                 }
             }
 
-            if (!empty($slotsLibres)) {
+            ksort($bloquesPorHora);
+            $todosBloques = array_values($bloquesPorHora);
+            $slotsLibres = array_values(array_map(
+                fn (array $b) => [
+                    'hora_inicio' => $b['hora_inicio'],
+                    'hora_fin' => $b['hora_fin'],
+                    'duracion_minutos' => $b['duracion_minutos'],
+                ],
+                array_filter($todosBloques, fn (array $b) => $b['disponible'])
+            ));
+            $totalOcupados = count(array_filter($todosBloques, fn (array $b) => $b['ocupado']));
+
+            if (!empty($todosBloques)) {
                 $ofertaDisponible[] = [
                     'medico' => [
                         'id_medico' => $medico->id_medico,
@@ -126,12 +148,96 @@ class DisponibilidadService
                     ],
                     'fecha' => $fechaConsulta->format('Y-m-d'),
                     'total_cupos' => count($slotsLibres),
+                    'total_ocupados' => $totalOcupados,
+                    'total_bloques' => count($todosBloques),
                     'cupos' => $slotsLibres,
+                    'todos_bloques' => $todosBloques,
                 ];
             }
         }
 
         return $ofertaDisponible;
+    }
+
+    /**
+     * Sugiere las próximas fechas con turnos libres disponibles para una especialidad y/o médico.
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function sugerirProximasFechas(
+        int $idEspecialidad,
+        ?int $idMedico = null,
+        ?string $fechaExcluir = null,
+        int $diasVentana = 14,
+        int $maxSugerencias = 5
+    ): array {
+        $tz = 'America/La_Paz';
+        $hoy = Carbon::now($tz)->startOfDay();
+        $sugerencias = [];
+
+        for ($offset = 0; $offset < $diasVentana; $offset++) {
+            $cursor = $hoy->copy()->addDays($offset);
+            $fechaIso = $cursor->format('Y-m-d');
+
+            if ($fechaExcluir !== null && $fechaIso === $fechaExcluir) {
+                continue;
+            }
+
+            try {
+                $oferta = $this->consultar($idEspecialidad, $idMedico, $fechaIso);
+            } catch (\Throwable) {
+                continue;
+            }
+
+            $horasLibres = [];
+            $medicosConCupos = 0;
+
+            foreach ($oferta as $item) {
+                $cupos = $item['cupos'] ?? [];
+                if (! empty($cupos)) {
+                    $medicosConCupos++;
+                    foreach ($cupos as $cupo) {
+                        $hora = is_array($cupo) ? ($cupo['hora_inicio'] ?? '') : (string) $cupo;
+                        if ($hora !== '') {
+                            $horasLibres[] = substr($hora, 0, 5);
+                        }
+                    }
+                }
+            }
+
+            if ($horasLibres === []) {
+                continue;
+            }
+
+            sort($horasLibres);
+            $horasUnicas = array_values(array_unique($horasLibres));
+
+            $sugerencias[] = [
+                'fecha' => $fechaIso,
+                'fecha_legible' => $cursor->format('d/m/Y'),
+                'dia_nombre' => match ($cursor->dayOfWeekIso) {
+                    1 => 'Lunes',
+                    2 => 'Martes',
+                    3 => 'Miércoles',
+                    4 => 'Jueves',
+                    5 => 'Viernes',
+                    6 => 'Sábado',
+                    default => 'Domingo',
+                },
+                'es_hoy' => $offset === 0,
+                'es_manana' => $offset === 1,
+                'total_cupos' => count($horasLibres),
+                'primera_hora' => $horasUnicas[0],
+                'ultima_hora' => $horasUnicas[count($horasUnicas) - 1],
+                'medicos_count' => $medicosConCupos,
+            ];
+
+            if (count($sugerencias) >= $maxSugerencias) {
+                break;
+            }
+        }
+
+        return $sugerencias;
     }
 }
 

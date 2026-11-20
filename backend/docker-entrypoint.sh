@@ -31,5 +31,10 @@ php artisan config:clear || true
 php artisan route:clear || true
 php artisan view:clear || true
 
+# Sincronizar migraciones y base vectorial de Triage IA de forma idempotente
+php artisan migrate --path=database/migrations/2026_11_19_000012_create_perfiles_clinicos_medicos_table.php --force || true
+php artisan migrate --path=database/migrations/2026_11_19_000013_create_consultas_triage_table.php --force || true
+php artisan db:seed --class=TriageConocimientoSeeder --force || true
+
 # Iniciar el servidor
 exec "$@"

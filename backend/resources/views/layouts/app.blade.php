@@ -151,6 +151,14 @@
                         <a href="{{ route('portal') }}" class="block px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 font-medium">
                             Ir a mi Consola Operativa
                         </a>
+                        @if ($usuarioActual->tieneRol('Paciente') || $usuarioActual->tieneRol('Administrador'))
+                            <a href="{{ url('/perfil-paciente') }}" class="block px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 font-medium">
+                                Mi Perfil de Paciente
+                            </a>
+                            <a href="{{ url('/perfil-paciente?seccion=analisis') }}" class="block px-4 py-2 text-xs text-[#0284C7] hover:bg-sky-50 font-semibold">
+                                Ver Mis Análisis Realizados
+                            </a>
+                        @endif
                         <div class="border-t border-slate-100 mt-1 pt-1 px-3">
                             <form method="POST" action="{{ url('/logout') }}">
                                 @csrf
@@ -283,19 +291,31 @@
 
                 <template x-if="!cargando && oferta.length > 0">
                     <div class="space-y-2.5 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
-                        <p class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Seleccione Médico y Horario Disponible:</p>
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <p class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Horarios por Médico:</p>
+                            <div class="flex items-center gap-2.5 text-[10px] text-slate-500">
+                                <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-white border border-slate-300"></span> Libre</span>
+                                <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-emerald-600"></span> Elegido</span>
+                                <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-rose-100 border border-rose-400"></span> Ocupado</span>
+                            </div>
+                        </div>
                         <template x-for="item in oferta" :key="(item.medico ? item.medico.id_medico : item.id_medico)">
-                            <div class="bg-white p-3 rounded-lg border border-slate-200">
+                            <div class="bg-white p-3 rounded-xl border border-slate-200">
                                 <p class="text-xs font-bold text-slate-800" x-text="item.medico ? item.medico.nombre_completo : (item.nombre_completo || 'Médico Especialista')"></p>
                                 <p class="text-[11px] text-slate-400 mb-2" x-text="'Registro: ' + (item.medico ? item.medico.registro_profesional : (item.consultorio || 'Central'))"></p>
-                                <div class="flex flex-wrap gap-1.5">
-                                    <template x-for="cupo in item.cupos" :key="(item.medico ? item.medico.id_medico : item.id_medico) + '-' + (typeof cupo === 'string' ? cupo : cupo.hora_inicio)">
+                                <div class="grid grid-cols-4 gap-1.5">
+                                    <template x-for="cupo in (item.todos_bloques && item.todos_bloques.length ? item.todos_bloques : item.cupos)" :key="(item.medico ? item.medico.id_medico : item.id_medico) + '-' + (typeof cupo === 'string' ? cupo : cupo.hora_inicio)">
                                         <button type="button"
                                                 @click="elegirCupo(item, cupo)"
-                                                :class="esElegido(item, cupo)
-                                                    ? 'bg-[#0284C7] text-white border-[#0284C7]'
-                                                    : 'bg-slate-50 text-slate-700 border-slate-200 hover:border-[#0284C7]'"
-                                                class="px-2.5 py-1 rounded-md text-xs font-semibold border transition-colors"
+                                                :disabled="typeof cupo === 'object' && cupo.estado && cupo.estado !== 'disponible'"
+                                                :class="(typeof cupo === 'object' && cupo.estado === 'ocupado')
+                                                    ? 'bg-rose-50 text-rose-600 border-rose-300 cursor-not-allowed'
+                                                    : ((typeof cupo === 'object' && cupo.estado === 'pasado')
+                                                        ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed line-through'
+                                                        : (esElegido(item, cupo)
+                                                            ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm font-bold'
+                                                            : 'bg-white text-slate-700 border-slate-200 hover:border-emerald-400 hover:bg-emerald-50/40'))"
+                                                class="px-2 py-1.5 rounded-lg text-xs font-mono font-semibold border transition-all text-center"
                                                 x-text="(typeof cupo === 'string' ? cupo : cupo.hora_inicio).substring(0, 5)">
                                         </button>
                                     </template>

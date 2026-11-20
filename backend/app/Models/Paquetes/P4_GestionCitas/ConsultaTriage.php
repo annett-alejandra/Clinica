@@ -11,6 +11,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ConsultaTriage extends Model
 {
+    public const ACCIONES_DERIVACION = [
+        'DERIVADO_URGENCIAS' => 'Derivado a Urgencias 24/7 (Box / Shock)',
+        'AMBULANCIA_DESPACHADA' => 'Ambulancia despachada a domicilio',
+        'CITA_PRIORITARIA' => 'Derivado a Cita Médica Prioritaria',
+        'CONTACTO_TELEFONICO' => 'Contacto telefónico / Paciente orientado',
+        'FALSO_POSITIVO' => 'Descartado / Falso positivo verificado',
+    ];
+
     protected $table = 'consultas_triage';
 
     protected $primaryKey = 'id_triage';
@@ -81,5 +89,17 @@ class ConsultaTriage extends Model
     public function usuarioAtendio(): BelongsTo
     {
         return $this->belongsTo(User::class, 'id_usuario_atendio', 'id_usuario');
+    }
+
+    public function resolucionManual(): ?array
+    {
+        $datos = $this->recomendaciones_json;
+        if (! is_array($datos)) {
+            return null;
+        }
+
+        return isset($datos['resolucion_manual']) && is_array($datos['resolucion_manual'])
+            ? $datos['resolucion_manual']
+            : null;
     }
 }

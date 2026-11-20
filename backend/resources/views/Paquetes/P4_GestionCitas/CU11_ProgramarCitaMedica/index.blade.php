@@ -17,9 +17,42 @@ document.addEventListener('alpine:init', () => {
         fecha: '{{ old('fecha_cita', request('fecha_cita', date('Y-m-d'))) }}',
         hora: '{{ old('hora_cita', request('hora_cita', '')) }}',
         cargandoCupos: false,
+        bloquesHorario: [],
         cuposDisponibles: [],
         medicos: @json($medicos),
-        mensajeDisponibilidad: '',
+        mensajeDisponibilidad: 'Selecciona especialidad o médico y la fecha para ver los horarios disponibles y ocupados del día.',
+
+        get bloquesManana() {
+            return this.bloquesHorario.filter(b => parseInt(b.hora.split(':')[0], 10) < 13);
+        },
+
+        get bloquesTarde() {
+            return this.bloquesHorario.filter(b => parseInt(b.hora.split(':')[0], 10) >= 13);
+        },
+
+        get totalLibres() {
+            return this.bloquesHorario.filter(b => b.estado === 'disponible').length;
+        },
+
+        get totalOcupados() {
+            return this.bloquesHorario.filter(b => b.estado === 'ocupado').length;
+        },
+
+        get etiquetaFechaDia() {
+            if (!this.fecha) return '';
+            const partes = this.fecha.split('-').map(Number);
+            if (partes.length !== 3) return this.fecha;
+            const d = new Date(partes[0], partes[1] - 1, partes[2]);
+            const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+            const meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+            return `${dias[d.getDay()]} ${partes[2]} ${meses[partes[1] - 1]}`;
+        },
+
+        get horaEstaOcupada() {
+            if (!this.hora) return false;
+            const hCorta = this.hora.substring(0, 5);
+            return this.bloquesHorario.some(b => b.hora === hCorta && b.estado === 'ocupado');
+        },
 
         get medicosFiltrados() {
             if (!this.especialidadId) return this.medicos;
@@ -116,61 +149,102 @@ document.addEventListener('alpine:init', () => {
 
         async consultarCupos() {
             if (!this.especialidadId || !this.fecha) {
+                this.bloquesHorario = [];
                 this.cuposDisponibles = [];
-                this.mensajeDisponibilidad = 'Selecciona especialidad y fecha para consultar horarios disponibles.';
+                this.mensajeDisponibilidad = 'Selecciona especialidad o médico y la fecha para ver los horarios disponibles y ocupados del día.';
                 return;
             }
 
             this.cargandoCupos = true;
             this.mensajeDisponibilidad = '';
+            this.bloquesHorario = [];
             this.cuposDisponibles = [];
 
             try {
-                let url = `{{ url('/api/disponibilidad') }}?id_especialidad=${this.especialidadId}&fecha=${this.fecha}`;
+                let url = `/api/disponibilidad?id_especialidad=${this.especialidadId}&fecha=${this.fecha}`;
                 if (this.medicoId) {
                     url += `&id_medico=${this.medicoId}`;
                 }
 
-                const res = await fetch(url);
+                const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
                 const json = await res.json();
 
                 if (json.success && Array.isArray(json.data) && json.data.length > 0) {
-                    let lista = [];
+                    let bloques = [];
+
                     if (this.medicoId) {
                         const found = json.data.find(d => d.medico && d.medico.id_medico == this.medicoId);
-                        if (found && found.cupos) {
-                            lista = found.cupos.map(c => typeof c === 'string' ? c : c.hora_inicio);
+                        if (found) {
+                            const origen = Array.isArray(found.todos_bloques) && found.todos_bloques.length > 0
+                                ? found.todos_bloques
+                                : (found.cupos || []).map(c => ({
+                                    hora_inicio: typeof c === 'string' ? c : c.hora_inicio,
+                                    hora_fin: typeof c === 'object' ? (c.hora_fin || '') : '',
+                                    estado: 'disponible',
+                                    disponible: true,
+                                    ocupado: false,
+                                }));
+                            bloques = origen.map(b => ({
+                                hora: String(b.hora_inicio || '').substring(0, 5),
+                                hora_fin: String(b.hora_fin || '').substring(0, 5),
+                                estado: b.estado || (b.ocupado ? 'ocupado' : 'disponible'),
+                                disponible: b.estado ? b.estado === 'disponible' : !b.ocupado,
+                            }));
                         }
                     } else {
-                        const set = new Set();
+                        const mapa = {};
                         json.data.forEach(d => {
-                            if (d.cupos) {
-                                d.cupos.forEach(c => set.add(typeof c === 'string' ? c : c.hora_inicio));
-                            }
+                            const origen = Array.isArray(d.todos_bloques) && d.todos_bloques.length > 0
+                                ? d.todos_bloques
+                                : (d.cupos || []).map(c => ({
+                                    hora_inicio: typeof c === 'string' ? c : c.hora_inicio,
+                                    hora_fin: typeof c === 'object' ? (c.hora_fin || '') : '',
+                                    estado: 'disponible',
+                                }));
+                            origen.forEach(b => {
+                                const h = String(b.hora_inicio || '').substring(0, 5);
+                                const est = b.estado || (b.ocupado ? 'ocupado' : 'disponible');
+                                if (!mapa[h]) {
+                                    mapa[h] = { hora: h, hora_fin: String(b.hora_fin || '').substring(0, 5), estado: est, disponible: est === 'disponible' };
+                                } else if (est === 'disponible') {
+                                    mapa[h].estado = 'disponible';
+                                    mapa[h].disponible = true;
+                                } else if (est === 'ocupado' && mapa[h].estado === 'pasado') {
+                                    mapa[h].estado = 'ocupado';
+                                }
+                            });
                         });
-                        lista = Array.from(set).sort();
+                        bloques = Object.values(mapa).sort((a, b) => a.hora.localeCompare(b.hora));
                     }
 
-                    this.cuposDisponibles = lista.map(h => h.substring(0, 5));
-                    if (this.cuposDisponibles.length === 0) {
-                        this.mensajeDisponibilidad = 'No hay cupos disponibles en esta fecha. El médico no atiende hoy o todos los turnos están ocupados.';
+                    this.bloquesHorario = bloques;
+                    this.cuposDisponibles = bloques.filter(b => b.estado === 'disponible').map(b => b.hora);
+
+                    if (this.bloquesHorario.length === 0) {
+                        this.mensajeDisponibilidad = 'El médico no tiene turnos configurados para este día de la semana.';
+                        this.hora = '';
                     } else {
-                        if (!this.hora || !this.cuposDisponibles.includes(this.hora)) {
-                            this.hora = this.cuposDisponibles[0];
+                        if (this.cuposDisponibles.length === 0) {
+                            this.mensajeDisponibilidad = 'Todos los horarios de este día están ocupados o ya pasaron.';
+                        }
+                        if (this.hora && !this.cuposDisponibles.includes(this.hora.substring(0, 5))) {
+                            this.hora = '';
                         }
                     }
                 } else {
-                    this.mensajeDisponibilidad = 'El médico no atiende en el día de la semana seleccionado o no hay turnos libres.';
+                    this.hora = '';
+                    this.mensajeDisponibilidad = json.message || 'El médico no atiende en el día de la semana seleccionado.';
                 }
             } catch (e) {
-                this.mensajeDisponibilidad = 'Consulta de cupos no disponible temporalmente.';
+                this.mensajeDisponibilidad = 'Consulta de horarios no disponible temporalmente.';
             } finally {
                 this.cargandoCupos = false;
             }
         },
 
-        seleccionarCupo(h) {
-            this.hora = h;
+        seleccionarCupo(bloque) {
+            if (!bloque || !bloque.disponible) return;
+            this.hora = bloque.hora;
         },
 
         init() {
@@ -279,51 +353,159 @@ document.addEventListener('alpine:init', () => {
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Fecha de la Cita *</label>
                         <input type="date" name="fecha_cita" x-model="fecha" @change="onFechaChange()"
-                               class="w-full text-sm border-slate-200 rounded-lg p-2.5 bg-slate-50 border focus:bg-white focus:border-[#0284C7] focus:outline-none"
+                               class="w-full text-sm border-slate-200 rounded-xl p-2.5 bg-slate-50 border focus:bg-white focus:border-[#0284C7] focus:outline-none transition-colors"
                                required min="{{ date('Y-m-d') }}">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Hora Seleccionada *</label>
                         <input type="time" name="hora_cita" x-model="hora" step="1800"
-                               class="w-full text-sm border-slate-200 rounded-lg p-2.5 bg-slate-50 border focus:bg-white focus:border-[#0284C7] focus:outline-none font-bold text-[#0284C7]" required>
+                               :class="horaEstaOcupada
+                                   ? 'border-rose-400 bg-rose-50 text-rose-700'
+                                   : (hora ? 'border-emerald-400 bg-emerald-50/70 text-emerald-700' : 'border-slate-200 bg-slate-50 text-slate-500')"
+                               class="w-full text-sm rounded-xl p-2.5 border focus:bg-white focus:border-emerald-500 focus:outline-none font-bold transition-colors" required>
                     </div>
                 </div>
 
-                <!-- Selector Dinámico de Horarios y Cupos Disponibles -->
-                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Horarios Disponibles</span>
+                <!-- Selector Visual de Horarios (Disponibles sin color, Seleccionado verde, Ocupados rojo) -->
+                <div class="p-4 rounded-2xl bg-slate-50/90 border border-slate-200/90 space-y-3 shadow-inner">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <div>
+                            <span class="text-xs font-bold text-slate-800 uppercase tracking-wider block">Horarios del Día</span>
+                            <span class="text-[11px] text-slate-500 font-medium" x-show="fecha" x-text="etiquetaFechaDia"></span>
+                        </div>
+
                         <template x-if="cargandoCupos">
-                            <span class="text-[11px] text-[#0284C7] flex items-center gap-1 font-semibold">
+                            <span class="text-[11px] text-[#0284C7] flex items-center gap-1.5 font-semibold bg-sky-50 px-2.5 py-1 rounded-full border border-sky-200">
                                 <span class="w-2 h-2 rounded-full bg-[#0284C7] animate-ping"></span>
-                                <span>Consultando cupos...</span>
+                                <span>Consultando agenda...</span>
                             </span>
+                        </template>
+
+                        <template x-if="!cargandoCupos && bloquesHorario.length > 0">
+                            <div class="flex items-center gap-1.5 text-[11px] font-bold">
+                                <span class="px-2 py-0.5 rounded-full bg-white text-slate-700 border border-slate-200">
+                                    <span x-text="totalLibres"></span> libres
+                                </span>
+                                <span class="px-2 py-0.5 rounded-full bg-rose-50 text-rose-600 border border-rose-200" x-show="totalOcupados > 0">
+                                    <span x-text="totalOcupados"></span> ocupados
+                                </span>
+                            </div>
                         </template>
                     </div>
 
-                    <!-- Mensaje si no hay cupos o faltan datos -->
+                    <!-- Leyenda de colores -->
+                    <div class="flex flex-wrap items-center gap-3 pt-1 pb-2 border-b border-slate-200/70 text-[11px] text-slate-600">
+                        <span class="inline-flex items-center gap-1.5">
+                            <span class="w-3 h-3 rounded bg-white border border-slate-300 shadow-xs"></span>
+                            <span>Disponible</span>
+                        </span>
+                        <span class="inline-flex items-center gap-1.5">
+                            <span class="w-3 h-3 rounded bg-emerald-600 border border-emerald-600"></span>
+                            <span class="font-semibold text-emerald-700">Seleccionado</span>
+                        </span>
+                        <span class="inline-flex items-center gap-1.5">
+                            <span class="w-3 h-3 rounded bg-rose-100 border border-rose-400"></span>
+                            <span class="font-semibold text-rose-600">Ocupado</span>
+                        </span>
+                    </div>
+
+                    <!-- Aviso si el usuario escribió manualmente una hora ocupada -->
+                    <template x-if="horaEstaOcupada">
+                        <div class="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold">
+                            Ese horario ya está ocupado para este médico. Selecciona un bloque disponible.
+                        </div>
+                    </template>
+
+                    <!-- Mensaje informativo si no hay bloques o todos están ocupados -->
                     <template x-if="mensajeDisponibilidad && !cargandoCupos">
-                        <div class="p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-xs">
+                        <div class="p-3 rounded-xl text-xs border"
+                             :class="bloquesHorario.length > 0 ? 'bg-rose-50/70 border-rose-200 text-rose-700' : 'bg-white border-slate-200 text-slate-500'">
                             <p x-text="mensajeDisponibilidad"></p>
                         </div>
                     </template>
 
-                    <!-- Lista de Cupos Clicables -->
-                    <template x-if="cuposDisponibles.length > 0 && !cargandoCupos">
-                        <div>
-                            <p class="text-[11px] text-slate-500 mb-2">Haz clic en un turno para seleccionarlo automáticamente:</p>
-                            <div class="grid grid-cols-4 gap-1.5 max-h-48 overflow-y-auto p-1">
-                                <template x-for="cupo in cuposDisponibles" :key="cupo">
-                                    <button type="button"
-                                            @click="seleccionarCupo(cupo)"
-                                            :class="hora === cupo
-                                                ? 'bg-[#0284C7] text-white border-[#0284C7] shadow-sm font-bold scale-[1.02]'
-                                                : 'bg-white text-slate-700 border-slate-200 hover:border-[#0284C7] hover:bg-sky-50 font-medium'"
-                                            class="py-1.5 px-2 rounded-lg text-xs border text-center transition-all cursor-pointer">
-                                        <span x-text="cupo"></span>
-                                    </button>
-                                </template>
-                            </div>
+                    <!-- Grilla de Bloques Horarios (Mañana y Tarde) -->
+                    <template x-if="bloquesHorario.length > 0 && !cargandoCupos">
+                        <div class="space-y-3 max-h-64 overflow-y-auto pr-1">
+                            <!-- Turno Mañana -->
+                            <template x-if="bloquesManana.length > 0">
+                                <div class="space-y-1.5">
+                                    <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                                        <span>Turno Mañana</span>
+                                        <span class="flex-1 h-px bg-slate-200/80"></span>
+                                    </p>
+                                    <div class="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                                        <template x-for="b in bloquesManana" :key="'m-' + b.hora">
+                                            <button type="button"
+                                                    @click="seleccionarCupo(b)"
+                                                    :disabled="!b.disponible"
+                                                    :title="b.estado === 'ocupado' ? 'Horario ocupado' : (b.estado === 'pasado' ? 'Horario ya pasado' : 'Seleccionar ' + b.hora)"
+                                                    :class="b.estado === 'ocupado'
+                                                        ? 'bg-rose-50 text-rose-600 border-rose-300 cursor-not-allowed'
+                                                        : (b.estado === 'pasado'
+                                                            ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed line-through'
+                                                            : (hora && hora.substring(0, 5) === b.hora
+                                                                ? 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-600/25 ring-2 ring-emerald-200 scale-[1.02]'
+                                                                : 'bg-white text-slate-700 border-slate-200 hover:border-emerald-400 hover:bg-emerald-50/40 hover:text-emerald-800 cursor-pointer'))"
+                                                    class="py-2 px-1.5 rounded-xl border text-center transition-all flex flex-col items-center justify-center leading-tight">
+                                                <span class="font-mono text-xs font-bold flex items-center gap-1">
+                                                    <span x-show="b.estado === 'ocupado'" class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                                                    <span x-show="b.disponible && hora && hora.substring(0, 5) === b.hora">✓</span>
+                                                    <span x-text="b.hora"></span>
+                                                </span>
+                                                <span class="text-[9px] font-semibold mt-0.5 uppercase tracking-wide"
+                                                      :class="b.estado === 'ocupado' ? 'text-rose-500' : (b.disponible && hora && hora.substring(0, 5) === b.hora ? 'text-emerald-100' : 'text-slate-400')"
+                                                      x-text="b.estado === 'ocupado' ? 'Ocupado' : (b.estado === 'pasado' ? 'Pasado' : (hora && hora.substring(0, 5) === b.hora ? 'Elegido' : 'Libre'))"></span>
+                                            </button>
+                                        </template>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <!-- Turno Tarde -->
+                            <template x-if="bloquesTarde.length > 0">
+                                <div class="space-y-1.5">
+                                    <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                                        <span>Turno Tarde</span>
+                                        <span class="flex-1 h-px bg-slate-200/80"></span>
+                                    </p>
+                                    <div class="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                                        <template x-for="b in bloquesTarde" :key="'t-' + b.hora">
+                                            <button type="button"
+                                                    @click="seleccionarCupo(b)"
+                                                    :disabled="!b.disponible"
+                                                    :title="b.estado === 'ocupado' ? 'Horario ocupado' : (b.estado === 'pasado' ? 'Horario ya pasado' : 'Seleccionar ' + b.hora)"
+                                                    :class="b.estado === 'ocupado'
+                                                        ? 'bg-rose-50 text-rose-600 border-rose-300 cursor-not-allowed'
+                                                        : (b.estado === 'pasado'
+                                                            ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed line-through'
+                                                            : (hora && hora.substring(0, 5) === b.hora
+                                                                ? 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-600/25 ring-2 ring-emerald-200 scale-[1.02]'
+                                                                : 'bg-white text-slate-700 border-slate-200 hover:border-emerald-400 hover:bg-emerald-50/40 hover:text-emerald-800 cursor-pointer'))"
+                                                    class="py-2 px-1.5 rounded-xl border text-center transition-all flex flex-col items-center justify-center leading-tight">
+                                                <span class="font-mono text-xs font-bold flex items-center gap-1">
+                                                    <span x-show="b.estado === 'ocupado'" class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                                                    <span x-show="b.disponible && hora && hora.substring(0, 5) === b.hora">✓</span>
+                                                    <span x-text="b.hora"></span>
+                                                </span>
+                                                <span class="text-[9px] font-semibold mt-0.5 uppercase tracking-wide"
+                                                      :class="b.estado === 'ocupado' ? 'text-rose-500' : (b.disponible && hora && hora.substring(0, 5) === b.hora ? 'text-emerald-100' : 'text-slate-400')"
+                                                      x-text="b.estado === 'ocupado' ? 'Ocupado' : (b.estado === 'pasado' ? 'Pasado' : (hora && hora.substring(0, 5) === b.hora ? 'Elegido' : 'Libre'))"></span>
+                                            </button>
+                                        </template>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+
+                    <!-- Resumen de selección verde -->
+                    <template x-if="hora && !horaEstaOcupada && bloquesHorario.length > 0">
+                        <div class="pt-2 border-t border-slate-200/70 flex items-center justify-between text-xs">
+                            <span class="text-slate-500">Turno elegido:</span>
+                            <span class="px-2.5 py-1 rounded-lg bg-emerald-600 text-white font-mono font-bold shadow-xs">
+                                ✓ <span x-text="hora.substring(0, 5)"></span> hrs
+                            </span>
                         </div>
                     </template>
                 </div>
@@ -331,10 +513,13 @@ document.addEventListener('alpine:init', () => {
                 <!-- Motivo de Consulta -->
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Motivo Clínico (Opcional)</label>
-                    <textarea name="motivo" rows="2" class="w-full text-sm border-slate-200 rounded-lg p-2.5 bg-slate-50 border focus:bg-white focus:border-[#0284C7] focus:outline-none" placeholder="Síntomas o control preventivo...">{{ old('motivo', request('motivo', '')) }}</textarea>
+                    <textarea name="motivo" rows="2" class="w-full text-sm border-slate-200 rounded-xl p-2.5 bg-slate-50 border focus:bg-white focus:border-[#0284C7] focus:outline-none" placeholder="Síntomas o control preventivo...">{{ old('motivo', request('motivo', '')) }}</textarea>
                 </div>
 
-                <button type="submit" class="btn-primary w-full justify-center shadow-md shadow-[#0284C7]/20 py-3 text-sm">
+                <button type="submit"
+                        :disabled="horaEstaOcupada"
+                        :class="horaEstaOcupada ? 'opacity-50 cursor-not-allowed' : ''"
+                        class="btn-primary w-full justify-center shadow-md shadow-[#0284C7]/20 py-3 text-sm">
                     Confirmar Reserva de Cita
                 </button>
             </form>

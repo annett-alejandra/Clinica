@@ -108,33 +108,45 @@
     </div>
 
     <!-- PESTAÑAS DE FILTRO RÁPIDO (TABS) -->
-    <div class="flex items-center gap-1.5 overflow-x-auto pb-2 mb-4 scrollbar-none">
+    <div class="flex flex-wrap items-center gap-1.5 pb-2 mb-4">
         <a href="{{ route('auditoria', ['categoria' => 'todas']) }}"
            class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap {{ $categoria === 'todas' ? 'bg-slate-900 text-white shadow-sm' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50' }}">
-            Todos los Eventos ({{ number_format($kpis['total']) }})
+            Todos ({{ number_format($kpis['total']) }})
+        </a>
+        <a href="{{ route('auditoria', ['categoria' => 'cancelaciones']) }}"
+           class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 {{ $categoria === 'cancelaciones' ? 'bg-rose-600 text-white shadow-sm' : 'bg-white text-rose-700 border border-rose-200 hover:bg-rose-50' }}">
+            <span class="w-2 h-2 rounded-full {{ $categoria === 'cancelaciones' ? 'bg-white' : 'bg-rose-500' }}"></span>
+            Cancelaciones ({{ number_format($kpis['cancelaciones'] ?? 0) }})
+        </a>
+        <a href="{{ route('auditoria', ['categoria' => 'reprogramaciones']) }}"
+           class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 {{ $categoria === 'reprogramaciones' ? 'bg-amber-600 text-white shadow-sm' : 'bg-white text-amber-800 border border-amber-200 hover:bg-amber-50' }}">
+            <span class="w-2 h-2 rounded-full {{ $categoria === 'reprogramaciones' ? 'bg-white' : 'bg-amber-500' }}"></span>
+            Reprogramaciones ({{ number_format($kpis['reprogramaciones'] ?? 0) }})
+        </a>
+        <a href="{{ route('auditoria', ['categoria' => 'inasistencias']) }}"
+           class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 {{ $categoria === 'inasistencias' ? 'bg-orange-600 text-white shadow-sm' : 'bg-white text-orange-700 border border-orange-200 hover:bg-orange-50' }}">
+            Inasistencias ({{ number_format($kpis['inasistencias'] ?? 0) }})
+        </a>
+        <a href="{{ route('auditoria', ['categoria' => 'clinica']) }}"
+           class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 {{ $categoria === 'clinica' ? 'bg-sky-600 text-white shadow-sm' : 'bg-white text-sky-700 border border-sky-200 hover:bg-sky-50' }}">
+            Actividad Clínica ({{ number_format($kpis['clinicos']) }})
         </a>
         <a href="{{ route('auditoria', ['categoria' => 'entradas']) }}"
            class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 {{ $categoria === 'entradas' ? 'bg-emerald-600 text-white shadow-sm' : 'bg-white text-emerald-700 border border-emerald-200 hover:bg-emerald-50' }}">
             <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-            Quién Entra (Login: {{ number_format($kpis['logins']) }})
+            Login ({{ number_format($kpis['logins']) }})
         </a>
         <a href="{{ route('auditoria', ['categoria' => 'salidas']) }}"
            class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 {{ $categoria === 'salidas' ? 'bg-blue-600 text-white shadow-sm' : 'bg-white text-blue-700 border border-blue-200 hover:bg-blue-50' }}">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7"/></svg>
-            Quién Sale (Logout: {{ number_format($kpis['logouts']) }})
+            Logout ({{ number_format($kpis['logouts']) }})
         </a>
         <a href="{{ route('auditoria', ['categoria' => 'fallidos']) }}"
-           class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 {{ $categoria === 'fallidos' ? 'bg-rose-600 text-white shadow-sm' : 'bg-white text-rose-700 border border-rose-200 hover:bg-rose-50' }}">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01"/></svg>
+           class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 {{ $categoria === 'fallidos' ? 'bg-rose-700 text-white shadow-sm' : 'bg-white text-rose-700 border border-rose-200 hover:bg-rose-50' }}">
             Intentos Fallidos ({{ number_format($kpis['fallidos']) }})
-        </a>
-        <a href="{{ route('auditoria', ['categoria' => 'clinica']) }}"
-           class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 {{ $categoria === 'clinica' ? 'bg-sky-600 text-white shadow-sm' : 'bg-white text-sky-700 border border-sky-200 hover:bg-sky-50' }}">
-            Actividad Clínica (Citas)
         </a>
         <a href="{{ route('auditoria', ['categoria' => 'admin']) }}"
            class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 {{ $categoria === 'admin' ? 'bg-purple-600 text-white shadow-sm' : 'bg-white text-purple-700 border border-purple-200 hover:bg-purple-50' }}">
-            Horarios y Usuarios
+            Horarios, Médicos y Usuarios
         </a>
     </div>
 
@@ -246,13 +258,21 @@
                             $isLogin = str_contains($accion, 'LOGIN') && !str_contains($accion, 'FALLIDO');
                             $isLogout = str_contains($accion, 'LOGOUT');
                             $isFallido = str_contains($accion, 'FALLIDO') || str_contains($accion, 'DENEGADO');
+                            $isCancelacion = str_contains($accion, 'CANCELAR');
+                            $isReprogramacion = str_contains($accion, 'REPROGRAMAR');
+                            $isInasistencia = str_contains($accion, 'INASISTENCIA');
+                            $isAtendida = str_contains($accion, 'ATENDIDA');
                             $isPassword = str_contains($accion, 'PASSWORD');
-                            $isClinica = str_contains($accion, 'CITA') || str_contains($accion, 'PACIENTE') || str_contains($accion, 'ATENDIDA') || str_contains($accion, 'EXPEDIENTE') || str_contains($accion, 'INASISTENCIA');
+                            $isClinica = str_contains($accion, 'CITA') || str_contains($accion, 'PACIENTE') || str_contains($accion, 'EXPEDIENTE');
 
                             $colorBadge = match(true) {
                                 $isLogin => 'bg-emerald-50 text-emerald-800 border-emerald-300 font-bold',
                                 $isLogout => 'bg-blue-50 text-blue-800 border-blue-200 font-bold',
-                                $isFallido => 'bg-rose-50 text-rose-800 border-rose-300 font-extrabold',
+                                $isFallido => 'bg-rose-100 text-rose-800 border-rose-300 font-extrabold',
+                                $isCancelacion => 'bg-rose-50 text-rose-700 border-rose-300 font-bold',
+                                $isReprogramacion => 'bg-amber-50 text-amber-800 border-amber-300 font-bold',
+                                $isInasistencia => 'bg-orange-50 text-orange-800 border-orange-300 font-bold',
+                                $isAtendida => 'bg-emerald-50 text-emerald-700 border-emerald-200 font-semibold',
                                 $isPassword => 'bg-purple-50 text-purple-800 border-purple-200 font-bold',
                                 $isClinica => 'bg-sky-50 text-sky-800 border-sky-200 font-semibold',
                                 default => 'bg-slate-100 text-slate-700 border-slate-200 font-medium',
@@ -367,12 +387,15 @@
                                 @if($aud->detalle)
                                     <button type="button"
                                             data-payload="{{ json_encode($aud->detalle, JSON_UNESCAPED_UNICODE) }}"
+                                            data-accion="{{ $aud->accion }}"
+                                            data-fecha="{{ $fechaLocal->format('d/m/Y H:i:s') }}"
+                                            data-operador="{{ $aud->usuario?->nombre_usuario ?? ($detalle['identificador'] ?? 'Sistema / Anónimo') }}"
                                             @click="
                                                 modalDetalle = true;
                                                 detallePayload = JSON.parse($el.dataset.payload);
-                                                detalleAccion = @js($aud->accion);
-                                                detalleFecha = @js($fechaLocal->format('d/m/Y H:i:s'));
-                                                detalleOperador = @js($aud->usuario?->nombre_usuario ?? ($detalle['identificador'] ?? 'Sistema / Anónimo'));
+                                                detalleAccion = $el.dataset.accion;
+                                                detalleFecha = $el.dataset.fecha;
+                                                detalleOperador = $el.dataset.operador;
                                             "
                                             class="px-2.5 py-1 rounded-lg border border-slate-200 hover:border-[#0284C7] hover:text-[#0284C7] bg-white text-slate-600 text-[11px] font-semibold transition-colors">
                                         Ver JSON

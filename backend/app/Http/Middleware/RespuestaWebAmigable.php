@@ -27,7 +27,15 @@ class RespuestaWebAmigable
         $mensaje = is_array($datos) ? ($datos['message'] ?? null) : null;
 
         if ($response->isSuccessful()) {
-            return back()->with('status', $mensaje ?: 'Operación realizada correctamente.');
+            $candidato = (is_array($datos) ? ($datos['redirect_to'] ?? null) : null)
+                ?? $request->input('redirect_to');
+            $candidato = is_string($candidato) ? trim($candidato) : null;
+            $destino = ($candidato !== null && str_starts_with($candidato, '/') && ! str_starts_with($candidato, '//'))
+                ? $candidato
+                : null;
+
+            return ($destino ? redirect($destino) : back())
+                ->with('status', $mensaje ?: 'Operación realizada correctamente.');
         }
 
         $redireccion = back()->withInput($request->except(['password', '_token']));

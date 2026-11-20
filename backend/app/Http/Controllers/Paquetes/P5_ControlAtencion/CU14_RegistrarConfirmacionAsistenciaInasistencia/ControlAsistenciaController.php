@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Paquetes\P5_ControlAtencion\CU14_RegistrarConfirm
 use App\Http\Controllers\Controller;
 use App\Services\Paquetes\P5_ControlAtencion\ControlAsistenciaService;
 use App\Traits\ApiResponse;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -40,10 +41,15 @@ class ControlAsistenciaController extends Controller
     public function registrarLlegada(Request $request, int $id): JsonResponse
     {
         try {
-            $idUsuario = (int) ($request->user()?->id_usuario ?? $request->header('X-User-Id') ?? 1);
-            $cita = $this->asistenciaService->registrarLlegada($id, $idUsuario);
+            $validated = $request->validate([
+                'hora_llegada' => ['nullable', 'regex:/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/'],
+            ]);
 
-            return $this->successResponse($cita, 'Llegada física del paciente registrada con éxito en sala de espera.');
+            $idUsuario = (int) ($request->user()?->id_usuario ?? $request->header('X-User-Id') ?? 1);
+            $cita = $this->asistenciaService->registrarLlegada($id, $idUsuario, $validated['hora_llegada'] ?? null);
+            $horaStr = Carbon::parse($cita->fecha_hora_llegada)->timezone('America/La_Paz')->format('H:i');
+
+            return $this->successResponse($cita, "Llegada del paciente registrada a las {$horaStr} en sala de espera.");
         } catch (ValidationException $e) {
             return $this->validationErrorResponse($e->errors());
         } catch (\Throwable $e) {

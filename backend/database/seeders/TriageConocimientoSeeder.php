@@ -32,7 +32,7 @@ class TriageConocimientoSeeder extends Seeder
 
     /**
      * Pobla de forma idempotente evaluaciones históricas y alertas rojas realistas
-     * para demostración del Panel de Monitoreo y Triage Inteligente.
+     * para demostración del Panel de Monitoreo, Derivación Manual y Triage Inteligente.
      */
     private function cargarHistorialYAlertasDemo(VectorMathService $vectorMath): int
     {
@@ -63,7 +63,7 @@ class TriageConocimientoSeeder extends Seeder
         };
 
         $casos = [
-            // 2 Alertas Rojas activas pendientes (para visibilidad inmediata en el monitor)
+            // 5 Alertas Rojas activas pendientes (distintos protocolos clínicos para probar derivación manual)
             [
                 'paciente_idx' => 0,
                 'esp' => 'Cardiología',
@@ -88,7 +88,43 @@ class TriageConocimientoSeeder extends Seeder
                 'atendida' => false,
                 'minutos_atras' => 38,
             ],
-            // Evaluaciones previas (incluye alertas rojas ya atendidas y casos prioritarios/normales)
+            [
+                'paciente_idx' => 2,
+                'esp' => 'Ginecología',
+                'sintomas' => 'Estoy embarazada de 7 meses y presento sangrado abundante con dolor abdominal fuerte desde hace 30 minutos',
+                'urgencia' => 'EMERGENCIA',
+                'es_emergencia' => true,
+                'palabras' => ['sangrado abundante', 'sangrado en el embarazo', 'embarazo + sangrado'],
+                'afinidad' => 97.2,
+                'explicacion' => 'ATENCIÓN PRIORITARIA: Compromiso obstétrico urgente detectado. Se activó protocolo de urgencia obstétrica 24/7 y se sugiere Ginecología y Obstetricia (97.2% de afinidad).',
+                'atendida' => false,
+                'minutos_atras' => 9,
+            ],
+            [
+                'paciente_idx' => 3,
+                'esp' => 'Medicina Interna',
+                'sintomas' => 'Tengo reacción alérgica severa con hinchazón de garganta, lengua hinchada y me cuesta mucho respirar tras tomar un medicamento',
+                'urgencia' => 'EMERGENCIA',
+                'es_emergencia' => true,
+                'palabras' => ['reaccion alergica severa', 'hinchazon de garganta', 'lengua hinchada', 'me cuesta mucho respirar'],
+                'afinidad' => 96.8,
+                'explicacion' => 'ATENCIÓN PRIORITARIA: Posible cuadro anafiláctico con compromiso de vía aérea. Requiere atención inmediata en Box de Shock y valoración por Medicina Interna (96.8% de afinidad).',
+                'atendida' => false,
+                'minutos_atras' => 22,
+            ],
+            [
+                'paciente_idx' => 4,
+                'esp' => 'Traumatología',
+                'sintomas' => 'Sufrió golpe fuerte en la cabeza por caída de escaleras, perdió el conocimiento brevemente y presenta fractura expuesta en el antebrazo',
+                'urgencia' => 'EMERGENCIA',
+                'es_emergencia' => true,
+                'palabras' => ['golpe fuerte en la cabeza', 'perdio el conocimiento', 'fractura expuesta'],
+                'afinidad' => 95.9,
+                'explicacion' => 'ATENCIÓN PRIORITARIA: Politraumatismo con pérdida de conciencia y fractura expuesta. Requiere inmovilización y cirugía de urgencia en Traumatología y Ortopedia (95.9% de afinidad).',
+                'atendida' => false,
+                'minutos_atras' => 51,
+            ],
+            // Evaluaciones previas (incluye alertas rojas ya atendidas con su derivación manual y casos prioritarios/normales)
             [
                 'paciente_idx' => 2,
                 'esp' => 'Pediatría',
@@ -124,6 +160,11 @@ class TriageConocimientoSeeder extends Seeder
                 'explicacion' => 'ATENCIÓN PRIORITARIA: Se detectó falta de aire súbita asociada a palpitaciones. Alerta atendida oportunamente por el equipo de guardia.',
                 'atendida' => true,
                 'minutos_atras' => 2890,
+                'resolucion_manual' => [
+                    'tipo_derivacion' => 'DERIVADO_URGENCIAS',
+                    'etiqueta_derivacion' => ConsultaTriage::ACCIONES_DERIVACION['DERIVADO_URGENCIAS'],
+                    'observacion' => 'Paciente ingresó a Box Shock 01 para electrocardiograma y control hipertensivo.',
+                ],
             ],
             [
                 'paciente_idx' => 1,
@@ -160,6 +201,11 @@ class TriageConocimientoSeeder extends Seeder
                 'explicacion' => 'ATENCIÓN PRIORITARIA: Síncope y dolor opresivo en el pecho. Paciente estabilizado en sala de shock tras despacho de Alerta Roja.',
                 'atendida' => true,
                 'minutos_atras' => 7200,
+                'resolucion_manual' => [
+                    'tipo_derivacion' => 'AMBULANCIA_DESPACHADA',
+                    'etiqueta_derivacion' => ConsultaTriage::ACCIONES_DERIVACION['AMBULANCIA_DESPACHADA'],
+                    'observacion' => 'Unidad móvil despachada al domicilio; paciente estabilizado e internado en observación.',
+                ],
             ],
         ];
 
@@ -173,7 +219,31 @@ class TriageConocimientoSeeder extends Seeder
             $paciente = $pacientes[$caso['paciente_idx'] % $pacientes->count()];
             $esp = $buscarEsp($caso['esp']);
             $med = $buscarMedParaEsp((int) $esp->id_especialidad);
-            $fechaRegistro = now()->subMinutes($caso['minutos_atras']);
+            $fechaRegistro = now('America/La_Paz')->subMinutes($caso['minutos_atras']);
+
+            $candidato = [
+                'medico' => [
+                    'id_medico' => $med->id_medico,
+                    'nombre_completo' => $med->nombre_completo,
+                ],
+                'especialidad' => [
+                    'id_especialidad' => $esp->id_especialidad,
+                    'nombre_especialidad' => $esp->nombre_especialidad,
+                ],
+                'porcentaje_afinidad' => $caso['afinidad'],
+            ];
+
+            $recomendacionesPayload = [$candidato];
+            if ($caso['es_emergencia'] && $caso['atendida'] && isset($caso['resolucion_manual'])) {
+                $recomendacionesPayload = [
+                    'candidatos' => [$candidato],
+                    'resolucion_manual' => array_merge($caso['resolucion_manual'], [
+                        'id_medico_asignado' => $med->id_medico,
+                        'medico_asignado' => $med->nombre_completo,
+                        'fecha_resolucion' => $fechaRegistro->copy()->addMinutes(6)->format('d/m/Y H:i'),
+                    ]),
+                ];
+            }
 
             $registro = ConsultaTriage::create([
                 'id_usuario' => $adminId,
@@ -188,17 +258,7 @@ class TriageConocimientoSeeder extends Seeder
                 'id_medico_recomendado' => $med->id_medico,
                 'puntaje_afinidad' => $caso['afinidad'],
                 'explicacion_clinica' => $caso['explicacion'],
-                'recomendaciones_json' => [[
-                    'medico' => [
-                        'id_medico' => $med->id_medico,
-                        'nombre_completo' => $med->nombre_completo,
-                    ],
-                    'especialidad' => [
-                        'id_especialidad' => $esp->id_especialidad,
-                        'nombre_especialidad' => $esp->nombre_especialidad,
-                    ],
-                    'porcentaje_afinidad' => $caso['afinidad'],
-                ]],
+                'recomendaciones_json' => $recomendacionesPayload,
                 'alerta_atendida' => $caso['atendida'],
                 'id_usuario_atendio' => ($caso['es_emergencia'] && $caso['atendida']) ? $adminId : null,
                 'fecha_atencion_alerta' => ($caso['es_emergencia'] && $caso['atendida'])

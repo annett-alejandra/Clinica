@@ -249,6 +249,7 @@ class TriageInteligenteService
             return $alertas->map(function (ConsultaTriage $a): array {
                 return [
                     'id_triage' => $a->id_triage,
+                    'id_paciente' => $a->id_paciente,
                     'paciente_nombre' => $a->paciente?->nombre_completo
                         ?? $a->usuario?->nombreVisible()
                         ?? 'Visitante / Paciente en Portal',
@@ -256,7 +257,9 @@ class TriageInteligenteService
                     'paciente_telefono' => $a->paciente?->telefono,
                     'sintomas_texto' => $a->sintomas_texto,
                     'palabras_detectadas' => $a->palabras_emergencia_detectadas ?? [],
+                    'id_especialidad_sugerida' => $a->id_especialidad_recomendada,
                     'especialidad_sugerida' => $a->especialidadRecomendada?->nombre_especialidad ?? 'Urgencias / Cardiología',
+                    'id_medico_sugerido' => $a->id_medico_recomendado,
                     'medico_sugerido' => $a->medicoRecomendado?->nombre_completo,
                     'puntaje_afinidad' => $a->puntaje_afinidad,
                     'fecha_registro' => $a->fecha_registro
@@ -275,18 +278,57 @@ class TriageInteligenteService
     }
 
     /**
-     * Marca una alerta roja de triage como atendida / despachada por un Administrador o Recepcionista.
+     * Marca una alerta roja de triage como atendida / despachada y registra la derivación manual.
      */
-    public function marcarAlertaAtendida(int $idTriage, int $idUsuario): ?ConsultaTriage
-    {
+    public function marcarAlertaAtendida(
+        int $idTriage,
+        int $idUsuario,
+        ?string $tipoDerivacion = null,
+        ?int $idMedicoAsignado = null,
+        ?string $observacion = null
+    ): ?ConsultaTriage {
         if (! $this->tablaTriageDisponible()) {
             return null;
         }
 
         $consulta = ConsultaTriage::findOrFail($idTriage);
+        $tipoFinal = array_key_exists((string) $tipoDerivacion, ConsultaTriage::ACCIONES_DERIVACION)
+            ? (string) $tipoDerivacion
+            : 'DERIVADO_URGENCIAS';
+        $etiqueta = ConsultaTriage::ACCIONES_DERIVACION[$tipoFinal];
+
+        $medicoAsignado = $idMedicoAsignado
+            ? Medico::find($idMedicoAsignado)
+            : ($consulta->id_medico_recomendado ? Medico::find($consulta->id_medico_recomendado) : null);
+
+        if ($idMedicoAsignado && $medicoAsignado) {
+            $consulta->id_medico_recomendado = $medicoAsignado->id_medico;
+        }
+
+        $actual = $consulta->recomendaciones_json ?? [];
+        $candidatos = (is_array($actual) && array_key_exists('candidatos', $actual))
+            ? $actual['candidatos']
+            : (is_array($actual) ? $actual : []);
+
+        $observacionFinal = trim((string) $observacion) !== ''
+            ? trim((string) $observacion)
+            : 'Alerta gestionada y cerrada manualmente por personal operativo.';
+
+        $consulta->recomendaciones_json = [
+            'candidatos' => $candidatos,
+            'resolucion_manual' => [
+                'tipo_derivacion' => $tipoFinal,
+                'etiqueta_derivacion' => $etiqueta,
+                'id_medico_asignado' => $medicoAsignado?->id_medico,
+                'medico_asignado' => $medicoAsignado?->nombre_completo,
+                'observacion' => $observacionFinal,
+                'fecha_resolucion' => now('America/La_Paz')->format('d/m/Y H:i'),
+            ],
+        ];
+
         $consulta->alerta_atendida = true;
         $consulta->id_usuario_atendio = $idUsuario;
-        $consulta->fecha_atencion_alerta = now();
+        $consulta->fecha_atencion_alerta = now('America/La_Paz');
         $consulta->save();
 
         AuditService::registrar(
@@ -298,6 +340,10 @@ class TriageInteligenteService
                 'nivel_urgencia' => $consulta->nivel_urgencia,
                 'id_paciente' => $consulta->id_paciente,
                 'palabras_detectadas' => $consulta->palabras_emergencia_detectadas,
+                'tipo_derivacion' => $tipoFinal,
+                'etiqueta_derivacion' => $etiqueta,
+                'medico_asignado' => $medicoAsignado?->nombre_completo,
+                'observacion' => $observacionFinal,
             ]
         );
 

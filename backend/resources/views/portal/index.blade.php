@@ -507,7 +507,7 @@
                                             </span>
                                         @elseif ((int) $cita->id_estado_cita === 2)
                                             <span class="px-3 py-1 rounded-full text-xs font-semibold border bg-sky-50 text-sky-700 border-sky-200">
-                                                {{ $cita->fecha_hora_llegada ? 'En Sala de Espera' : 'Confirmada' }}
+                                                {{ $cita->fecha_hora_llegada ? 'En Sala · ' . \Illuminate\Support\Carbon::parse($cita->fecha_hora_llegada)->timezone('America/La_Paz')->format('H:i') : 'Confirmada' }}
                                             </span>
                                         @else
                                             <span class="px-3 py-1 rounded-full text-xs font-semibold border bg-emerald-50 text-emerald-700 border-emerald-200">
